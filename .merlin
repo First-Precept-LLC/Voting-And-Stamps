@@ -1,0 +1,46 @@
+####{BSB GENERATED: NO EDIT
+FLG -ppx "C:\Users\dania\Documents\GitHub\vulcan-next\node_modules\rescript\win32\bsc.exe -as-ppx "
+S C:\Users\dania\Documents\GitHub\vulcan-next\node_modules\rescript\lib\ocaml
+B C:\Users\dania\Documents\GitHub\vulcan-next\node_modules\rescript\lib\ocaml
+FLG -w +a-4-9-20-40-41-42-50-61-102
+S C:\Users\dania\Documents\GitHub\vulcan-next\node_modules\rationale\lib\ocaml
+B C:\Users\dania\Documents\GitHub\vulcan-next\node_modules\rationale\lib\ocaml
+S C:\Users\dania\Documents\GitHub\vulcan-next\node_modules\@glennsl\rescript-jest\lib\ocaml
+B C:\Users\dania\Documents\GitHub\vulcan-next\node_modules\@glennsl\rescript-jest\lib\ocaml
+S C:\Users\dania\Documents\GitHub\vulcan-next\node_modules\@glennsl\bs-json\lib\ocaml
+B C:\Users\dania\Documents\GitHub\vulcan-next\node_modules\@glennsl\bs-json\lib\ocaml
+S src\lib\prediction-analysis\__tests__\utility
+B lib\bs\src\lib\prediction-analysis\__tests__\utility
+S src\lib\prediction-analysis\__tests__\Measures
+B lib\bs\src\lib\prediction-analysis\__tests__\Measures
+S src\lib\prediction-analysis\src\Utility
+B lib\bs\src\lib\prediction-analysis\src\Utility
+S src\lib\prediction-analysis\src\ScoringDataStructures
+B lib\bs\src\lib\prediction-analysis\src\ScoringDataStructures
+S src\lib\prediction-analysis\src\MeasureStrategies
+B lib\bs\src\lib\prediction-analysis\src\MeasureStrategies
+S src\lib\prediction-analysis\src\Measures
+B lib\bs\src\lib\prediction-analysis\src\Measures
+S src\lib\prediction-analysis\src\Measurement
+B lib\bs\src\lib\prediction-analysis\src\Measurement
+S src\lib\prediction-analysis\src\JsExport
+B lib\bs\src\lib\prediction-analysis\src\JsExport
+S src\lib\prediction-analysis\src\Common
+B lib\bs\src\lib\prediction-analysis\src\Common
+S src\lib\prediction-analysis\node_modules\rationale\__tests__
+B lib\bs\src\lib\prediction-analysis\node_modules\rationale\__tests__
+S src\lib\prediction-analysis\node_modules\rationale\src
+B lib\bs\src\lib\prediction-analysis\node_modules\rationale\src
+S src\lib\prediction-analysis\node_modules\rationale\examples
+B lib\bs\src\lib\prediction-analysis\node_modules\rationale\examples
+S src\lib\prediction-analysis\node_modules\bs-platform\scripts
+B lib\bs\src\lib\prediction-analysis\node_modules\bs-platform\scripts
+S src\lib\prediction-analysis\node_modules\bs-platform\lib\ocaml
+B lib\bs\src\lib\prediction-analysis\node_modules\bs-platform\lib\ocaml
+S src\lib\prediction-analysis\node_modules\bs-platform\lib\4.06.1
+B lib\bs\src\lib\prediction-analysis\node_modules\bs-platform\lib\4.06.1
+S src\lib\prediction-analysis\node_modules\@glennsl\bs-json\src
+B lib\bs\src\lib\prediction-analysis\node_modules\@glennsl\bs-json\src
+S src\lib\prediction-analysis\node_modules\@glennsl\bs-jest\src
+B lib\bs\src\lib\prediction-analysis\node_modules\@glennsl\bs-jest\src
+####BSB GENERATED: NO EDIT}

@@ -107,15 +107,14 @@ class Utilities {
         return 0.0;
     }
     //A series of databse functions follow. Modify based on db implementation.
-    static async update_vote(userwallet, user_name, voted_for, voted_for_transaction, voted_for_proposal, vote_quantity, collection) {
+    static async update_vote(userwallet, user_name, voted_for, voted_for_target, vote_quantity, collection) {
 		    let targetTable = Utilities.UserVotes;
         let insertedObj = {
             user: userwallet,
             sourceName: user_name,
             votedFor: voted_for,
-            targetTransaction: voted_for_transaction,
+            target: voted_for_target,
             votecount: vote_quantity,
-            targetProposal: voted_for_proposal,
             graph: collection			
         };
         await targetTable.insertOne(insertedObj);
@@ -481,3 +480,176 @@ class StampsModule {
     } 
 
 }
+
+/**
+ * Example graphQL schema and resolvers generated using Vulcan declarative approach
+ * http://vulcanjs.org/
+ */
+ const vulcanRawSchema = buildApolloSchema(models);
+ console.log(vulcanRawSchema);
+ const vulcanSchema = makeExecutableSchema(vulcanRawSchema);
+ 
+ /*function normal(mu, sigma, nsamples){
+   if(!nsamples) nsamples = 6
+   if(!sigma) sigma = 1
+   if(!mu) mu=0
+ 
+   var run_total = 0
+   for(var i=0 ; i<nsamples ; i++){
+      run_total += Math.random()
+   }
+ 
+   return sigma*(run_total - nsamples/2)/(nsamples/2) + mu
+ }*/
+ 
+ /**
+  * Example custom Apollo server, written by hand
+  */
+ const typeDefs = gql`
+   type Query {
+     getUservotes(graph: String): [UserVote]
+     getVotesByTarget(targets: [String], collection: String): [Int]
+     updateVote(stampType: String, fromId: String, fromName: String, toId: String, toTransaction: String, toProposal: String, collection: String, negative: Boolean): Boolean
+     updateVoteForTransaction(stampType: String, fromId: String, fromName: String, toIdSource: String, toIdDest: String, toTransaction: String, toCollection: String, negative: Boolean): Boolean
+     updateVoteForProposal(stampType: String, proposer: String, proposerName: String, toIdSource: String, toProposal: String, collection: String, negative: Boolean): Boolean
+     getUserStamps(user: String, collection: String): Float
+     addNewTransaction(transactionId: String, amountSent: Int, source: String, dest: String, description: String): Boolean
+     addNewProposal(proposalId: String, proposer: String, description: String, resolvingUsers: String): Boolean
+     getTransactionPage(pageNumber: Int): [Transaction]
+     getProposalPage(pageNumber: Int): [Proposal]
+     getProposalScore(proposals: [String]): [Float]
+     getUserScore(user: String): Float
+     saveVariable(user: String, proposalId: String, name: String, type: String, value: String) : Boolean
+     calculateResult(user: String, proposalId: String, expression: String, collection: String): Float
+     scoreUserByTag(user: String, collection: String, tag: String): Float
+   }
+ 
+   type UserVote {
+     _id: ID!
+     user: String
+     sourceName: String
+     votedFor: String
+     targetTransaction: String
+     voteCount: Int
+     targetProposal: String
+   }
+    `;
+ const resolvers = {
+   Query: {
+     getUservotes: async (obj, args, context, info) => {
+       const db = mongoose.connection;
+       const collection = db.collection("uservotes");
+        const filteredDocs = await collection.find({graph: args.graph}).toArray();
+       console.log(filteredDocs);
+       return filteredDocs;
+    },
+     
+     getVotesByTarget: async (obj, args, context, info) => {
+       const stamps = new StampsModule();
+       await stamps.init();
+       
+       let resultData = [] as any;
+       for (let i = 0; i < args.transactions.length; i++) {
+         resultData.push(await stamps.utils.get_votes_by_transaction(args.targets[i], args.collection));
+       }
+       return resultData;
+     },
+ 
+     getVotesByProposal: async (obj, args, context, info) => {
+       const stamps = new StampsModule();
+       await stamps.init();
+       
+       let resultData = [] as any;
+       for (let i = 0; i < args.proposals.length; i++) {
+         resultData.push(await stamps.utils.get_votes_by_proposal(args.proposals[i], args.collection));
+         console.log(resultData);
+       }
+       return resultData;
+     },
+     
+     updateVote: async (obj, args, context, info) => {
+       const stamps = new StampsModule();
+       await stamps.init();
+       if (! args.toTransaction) {
+           args.toTransaction = null;
+       }
+       if (! args.toProposal) {
+         args.toProposal = null;
+       }
+       const success = await stamps.update_vote(args.stampType, args.fromId, args.fromName, args.toId, args.toTransaction, args.toProposal, args.collection, args.negative); //req.query.negative is true in the case of a downvote, and false otherwise.
+         return success;
+     },
+     
+     updateVoteForTarget: async (obj, args, context, info) => {
+       const stamps = new StampsModule();
+       await stamps.init();
+       const success = await stamps.update_vote(args.stampType, args.fromId, args.fromName, args.toId, args.toTarget, args.collection, args.negative);
+         return success;
+     },
+     
+     updateVoteForProposal: async (obj, args, context, info) => {
+       const stamps = new StampsModule();
+       await stamps.init();
+       const success = await stamps.update_vote(args.stampType, args.proposer, args.proposerName, args.toIdSource, null, args.toProposal, args.collection, args.negative);
+         return success;
+     },
+     
+     getUserStamps: async (obj, args, context, info) => {
+       const stamps = new StampsModule();
+       await stamps.init();
+       let resultData = await stamps.get_user_stamps(args.user, args.collection);
+       return resultData;
+     },
+     
+
+     
+    
+ }
+ };
+ const customSchema = makeExecutableSchema({ typeDefs, resolvers });
+ // NOTE: schema stitching can cause a bad developer experience with errors
+ export const mergedSchema = mergeSchemas({ schemas: [vulcanSchema, customSchema] });
+ 
+ const mongoUri = process.env.MONGO_URI;
+ if (!mongoUri) throw new Error("MONGO_URI env variable is not defined");
+ 
+ // Define the server (using Express for easier middleware usage)
+ const server = new ApolloServer({
+   schema: mergedSchema,
+   context: ({ req }) => contextFromReq(req as Request),
+   introspection: process.env.NODE_ENV !== "production",
+   playground:
+     process.env.NODE_ENV !== "production"
+       ? {
+           settings: {
+             "request.credentials": "include",
+           },
+         }
+       : false,
+ });
+ 
+ const app = express();
+ 
+ app.set("trust proxy", true);
+ 
+ const gqlPath = "/api/graphql";
+ // setup cors
+ app.use(gqlPath, cors(corsOptions));
+ // init the db
+ app.use(gqlPath, mongoConnection(mongoUri));
+ 
+ server.applyMiddleware({ app, path: "/api/graphql" });
+ 
+ export default app;
+ 
+ export const config = {
+   api: {
+     bodyParser: false,
+   },
+ };
+ 
+ export const testServer = server;
+ 
+ // Seed in development
+ runSeed();
+ 

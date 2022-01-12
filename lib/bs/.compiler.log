@@ -1,0 +1,5 @@
+#Start(-559156674)
+File "C:\Users\dania\Documents\GitHub\vulcan-next\src\lib\prediction-analysis\node_modules\bs-platform\lib\ocaml\js_re.ml", line 200, characters 44-56:
+Warning 103: FFI warning: This attribute is deprecated, use @send instead.
+File "C:\Users\dania\Documents\GitHub\vulcan-next\src\lib\prediction-analysis\node_modules\bs-platform\lib\ocaml\js_re.ml", line 174, characters 53-65:
+Warning 103: FFI warning: This attribute is deprecated, use @send instead.

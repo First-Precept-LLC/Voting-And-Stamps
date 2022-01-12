@@ -1,0 +1,42 @@
+{
+  "name": "@foretold/cdf",
+  "version": "1.0.16",
+  "description": "Cumulative distribution functions",
+  "main": "dist/index.js",
+  "scripts": {
+    "parcel": "parcel build ./index.js --no-source-maps --no-autoinstall",
+    "test": "jest --watch",
+    "test:cv": "jest --coverage --forceExit",
+    "test:ci": "jest --forceExit"
+  },
+  "author": "Ozzie Gooen",
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "24.9.0"
+  },
+  "dependencies": {
+    "parcel-bundler": "1.12.3",
+    "pdfast": "0.2.0",
+    "lodash": "4.17.19"
+  },
+  "private": false,
+  "keywords": [
+    "foretold",
+    "cdf",
+    "javascript",
+    "prediction",
+    "trends"
+  ],
+  "jest": {
+    "restoreMocks": true,
+    "clearMocks": true,
+    "testEnvironment": "node",
+    "testPathIgnorePatterns": [
+      "/manuals/"
+    ],
+    "setupFiles": [
+      "./jest-globals.js"
+    ]
+  },
+  "gitHead": "e66d3be259e0958e0f8a4ff62ce0063fa9994381"
+}
