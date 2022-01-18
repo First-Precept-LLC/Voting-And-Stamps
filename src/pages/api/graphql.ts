@@ -227,8 +227,8 @@ class Utilities {
   }
 
   static async get_resolving_user_ids(target, targetType) {
-		let targetTable = Utilities.db.collection(targetType);
-    let targetProposal = (await targetTable.find({id: target}).toArray())[0]; //TODO: what identifier do we use?
+		let targetTable = Utilities.db.collection("contents");
+    let targetProposal = (await targetTable.find({id: target, contentType: targetType}).toArray())[0]; //TODO: what identifier do we use?
     if (! targetProposal.resolvingUsers) {
       return [];
     } else {
@@ -267,11 +267,8 @@ class Utilities {
 	}
 	
 	static async get_average_impact_by_user(userwallet) {
-    let contentTypes = await Utilities.get_content_types();
-    let user_content = [] as any;
-    for (let i = 0; i < contentTypes.length; i++) {
-      user_content = user_content.concat((await Utilities.db.collection(contentTypes[i]).find({creator: userwallet})).toArray());
-    }
+    let user_content = await Utilities.db.collection("contents").find({userId: userwallet}).toArray();
+    
 		let total = 0;
 		if (user_content.length < 1) {
 			return 0;
@@ -543,18 +540,14 @@ class StampsModule {
      getUservotes(graph: String): [UserVote]
      getVotesByTarget(targets: [String], collection: String): [Int]
      updateVote(stampType: String, fromId: String, fromName: String, toId: String, toTransaction: String, toProposal: String, collection: String, negative: Boolean): Boolean
-     updateVoteForTransaction(stampType: String, fromId: String, fromName: String, toIdSource: String, toIdDest: String, toTransaction: String, toCollection: String, negative: Boolean): Boolean
-     updateVoteForProposal(stampType: String, proposer: String, proposerName: String, toIdSource: String, toProposal: String, collection: String, negative: Boolean): Boolean
+     updateVoteForTarget(stampType: String, fromId: String, fromName: String, toId: String, toTarget: String, collection: String, negative: Boolean): Boolean
      getUserStamps(user: String, collection: String): Float
-     addNewTransaction(transactionId: String, amountSent: Int, source: String, dest: String, description: String): Boolean
-     addNewProposal(proposalId: String, proposer: String, description: String, resolvingUsers: String): Boolean
-     getTransactionPage(pageNumber: Int): [Transaction]
-     getProposalPage(pageNumber: Int): [Proposal]
-     getScore(targets: [String]): [Float]
+     getContentScore(targets: [String]): [Float]
      getUserScore(user: String): Float
      saveVariable(user: String, proposalId: String, name: String, type: String, value: String) : Boolean
      calculateResult(user: String, proposalId: String, expression: String, collection: String): Float
      scoreUserByTag(user: String, collection: String, tag: String): Float
+     getContentPage(first: Int, after: String): ContentConnection
    }
  
    type UserVote {
@@ -565,6 +558,24 @@ class StampsModule {
      targetTransaction: String
      voteCount: Int
      targetProposal: String
+   }
+
+
+   type ContentConnection {
+     edges: [ContentEdge]
+     pageInfo: PageInfo 
+   }
+
+   type ContentEdge {
+     node: Int
+     cursor: String
+   }
+
+   type PageInfo {
+     hasPreviousPage: Boolean
+     hasNextPage: Boolean
+     startCursor: String
+     endCursor: String
    }
     `;
  const resolvers = {
@@ -582,20 +593,8 @@ class StampsModule {
        await stamps.init();
        
        let resultData = [] as any;
-       for (let i = 0; i < args.transactions.length; i++) {
+       for (let i = 0; i < args.targets.length; i++) {
          resultData.push(await stamps.utils.get_votes_by_transaction(args.targets[i], args.collection));
-       }
-       return resultData;
-     },
- 
-     getVotesByProposal: async (obj, args, context, info) => {
-       const stamps = new StampsModule();
-       await stamps.init();
-       
-       let resultData = [] as any;
-       for (let i = 0; i < args.proposals.length; i++) {
-         resultData.push(await stamps.utils.get_votes_by_proposal(args.proposals[i], args.collection));
-         console.log(resultData);
        }
        return resultData;
      },
@@ -617,13 +616,6 @@ class StampsModule {
        const stamps = new StampsModule();
        await stamps.init();
        const success = await stamps.update_vote(args.stampType, args.fromId, args.fromName, args.toId, args.toTarget, args.collection, args.negative);
-         return success;
-     },
-     
-     updateVoteForProposal: async (obj, args, context, info) => {
-       const stamps = new StampsModule();
-       await stamps.init();
-       const success = await stamps.update_vote(args.stampType, args.proposer, args.proposerName, args.toIdSource, null, args.toProposal, args.collection, args.negative);
          return success;
      },
      
@@ -810,6 +802,57 @@ class StampsModule {
     }
     db.collection("users").findOneAndUpdate({user: args.user, tag: args.tag, collection: args.collection}, {$set: {user: args.user, tag: args.tag, collection: args.collection, score: finalScore}}, {upsert: true});
     return finalScore;
+  },
+  
+  getContentPage: async (obj, args, context, info) => {
+    let first = args.first;
+    let after = args.after;
+    let contentType = args.contentType;
+    const db = mongoose.connection;
+    let allContent = await db.collection("contents").find({contentType: contentType}).sort({createdAt: -1}).toArray();
+    let allEdges = allContent.map(function (item) { 
+      return {node: item.id, cursor: item.createdAt.toString()}
+    });
+
+
+    const applyCursorsToEdges = function(allEdges, after) {
+      let edges = allEdges;
+      let afterEdge = allEdges.filter(function(edge) { return edge.cursor == after})[0];
+      if (afterEdge) {
+        edges = edges.slice(edges.indexOf(afterEdge) + 1)
+      }
+      return edges;
+    }
+
+    const edgesToReturn = function(allEdges, first, after) {
+      let edges = applyCursorsToEdges(allEdges, after);
+      if(first){
+        if(first < 0) {
+          throw Error("First below zero!");
+        } else {
+          return edges.slice(0, first + 1);
+        }
+      }
+
+      return edges;
+
+    }
+
+    let finalEdges = edgesToReturn(allEdges, first, after);
+
+    return {
+
+      edges: finalEdges,
+
+      pageInfo: {
+        startCursor: finalEdges[0].cursor,
+        endCursor: finalEdges[finalEdges.length - 1].cursor,
+        hasPreviousPage: allEdges.indexOf(finalEdges[0]) > first,
+        hasNextPage: allEdges.indexOf(finalEdges[finalEdges.length - 1]) < allEdges.length - first
+      }
+    }
+
+
   }
     
  }
