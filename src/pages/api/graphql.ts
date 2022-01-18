@@ -811,7 +811,7 @@ class StampsModule {
     const db = mongoose.connection;
     let allContent = await db.collection("contents").find({contentType: contentType}).sort({createdAt: -1}).toArray();
     let allEdges = allContent.map(function (item) { 
-      return {node: item.id, cursor: item.createdAt.toString()}
+      return {node: item._id, cursor: item.createdAt.toString()}
     });
 
 
