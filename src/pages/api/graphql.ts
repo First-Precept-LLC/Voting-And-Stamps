@@ -547,7 +547,7 @@ class StampsModule {
      saveVariable(user: String, proposalId: String, name: String, type: String, value: String) : Boolean
      calculateResult(user: String, proposalId: String, expression: String, collection: String): Float
      scoreUserByTag(user: String, collection: String, tag: String): Float
-     getContentPage(first: Int, after: String): ContentConnection
+     getContentPage(first: Int, after: String, contentType: String): ContentConnection
    }
  
    type UserVote {
@@ -567,7 +567,7 @@ class StampsModule {
    }
 
    type ContentEdge {
-     node: Int
+     node: String
      cursor: String
    }
 
@@ -830,7 +830,7 @@ class StampsModule {
         if(first < 0) {
           throw Error("First below zero!");
         } else {
-          return edges.slice(0, first + 1);
+          return edges.slice(0, first);
         }
       }
 
