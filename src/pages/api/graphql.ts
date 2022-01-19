@@ -229,7 +229,7 @@ class Utilities {
 
   static async get_resolving_user_ids(target, targetType) {
 		let targetTable = Utilities.db.collection("contents");
-    let targetProposal = (await targetTable.find({id: target, contentType: targetType}).toArray())[0]; //TODO: what identifier do we use?
+    let targetProposal = (await targetTable.find({_id: target, contentType: targetType}).toArray())[0];
     if (! targetProposal.resolvingUsers) {
       return [];
     } else {
@@ -280,7 +280,6 @@ class Utilities {
 		return total/user_content.length;
 	}
 	
-	//TODO: maybe add page getters here.
 
 }
 
