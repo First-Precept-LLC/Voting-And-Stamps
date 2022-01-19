@@ -525,7 +525,7 @@ class StampsModule {
    type Query {
      getUservotes(graph: String): [UserVote]
      getVotesByTarget(targets: [String], collection: String): [Int]
-     updateVote(stampType: String, fromId: String, fromName: String, toId: String, toTransaction: String, toProposal: String, collection: String, negative: Boolean): Boolean
+     updateVote(stampType: String, fromId: String, fromName: String, toId: String, toTarget: String, targetType: String, collection: String, negative: Boolean): Boolean
      updateVoteForTarget(stampType: String, fromId: String, fromName: String, toId: String, toTarget: String, collection: String, negative: Boolean): Boolean
      getUserStamps(user: String, collection: String): Float
      getContentScore(targets: [String]): [Float]
@@ -594,7 +594,7 @@ class StampsModule {
        if (! args.toProposal) {
          args.toProposal = null;
        }
-       const success = await stamps.update_vote(args.stampType, args.fromId, args.fromName, args.toId, args.toTransaction, args.toProposal, args.collection, args.negative); //req.query.negative is true in the case of a downvote, and false otherwise.
+       const success = await stamps.update_vote(args.stampType, args.fromId, args.fromName, args.toId, args.toTarget, args.targetType, args.collection, args.negative); //req.query.negative is true in the case of a downvote, and false otherwise.
          return success;
      },
      
