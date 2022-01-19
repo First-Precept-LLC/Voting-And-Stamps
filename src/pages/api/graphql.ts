@@ -371,52 +371,52 @@ class StampsModule {
     }
 
     async calculate_stamps(collection) {
-        //set up and solve the system of linear equations
-        console.log("RECALCULATING STAMP SCORES");
-        let allUsers = [] as any;
-        for (let i = 0; i < this.graphs.length; i++) {
-            let users = await this.utils.get_users(this.graphs[i]);
-            allUsers = [...new Set([...allUsers, ...users])];
-        }
+      //set up and solve the system of linear equations
+      console.log("RECALCULATING STAMP SCORES");
+      let allUsers = [] as any;
+      for (let i = 0; i < this.graphs.length; i++) {
+          let users = await this.utils.get_users(this.graphs[i]);
+          allUsers = [...new Set([...allUsers, ...users])];
+      }
 
 
-		this.utils.users = allUsers;
-        await this.utils.update_ids_list();
+		  this.utils.users = allUsers;
+      await this.utils.update_ids_list();
 		
-		let user_count = this.utils.get_users(collection).length;
-		let targetIndex = this.utils.indices[collection];
+		  let user_count = this.utils.get_users(collection).length;
+		  let targetIndex = this.utils.indices[collection];
 
 
         
-        let users_matrix = Matrix.zeros(user_count, user_count);
+      let users_matrix = Matrix.zeros(user_count, user_count);
 
-        let votes = await this.utils.get_all_user_votes(collection);
+      let votes = await this.utils.get_all_user_votes(collection);
 		
 
-        for(let i = 0; i < votes.length; i++) {
-            let from_id = votes[i]['user']; //This may change depending on the database implementation and what objects returned from the database look like
-            let to_id = votes[i]['votedFor'];
-            let votes_for_user = votes[i]['votecount'];
-            let from_id_index = targetIndex[from_id];
-            let toi = targetIndex[to_id];
-            let total_votes_by_user = await this.utils.get_votes_by_user(from_id, collection);
-            if (total_votes_by_user != 0) {
-                let score = (this.user_karma * votes_for_user) / total_votes_by_user;
-                users_matrix.set(toi, from_id_index, users_matrix.get(toi, from_id_index) + score); 
-            }
-
+      for(let i = 0; i < votes.length; i++) {
+        let from_id = votes[i]['user']; //This may change depending on the database implementation and what objects returned from the database look like
+        let to_id = votes[i]['votedFor'];
+        let votes_for_user = votes[i]['votecount'];
+        let from_id_index = targetIndex[from_id];
+        let toi = targetIndex[to_id];
+        let total_votes_by_user = await this.utils.get_votes_by_user(from_id, collection);
+        if (total_votes_by_user != 0) {
+            let score = (this.user_karma * votes_for_user) / total_votes_by_user;
+            users_matrix.set(toi, from_id_index, users_matrix.get(toi, from_id_index) + score); 
         }
 
-        for (let i = 1; i < user_count; i++) {
-            users_matrix.set(i, i, -1.0);
-        }
+      }
 
-        users_matrix.set(0, 0, 1.0);
+      for (let i = 1; i < user_count; i++) {
+        users_matrix.set(i, i, -1.0);
+      }
 
-        let user_count_matrix = Matrix.zeros(user_count, 1);
-        user_count_matrix.set(0, 0, 1.0); //God has 1 karma
+      users_matrix.set(0, 0, 1.0);
+
+      let user_count_matrix = Matrix.zeros(user_count, 1);
+      user_count_matrix.set(0, 0, 1.0); //God has 1 karma
 	    this.utils.scores[collection] = solve(users_matrix, user_count_matrix).to1DArray();
-		console.log(this.utils.scores);		
+		  console.log(this.utils.scores);		
         //this.print_all_scores(collection);
         //done
     }
@@ -448,13 +448,13 @@ class StampsModule {
     }
 
     get_user_stamps(user, collection) {
-		if (!user) {
-			return 0;
-		}
-        let index = this.utils.index_dammit(user, collection);
-        console.log("get_user_stamps for " + String(user)+ ", index=" + String(index) + ", collection=" + collection);
-        let stamps = 0.0; //Maybe readd nonzero predicate when seed users are figured out?
-			  stamps = this.utils.scores[collection][index] * this.total_votes;
+		  if (!user) {
+			  return 0;
+		  }
+      let index = this.utils.index_dammit(user, collection);
+      console.log("get_user_stamps for " + String(user)+ ", index=" + String(index) + ", collection=" + collection);
+      let stamps = 0.0; //Maybe readd nonzero predicate when seed users are figured out?
+			stamps = this.utils.scores[collection][index] * this.total_votes;
 	
 
 			console.log(this.utils.scores[index]);
