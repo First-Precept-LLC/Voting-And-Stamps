@@ -670,19 +670,6 @@ class StampsModule {
       }
 
       let allRelevantVariables = await db.collection("variables").find({user: args.user, targetId: args.targetId}).toArray();
-
-      const getMeanStddev = function(lowerBound, upperBound) {
-        lowerBound = parseFloat(lowerBound);
-        upperBound = parseFloat(upperBound);
-        const mean = (lowerBound + upperBound)/2;
-        const stddev = (upperBound - mean)/1.645;
-        return [mean, stddev];
-      }
-
-      const getConfidenceInterval = function(mean, stddev) {
-        return [mean - 1.645 * stddev, mean + 1.645 * stddev];
-      }
-
       const matchVariable = function(str) {
         for (let i = 0; i < allRelevantVariables.length; i++){
           const possibleVar = allRelevantVariables[i]["name"];
