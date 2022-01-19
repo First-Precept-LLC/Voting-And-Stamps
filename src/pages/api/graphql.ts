@@ -76,6 +76,7 @@ class Utilities {
         Utilities.Resolutions = Utilities.db.collection("resolutions");
         Utilities.ProposalTags = Utilities.db.collection("proposaltags");
         Utilities.scores = {};
+        Utilities.indices = {};
     }
 
     static async clearVotes() {
@@ -86,7 +87,7 @@ class Utilities {
         if (Utilities.users) {
           Utilities.ids = Utilities.users.sort();
         }
-		console.log(Utilities.ids);
+		    console.log(Utilities.ids);
         let graphs = await Utilities.get_graphs()
         for(let i = 0; i < graphs.length; i++) {
             Utilities.indices[graphs[i]] = {0: 0};
@@ -126,7 +127,10 @@ class Utilities {
     static get_user_score(user, collection) {
         let userIndex = this.index_dammit(user, collection);
         if (userIndex) {
-          return Utilities.scores[collection][userIndex];
+          console.log(Utilities.scores);
+          let res = Utilities.scores[collection][userIndex];
+          console.log("Aha!");
+          return res;
         }
         return 0.0;
     }
@@ -142,6 +146,7 @@ class Utilities {
             votecount: vote_quantity,
             graph: collection			
         };
+        console.log(insertedObj);
         await targetTable.insertOne(insertedObj);
     }
 
@@ -382,15 +387,17 @@ class StampsModule {
 		  this.utils.users = allUsers;
       await this.utils.update_ids_list();
 		
-		  let user_count = this.utils.get_users(collection).length;
-		  let targetIndex = this.utils.indices[collection];
+
+      let targetIndex = this.utils.indices[collection];
+      let user_count = Object.keys(targetIndex).length - 1;
 
 
-        
+
       let users_matrix = Matrix.zeros(user_count, user_count);
 
-      let votes = await this.utils.get_all_user_votes(collection);
-		
+      let votes = await this.utils.get_all_user_votes(collection);		
+
+
 
       for(let i = 0; i < votes.length; i++) {
         let from_id = votes[i]['user']; //This may change depending on the database implementation and what objects returned from the database look like
@@ -401,8 +408,14 @@ class StampsModule {
         let total_votes_by_user = await this.utils.get_votes_by_user(from_id, collection);
         if (total_votes_by_user != 0) {
             let score = (this.user_karma * votes_for_user) / total_votes_by_user;
+            console.log(users_matrix);
+            console.log(toi);
+            console.log(from_id_index);
+            console.log(users_matrix.get(toi, from_id_index));
             users_matrix.set(toi, from_id_index, users_matrix.get(toi, from_id_index) + score); 
         }
+
+
 
       }
 
@@ -411,6 +424,7 @@ class StampsModule {
       }
 
       users_matrix.set(0, 0, 1.0);
+
 
       let user_count_matrix = Matrix.zeros(user_count, 1);
       user_count_matrix.set(0, 0, 1.0); //God has 1 karma
