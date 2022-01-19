@@ -72,9 +72,10 @@ class Utilities {
 
     static async init() {
         Utilities.UserVotes = Utilities.db.collection("uservotes");
-		/*Utilities.Models = Utilities.db.collection("models");
+		    Utilities.Models = Utilities.db.collection("models");
         Utilities.Resolutions = Utilities.db.collection("resolutions");
-        Utilities.ProposalTags = Utilities.db.collection("proposaltags");*/
+        Utilities.ProposalTags = Utilities.db.collection("proposaltags");
+        Utilities.scores = {};
     }
 
     static async clearVotes() {
@@ -125,7 +126,7 @@ class Utilities {
     static get_user_score(user, collection) {
         let userIndex = this.index_dammit(user, collection);
         if (userIndex) {
-          return Utilities.scores[userIndex];
+          return Utilities.scores[collection][userIndex];
         }
         return 0.0;
     }
@@ -414,7 +415,7 @@ class StampsModule {
 
         let user_count_matrix = Matrix.zeros(user_count, 1);
         user_count_matrix.set(0, 0, 1.0); //God has 1 karma
-	    this.utils.scores = solve(users_matrix, user_count_matrix).to1DArray();
+	    this.utils.scores[collection] = solve(users_matrix, user_count_matrix).to1DArray();
 		console.log(this.utils.scores);		
         //this.print_all_scores(collection);
         //done
@@ -453,27 +454,13 @@ class StampsModule {
         let index = this.utils.index_dammit(user, collection);
         console.log("get_user_stamps for " + String(user)+ ", index=" + String(index) + ", collection=" + collection);
         let stamps = 0.0; //Maybe readd nonzero predicate when seed users are figured out?
-		if (collection == "temperature") {
-	        stamps = this.utils.temperaturescores[index] * this.total_temperature_votes;
-		} else if (collection == "capital") {
-			stamps = this.utils.capitalscores[index] * this.total_capital_votes
-		} else {
-			stamps = this.utils.scores[index] * this.total_votes;
-		}
-		if (collection == "temperature") {
-			console.log(this.utils.temperaturescores[index]);
-		    console.log(this.utils.temperaturescores);
-            console.log(this.total_temperature_votes);
-		} else if (collection == "capital") {
-			console.log(this.utils.capitalscores[index]);
-		    console.log(this.utils.capitalscores);
-            console.log(this.total_capital_votes);
-		} else {
+			  stamps = this.utils.scores[collection][index] * this.total_votes;
+	
+
 			console.log(this.utils.scores[index]);
-		    console.log(this.utils.scores);
-            console.log(this.total_votes);
-		}
-        return stamps;
+		  console.log(this.utils.scores);
+      console.log(this.total_votes);
+      return stamps;
     }
 
     load_votes_from_csv(collection, filename="stamps.csv") {
