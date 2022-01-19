@@ -32,6 +32,15 @@ import {
       canCreate: ["members"]
 
     },
+
+    externalId: {
+        type: String,
+        optional: true,
+        canRead: ["guests"],
+        canCreate: ["members"]
+    },
+
+
     createdAt: {
       type: Date,
       optional: true,
