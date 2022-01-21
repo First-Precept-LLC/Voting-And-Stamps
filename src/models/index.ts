@@ -2,5 +2,7 @@
 // Please do not remove the User model, which is necessary for auth
 import { SampleModel } from "./sampleModel";
 import { User } from "./user";
-const models = [User, SampleModel];
+import {UserVote} from "./uservote.server";
+
+const models = [User, SampleModel, UserVote];
 export default models;
