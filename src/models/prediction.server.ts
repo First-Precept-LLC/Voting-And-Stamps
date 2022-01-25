@@ -21,6 +21,7 @@ import {
       type: String,
       optional: true,
       canRead: ["guests"],
+      canCreate: ["members"]
     },
     // userId is the _id of the owner of the document
     // Here, it guarantees that the user belongs to group "owners" for his own data
@@ -28,6 +29,7 @@ import {
       type: String,
       optional: true,
       canRead: ["guests"],
+      canCreate: ["members"]
     },
     createdAt: {
       type: Date,
@@ -36,29 +38,34 @@ import {
       onCreate: () => {
         return new Date();
       },
+      canCreate: ["members"]
     },
     user: {
       type: String,
       optional: true,
-      canRead: ["guests"]
+      canRead: ["guests"],
+      canCreate: ["members"]
     },
   
     contentId: {
       type: String,
       optional: true,
-      canRead: ["guests"]
+      canRead: ["guests"],
+      canCreate: ["members"]
     },
 
     collection: {
         type: String,
         optional: true,
-        canRead: ["guests"]
+        canRead: ["guests"],
+        canCreate: ["members"]
     },
 
     score: {
         type: Number,
         optional: true,
-        canRead: ["guests"]
+        canRead: ["guests"],
+        canCreate: ["members"]
     }
   };
 
@@ -70,7 +77,7 @@ import {
     },
     schema,
     permissions: {
-      canCreate: ["members", "owners, admins"], 
+      canCreate: ["members"], 
       canUpdate: ["owners", "admins"],
       canDelete: ["owners", "admins"],
       canRead: ["members", "admins"],
