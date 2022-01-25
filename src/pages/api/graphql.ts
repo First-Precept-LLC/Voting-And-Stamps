@@ -48,7 +48,7 @@ class Utilities {
     static indices;
     static scores;
     static UserVotes;
-    static Models;
+    static Predictions;
     static Resolutions;
     static ProposalTags;
 
@@ -72,7 +72,7 @@ class Utilities {
 
     static async init() {
         Utilities.UserVotes = Utilities.db.collection("uservotes");
-		    Utilities.Models = Utilities.db.collection("models");
+		    Utilities.Predictions = Utilities.db.collection("predictions");
         Utilities.Resolutions = Utilities.db.collection("resolutions");
         Utilities.ProposalTags = Utilities.db.collection("proposaltags");
         Utilities.scores = {};
@@ -227,9 +227,9 @@ class Utilities {
   }
 
   static async get_predictors_by_target(target, collection){
-		let targetTable = Utilities.Models;
-    let allPredictions = await targetTable.find({targetId: target, collection: collection}).toArray();
-    return allPredictions.map(model => model.user);
+		let targetTable = Utilities.Predictions;
+    let allPredictions = await targetTable.find({contentId: target, collection: collection}).toArray();
+    return allPredictions.map(prediction => prediction.user);
   }
 
   static async get_resolving_user_ids(target, targetType) {
@@ -255,13 +255,13 @@ class Utilities {
   }
 
   static async get_prediction(user, id) {
-    let targetTable = Utilities.Models;
+    let targetTable = Utilities.Predictions;
     let finalPredictions = await targetTable.find({user: user, contentId: id}).toArray();
     return finalPredictions[0];
   }
 	
   static async get_average_impact_by_target(id) {
-		let all_impact_votes = await Utilities.Models.find({contentId: id}).toArray();
+		let all_impact_votes = await Utilities.Predictions.find({contentId: id}).toArray();
     let all_impact_resolutions = await Utilities.Resolutions.find({contentId: id}).toArray();
     if (all_impact_resolutions.length > 0) {
       all_impact_votes = all_impact_resolutions;
@@ -721,7 +721,7 @@ class StampsModule {
         console.log(item);
         const sum = (previousValue, currentValue) => previousValue + currentValue;
         let assignedValue = results["values"].reduce(sum)/results["values"].length;
-        db.collection("models").findOneAndUpdate({user: args.user, targetId: args.targetId, collection: args.collection}, {$set: {user: args.user, targetId: args.targetId, collection: args.collection, score: assignedValue}}, {upsert: true});
+        db.collection("predictions").findOneAndUpdate({user: args.user, contentId: args.targetId, collection: args.collection}, {$set: {user: args.user, contentId: args.targetId, collection: args.collection, score: assignedValue}}, {upsert: true});
         return assignedValue;
       } else {
         return -999;

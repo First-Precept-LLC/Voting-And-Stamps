@@ -7,7 +7,7 @@ import {
   import { createMongooseConnector } from "@vulcanjs/mongo";
 
 
-  export interface ModelTypeServer extends VulcanDocument {
+  export interface PredictionTypeServer extends VulcanDocument {
     user?: string;
     proposalId?: string;
     score?: string;
@@ -43,7 +43,7 @@ import {
       canRead: ["guests"]
     },
   
-    proposalId: {
+    contentId: {
       type: String,
       optional: true,
       canRead: ["guests"]
@@ -63,21 +63,21 @@ import {
   };
 
   export const modelDef: CreateGraphqlModelOptionsServer = {
-    name: "Model",
+    name: "Prediction",
     graphql: {
-      typeName: "Model",
-      multiTypeName: "Model",
+      typeName: "Prediction",
+      multiTypeName: "Predictions",
     },
     schema,
     permissions: {
-      canCreate: ["owners, admins"], 
+      canCreate: ["members", "owners, admins"], 
       canUpdate: ["owners", "admins"],
       canDelete: ["owners", "admins"],
       canRead: ["members", "admins"],
     },
   };
 
-  export const Model = createGraphqlModelServer(modelDef);
+  export const Prediction = createGraphqlModelServer(modelDef);
 
-  export const ModelConnector = createMongooseConnector<ModelTypeServer>(Model);
+  export const PredictionConnector = createMongooseConnector<PredictionTypeServer>(Prediction);
 
