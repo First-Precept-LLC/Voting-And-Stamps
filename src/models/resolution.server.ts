@@ -9,7 +9,7 @@ import {
 
   export interface ResolutionTypeServer extends VulcanDocument {
     user?: string;
-    proposalId?: string;
+    contentId?: string;
     score?: string;
     collection?: string;
   }
@@ -47,7 +47,7 @@ import {
       canCreate: ["members"],
     },
   
-    proposalId: {
+    contentId: {
       type: String,
       optional: true,
       canRead: ["guests"],

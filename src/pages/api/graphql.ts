@@ -262,7 +262,7 @@ class Utilities {
 	
   static async get_average_impact_by_target(id) {
 		let all_impact_votes = await Utilities.Models.find({contentId: id}).toArray();
-    let all_impact_resolutions = await Utilities.Resolutions.find({proposalId: id}).toArray();
+    let all_impact_resolutions = await Utilities.Resolutions.find({contentId: id}).toArray();
     if (all_impact_resolutions.length > 0) {
       all_impact_votes = all_impact_resolutions;
     }
