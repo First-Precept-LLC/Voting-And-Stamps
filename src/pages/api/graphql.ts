@@ -266,6 +266,7 @@ class Utilities {
     if (all_impact_resolutions.length > 0) {
       all_impact_votes = all_impact_resolutions;
     }
+    console.log(all_impact_votes);
 		let total = 0;
 		if (all_impact_votes.length < 1) {
 			return 0;
@@ -285,7 +286,7 @@ class Utilities {
 			return 0;
 		}
 		for (let i = 0; i < user_content.length; i++) {
-			total += await this.get_average_impact_by_target(user_content[i].id);
+			total += await this.get_average_impact_by_target(user_content[i]._id);
 		}
 		return total/user_content.length;
 	}
@@ -659,8 +660,6 @@ class StampsModule {
         total_user_votes += await stamps.utils.get_votes_for_user(args.user, graphs[i]);
       }
       let average_impact_rating = await stamps.utils.get_average_impact_by_user(args.user);
-      console.log("whee!");
-      console.log(average_impact_rating);
       return average_impact_rating + total_user_votes;
     },
 
