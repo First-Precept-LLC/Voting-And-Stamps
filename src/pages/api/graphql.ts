@@ -260,8 +260,12 @@ class Utilities {
     return finalPredictions[0];
   }
 	
-	static async get_average_impact_by_target(id) {
+  static async get_average_impact_by_target(id) {
 		let all_impact_votes = await Utilities.Models.find({contentId: id}).toArray();
+    let all_impact_resolutions = await Utilities.Resolutions.find({proposalId: id}).toArray();
+    if (all_impact_resolutions.length > 0) {
+      all_impact_votes = all_impact_resolutions;
+    }
 		let total = 0;
 		if (all_impact_votes.length < 1) {
 			return 0;

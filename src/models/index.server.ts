@@ -3,8 +3,10 @@
 import { SampleModel } from "./sampleModel.server";
 import { User } from "./user.server";
 import { Content } from "./content.server"
+import { Resolution } from "./resolution.server";
+import { Model } from "./model.server";
 
-const models = [User, SampleModel, Content];
+const models = [User, SampleModel, Content, Resolution, Model];
 
 
 
