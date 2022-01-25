@@ -277,7 +277,8 @@ class Utilities {
 	}
 	
 	static async get_average_impact_by_user(userwallet) {
-    let user_content = await Utilities.db.collection("contents").find({userId: userwallet}).toArray();
+    let user_content = await Utilities.db.collection("contents").find({creator: userwallet}).toArray();
+    console.log(user_content);
     
 		let total = 0;
 		if (user_content.length < 1) {
@@ -642,7 +643,7 @@ class StampsModule {
         for (let j = 0; j < graphs.length; i++) {
           total_proposal_votes += await stamps.utils.get_votes_by_target(args.targets[i], graphs[j]);
         }
-        let average_impact_rating = await stamps.utils.get_average_impact_by_proposal(args.targets[i]);
+        let average_impact_rating = await stamps.utils.get_average_impact_by_target(args.targets[i]);
         resultData.push(average_impact_rating + total_proposal_votes);
       }
   
@@ -658,6 +659,8 @@ class StampsModule {
         total_user_votes += await stamps.utils.get_votes_for_user(args.user, graphs[i]);
       }
       let average_impact_rating = await stamps.utils.get_average_impact_by_user(args.user);
+      console.log("whee!");
+      console.log(average_impact_rating);
       return average_impact_rating + total_user_votes;
     },
 
