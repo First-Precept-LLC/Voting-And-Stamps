@@ -380,6 +380,8 @@ class StampsModule {
         return true;
     }
 
+
+    //TODO: use start sets specified.
     async calculate_stamps(collection) {
       //set up and solve the system of linear equations
       console.log("RECALCULATING STAMP SCORES");

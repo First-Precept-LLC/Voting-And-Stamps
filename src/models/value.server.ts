@@ -7,7 +7,7 @@ import {
   import { createMongooseConnector } from "@vulcanjs/mongo";
 
 
-  export interface ChatTypeServer extends VulcanDocument {
+  export interface ValueTypeServer extends VulcanDocument {
     proposer?: string;
     proposalId?: string;
     description?: string;
@@ -33,9 +33,8 @@ import {
 
     },
 
-    //This ID is referenced in the externalId of any content of type 'chat'.
-
-    chatId: {
+    //This name will be the value's graph field in uservotes.
+    name: {
         type: String,
         optional: true,
         canRead: ["guests"],
@@ -63,8 +62,6 @@ import {
 
     },
 
-
-    //the content of the message itself.
     description: {
         type: String,
         optional: true,
@@ -72,16 +69,17 @@ import {
         canCreate: ["members"]
     },
 
-    //This is either the id of another chat message, if this is a reply, or the id of a non-chat piece of content.
-    //Which of the two it is depends on the isBase field.
-    subject: {
+    //TODO: store image fields
+    image: {
         type: String,
         optional: true,
         canRead: ["guests"],
         canCreate: ["members"]
     },
 
-    isBase: {
+
+    //Users who begin with stamps for this value. If unset, defaults to the creator.
+    startSet: {
         type: Boolean,
         optional: true,
         canRead: ["guests"],
@@ -90,21 +88,21 @@ import {
   };
 
   export const modelDef: CreateGraphqlModelOptionsServer = {
-    name: "Chat",
+    name: "Value",
     graphql: {
-      typeName: "Chat",
-      multiTypeName: "Chats",
+      typeName: "Value",
+      multiTypeName: "Values",
     },
     schema,
     permissions: {
-      canCreate: ["members"], // Users should be able to create contents
+      canCreate: ["members"], 
       canUpdate: ["owners", "admins"],
       canDelete: ["owners", "admins"],
       canRead: ["members", "admins"],
     },
   };
 
-  export const Chat = createGraphqlModelServer(modelDef);
+  export const Value = createGraphqlModelServer(modelDef);
 
-  export const ChatConnector = createMongooseConnector<ChatTypeServer>(Chat);
+  export const ValueConnector = createMongooseConnector<ValueTypeServer>(Value);
 
