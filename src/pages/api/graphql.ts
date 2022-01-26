@@ -51,6 +51,7 @@ class Utilities {
     static Predictions;
     static Resolutions;
     static ProposalTags;
+    static Values;
 
 
     static get_instance () {
@@ -75,6 +76,7 @@ class Utilities {
 		    Utilities.Predictions = Utilities.db.collection("predictions");
         Utilities.Resolutions = Utilities.db.collection("resolutions");
         Utilities.ProposalTags = Utilities.db.collection("proposaltags");
+        Utilities.Values = Utilities.db.collection("values");
         Utilities.scores = {};
         Utilities.indices = {};
     }
@@ -290,6 +292,17 @@ class Utilities {
 		}
 		return total/user_content.length;
 	}
+
+  static async get_start_set(name) {
+    let values = await Utilities.Values.find({name: name}).toArray();
+    if (values.length < 1) {
+      return [];
+    } else if (! values[0].startSet) {
+      return [values[0].creator];
+    } else {
+      return values[0].startSet.split(",");
+    }
+  }
 	
 
 }
@@ -431,11 +444,27 @@ class StampsModule {
         users_matrix.set(i, i, -1.0);
       }
 
-      users_matrix.set(0, 0, 1.0);
+      let start_set = this.utils.get_start_set(collection);
+
+      let start_indices;
+
+      if (start_set.length == 0) {
+        start_indices = [0];
+      } else {
+        for (let i = 0; i < start_set.length; i++) {
+          start_indices.push(targetIndex[start_set[i]]);
+        }
+      }
+
+      for (let i = 0; i < start_indices.length; i++) {
+        users_matrix.set(start_indices[i], start_indices[i], 1.0);
+      }
 
 
       let user_count_matrix = Matrix.zeros(user_count, 1);
-      user_count_matrix.set(0, 0, 1.0); //God has 1 karma
+      for (let i = 0; i < start_indices.length; i++) {
+        users_matrix.set(start_indices[i], 0, 1.0); //TODO: Is this the right dimension to use?
+      }
 	    this.utils.scores[collection] = solve(users_matrix, user_count_matrix).to1DArray();
 		  console.log(this.utils.scores);		
         //this.print_all_scores(collection);

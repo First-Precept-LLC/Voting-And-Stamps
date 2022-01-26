@@ -78,9 +78,9 @@ import {
     },
 
 
-    //Users who begin with stamps for this value. If unset, defaults to the creator.
+    //Users who begin with stamps for this value. If unset, defaults to the creator. Comma-separated IDs.
     startSet: {
-        type: Boolean,
+        type: String,
         optional: true,
         canRead: ["guests"],
         canCreate: ["members"]
