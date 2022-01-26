@@ -83,6 +83,7 @@
     "babel-jest": "26.0.1",
     "babel-plugin-istanbul": "6.0.0",
     "bucklescript": "^0.0.2",
+    "cloudinary": "^1.28.1",
     "clsx": "^1.1.1",
     "cors": "^2.8.5",
     "cross-env": "7.0.2",

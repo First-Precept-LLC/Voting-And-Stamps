@@ -5,8 +5,10 @@ import { User } from "./user.server";
 import { Content } from "./content.server"
 import { Resolution } from "./resolution.server";
 import { Prediction } from "./prediction.server";
+import { Value } from "./value.server";
+import { Chat } from "./chat.server";
 
-const models = [User, SampleModel, Content, Resolution, Prediction];
+const models = [User, SampleModel, Content, Resolution, Prediction, Value, Chat];
 
 
 

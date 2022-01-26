@@ -4,8 +4,10 @@ import {
     createGraphqlModelServer,
     VulcanGraphqlSchemaServer,
   } from "@vulcanjs/graphql/server";
-  import { createMongooseConnector } from "@vulcanjs/mongo";
+import { createMongooseConnector } from "@vulcanjs/mongo";
 
+
+var cloudinary = require('cloudinary');
 
   export interface ValueTypeServer extends VulcanDocument {
     proposer?: string;
@@ -69,8 +71,30 @@ import {
         canCreate: ["members"]
     },
 
-    //TODO: store image fields
+    //The public ID of the image, stored in Cloudinary. Supply a URL for imageUrl in the request, and it will automatically be uploaded, 
+    //with the public ID of the uploaded image occupying this field.
     image: {
+        type: String,
+        optional: true,
+        canRead: ["guests"],
+        canCreate: ["members"],
+        onCreate: (self) => {
+            console.log("go!");
+            console.log(self);
+            let resultId;
+            cloudinary.v2.uploader.upload(self.document.imageUrl,
+            { public_id: self.document.name }, 
+            function(error, result) {
+               console.log(result); 
+               resultId =  result.public_id;
+            });
+
+            return resultId;
+
+        },
+    },
+
+    imageUrl: {
         type: String,
         optional: true,
         canRead: ["guests"],
