@@ -33,7 +33,7 @@ const f = require('fs');
 const admin_usernames = []; //Either fill with admins, or remove
 
 
-
+//Singleton utility class. Contains many static functions that access the database.
 class Utilities {
 
     static DB_PATH;
@@ -45,8 +45,10 @@ class Utilities {
 
     static users;
     static ids;
+    //indices of users and scores for each trust graph.
     static indices;
     static scores;
+    //MongoDB collections
     static UserVotes;
     static Predictions;
     static Resolutions;
@@ -84,6 +86,8 @@ class Utilities {
     static async clearVotes() {
         await Utilities.UserVotes.deleteMany({});
     }
+
+    //update the ids list and indices based on changes to the users.
 
     static async update_ids_list() {
         if (Utilities.users) {
@@ -126,6 +130,7 @@ class Utilities {
         return null;
     }
 
+    //Get the score of a user from the scores array.
     static get_user_score(user, collection) {
         let userIndex = this.index_dammit(user, collection);
         if (userIndex) {
@@ -136,7 +141,7 @@ class Utilities {
         }
         return 0.0;
     }
-    //A series of databse functions follow. Modify based on db implementation.
+    //Add a vote for a piece of content.
     static async update_vote(userwallet, user_name, voted_for, voted_for_target, target_type, vote_quantity, collection) {
 		    let targetTable = Utilities.UserVotes;
         let insertedObj = {
@@ -152,6 +157,7 @@ class Utilities {
         await targetTable.insertOne(insertedObj);
     }
 
+  //Find all the votes a user has made.
   static async get_votes_by_user(userwallet, collection){
 		let targetTable = Utilities.UserVotes;
     let allUserVotes = await targetTable.find({user: userwallet, graph: collection}).toArray();
@@ -162,6 +168,7 @@ class Utilities {
     return total;
   }
 
+  //Find all the votes a user has received.
   static async get_votes_for_user(userwallet, collection){
 		let targetTable = Utilities.UserVotes;
     let allUserVotes = await targetTable.find({votedFor: userwallet, graph: collection}).toArray();
@@ -172,6 +179,8 @@ class Utilities {
     return total;
   }
 
+
+  //Find all the votes a piece of content has received.
   static async get_votes_by_target(target, collection){
 		let targetTable = Utilities.UserVotes;
     let allUserVotes = await targetTable.find({target: target, graph: collection}).toArray();
@@ -181,7 +190,7 @@ class Utilities {
     }
     return total;
   }
-
+  //Get the total votes for a provided trust graph.
   static async get_total_votes(collection){
 		let targetTable = Utilities.UserVotes;
     let allUserVotes = await targetTable.find({graph: collection}).toArray();
@@ -191,12 +200,12 @@ class Utilities {
     }
     return total;
   }
-
+  //Get every vote for a provided trust graph.
   static async get_all_user_votes(collection){
 		let targetTable = Utilities.UserVotes;
     return await targetTable.find({graph: collection}).toArray();
   }
-
+  //Get the users that have interacted through votes with a given trust graph, whether by giving or receiving a vote.
   static async get_users(collection) {
       let targetTable = Utilities.UserVotes;
       let users = [] as any;
@@ -211,29 +220,29 @@ class Utilities {
       }
       return users;
   }
-
+  //Get every trust graph.
   static async get_graphs() {
     let targetTable = Utilities.UserVotes;
     return targetTable.distinct("graph", {});
   }
-
+  //Get every content type.
   static async get_content_types() {
     let targetTable = Utilities.UserVotes;
     return targetTable.distinct("targetType", {});
   }
-
+  //Get resolutions for a piece of content.
   static async get_resolutions_by_target(target, collection){
 		let targetTable = Utilities.Resolutions;
     let allResolutions = await targetTable.find({targetId: target, collection: collection}).toArray();
     return allResolutions;
   }
-
+  //Get predictions for a piece of content.
   static async get_predictors_by_target(target, collection){
 		let targetTable = Utilities.Predictions;
     let allPredictions = await targetTable.find({contentId: target, collection: collection}).toArray();
     return allPredictions.map(prediction => prediction.user);
   }
-
+  //Get the resolving users for a piece of content. If the empty list is returned, all users are counted as resolving users.
   static async get_resolving_user_ids(target, targetType) {
 		let targetTable = Utilities.db.collection("contents");
     let targetProposal = (await targetTable.find({_id: target, contentType: targetType}).toArray())[0];
@@ -243,25 +252,26 @@ class Utilities {
       return targetProposal.resolvingUsers.split(",");
     }
   }
-
+  //Get all pieces of content with some tag.
   static async get_content_by_tag(tag) {
     let targetTable = Utilities.ProposalTags;
     let targetTags = await targetTable.find({tagName: tag}).toArray();
     return targetTags.map(tag => tag.id);
   }
-
+  //Get the amount of times a tag has been applied to a piece of content.
   static async get_tag_count(tag, id) {
     let targetTable = Utilities.ProposalTags;
     let targetTags = await targetTable.find({tagName: tag, id: id}).toArray();
     return targetTags.length;
   }
-
+  //get a user's prediction of a piece of content.
   static async get_prediction(user, id) {
     let targetTable = Utilities.Predictions;
     let finalPredictions = await targetTable.find({user: user, contentId: id}).toArray();
     return finalPredictions[0];
   }
-	
+	//Get the average impact of a piece of content.
+  //Use resolutions if any exist, otherwise use predictions.
   static async get_average_impact_by_target(id) {
 		let all_impact_votes = await Utilities.Predictions.find({contentId: id}).toArray();
     let all_impact_resolutions = await Utilities.Resolutions.find({contentId: id}).toArray();
@@ -278,7 +288,7 @@ class Utilities {
         }
         return total/all_impact_votes.length;
 	}
-	
+	//Get the average impact of a user, using all pieces of content they have created.
 	static async get_average_impact_by_user(userwallet) {
     let user_content = await Utilities.db.collection("contents").find({creator: userwallet}).toArray();
     console.log(user_content);
@@ -292,7 +302,7 @@ class Utilities {
 		}
 		return total/user_content.length;
 	}
-
+  //Get the start set for a value or trust graph. If no start set is specified, default to the value's creator.
   static async get_start_set(name) {
     let values = await Utilities.Values.find({name: name}).toArray();
     if (values.length < 1) {
@@ -309,11 +319,13 @@ class Utilities {
 
 class StampsModule {
     utils: any;
+    //Strengths of votes.
     red_stamp_value: number;
     gold_stamp_value: number;
     half_red_stamp_value: number;
     half_gold_stamp_value: number;
     zero_stamp_value: number;
+
     user_karma: number;
     total_votes: any;
     total_temperature_votes: any;
@@ -352,6 +364,7 @@ class StampsModule {
       this.utils.update_vote('paul', 'paul_name', 'carl', 'seed_transaction', null, 7, "capital", "transaction"); //Generate start set IDs and replace these
     }
 
+    //Process a vote.
     async update_vote(stamp_type, from_id, from_name, to_id, to_target, target_type, collection, negative=false, recalculate=true){
         if (to_id == stampy_id) {
             //votes for stampy do nothing
@@ -394,7 +407,7 @@ class StampsModule {
     }
 
 
-    //TODO: use start sets specified.
+    //Calculate the stamps each user has, given all the votes thus far.
     async calculate_stamps(collection) {
       //set up and solve the system of linear equations
       console.log("RECALCULATING STAMP SCORES");
@@ -497,6 +510,7 @@ class StampsModule {
         console.log("Total stamps:" + String(total_stamps));
     }
 
+    //Get the stamps a user has regarding a particular trust graph.
     get_user_stamps(user, collection) {
 		  if (!user) {
 			  return 0;
@@ -625,6 +639,7 @@ class StampsModule {
        return filteredDocs;
     },
      
+     //Get votes for a particular piece of content
      getVotesByTarget: async (obj, args, context, info) => {
        const stamps = new StampsModule();
        await stamps.init();
@@ -636,26 +651,15 @@ class StampsModule {
        return resultData;
      },
      
+     //process a vote
      updateVote: async (obj, args, context, info) => {
        const stamps = new StampsModule();
        await stamps.init();
-       if (! args.toTransaction) {
-           args.toTransaction = null;
-       }
-       if (! args.toProposal) {
-         args.toProposal = null;
-       }
        const success = await stamps.update_vote(args.stampType, args.fromId, args.fromName, args.toId, args.toTarget, args.targetType, args.collection, args.negative); //req.query.negative is true in the case of a downvote, and false otherwise.
          return success;
      },
-     
-     updateVoteForTarget: async (obj, args, context, info) => {
-       const stamps = new StampsModule();
-       await stamps.init();
-       const success = await stamps.update_vote(args.stampType, args.fromId, args.fromName, args.toId, args.toTarget, args.collection, args.negative);
-         return success;
-     },
-     
+
+     //Get the stamps of a user in a particular trust graph
      getUserStamps: async (obj, args, context, info) => {
        const stamps = new StampsModule();
        await stamps.init();
@@ -663,7 +667,7 @@ class StampsModule {
        return resultData;
      },
      
-
+     //Get the score of a piece of content, based on the votes for it and either predictions or resolutions of it, across all trust graphs.
      getContentScore: async (obj, args, context, info) => {
       const stamps = new StampsModule();
       await stamps.init();
@@ -681,7 +685,7 @@ class StampsModule {
   
       return resultData;
     },
-    
+    //Get the score of a user, based on the content they have created, across all trust graphs.
     getUserScore: async (obj, args, context, info) => {
       const stamps = new StampsModule();
       await stamps.init();
@@ -694,6 +698,8 @@ class StampsModule {
       return average_impact_rating + total_user_votes;
     },
 
+
+    //Save a variable for use in a prediction.
     saveVariable: async (obj, args, context, info) => {
       const db = mongoose.connection;
       let insertedObj = {
@@ -706,7 +712,7 @@ class StampsModule {
       db.collection("variables").findOneAndUpdate({user: args.user, targetId: args.targetId, name: args.name}, {$set: insertedObj}, {upsert: true});
       return true;
     },
-
+    //Calculate the result of a complex prediction, using a Guesstimate string.
     calculateResult: async(obj, args, context, info) => {
 
 
@@ -827,7 +833,7 @@ class StampsModule {
     db.collection("users").findOneAndUpdate({user: args.user, tag: args.tag, collection: args.collection}, {$set: {user: args.user, tag: args.tag, collection: args.collection, score: finalScore}}, {upsert: true});
     return finalScore;
   },
-  
+  //Generate a page of content.
   getContentPage: async (obj, args, context, info) => {
     let first = args.first;
     let after = args.after;
