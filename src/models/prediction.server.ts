@@ -47,6 +47,7 @@ import {
       canCreate: ["members"]
     },
   
+    //The piece of content being predicted.
     contentId: {
       type: String,
       optional: true,
@@ -54,6 +55,7 @@ import {
       canCreate: ["members"]
     },
 
+    //The trust graph this prediction is associated with.
     collection: {
         type: String,
         optional: true,
@@ -61,6 +63,7 @@ import {
         canCreate: ["members"]
     },
 
+    //The actual number being predicted. Typically calculated using a Guesstimate 
     score: {
         type: Number,
         optional: true,

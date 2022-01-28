@@ -47,6 +47,7 @@ import {
       canCreate: ["members"],
     },
   
+    //The piece of content being resolved.
     contentId: {
       type: String,
       optional: true,
@@ -54,12 +55,6 @@ import {
       canCreate: ["members"]
     },
 
-    collection: {
-        type: String,
-        optional: true,
-        canRead: ["guests"],
-        canCreate: ["members"]
-    },
 
     score: {
         type: Number,
@@ -67,6 +62,8 @@ import {
         canRead: ["guests"],
         canCreate: ["members"]
     },
+
+    //The trust graph this resolution is associated with.
     graph: {
       type: String,
       optional: true,

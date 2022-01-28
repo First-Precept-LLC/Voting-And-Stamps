@@ -33,6 +33,8 @@ import {
 
     },
 
+    //This ID is used to map to the data specific to this type of content, rather than the data here that all content has.
+    //Can be used to index into other databases.
     externalId: {
         type: String,
         optional: true,
@@ -82,6 +84,9 @@ import {
         canCreate: ["members"]
     },
 
+
+    //The users trusted to produce resolutions of the effect of this piece of content.
+    //By default, all users are so trusted.
     resolvingUsers: {
       type: String,
       optional: true,

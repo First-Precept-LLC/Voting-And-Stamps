@@ -233,7 +233,7 @@ class Utilities {
   //Get resolutions for a piece of content.
   static async get_resolutions_by_target(target, collection){
 		let targetTable = Utilities.Resolutions;
-    let allResolutions = await targetTable.find({targetId: target, collection: collection}).toArray();
+    let allResolutions = await targetTable.find({targetId: target, graph: collection}).toArray();
     return allResolutions;
   }
   //Get predictions for a piece of content.
@@ -830,7 +830,7 @@ class StampsModule {
     for (let i = 0; i < weights.length; i++) {
       finalScore += rawScores[i] * weights[i]/totalWeights;
     }
-    db.collection("users").findOneAndUpdate({user: args.user, tag: args.tag, collection: args.collection}, {$set: {user: args.user, tag: args.tag, collection: args.collection, score: finalScore}}, {upsert: true});
+    db.collection("users").findOneAndUpdate({user: args.user, tag: args.tag, graph: args.collection}, {$set: {user: args.user, tag: args.tag, graph: args.collection, score: finalScore}}, {upsert: true});
     return finalScore;
   },
   //Generate a page of content.
