@@ -718,15 +718,13 @@ class StampsModule {
 
       const db = mongoose.connection;
 
-      const getVariable = async function(name) {
-        return await db.collection("variables").find({user: args.user, name: name, targetId: args.targetId}).toArray()[0];
-      }
-
       function replaceAll(str, find, replace) {
         return str.replace(new RegExp(find, 'g'), replace);
       }
 
       let allRelevantVariables = await db.collection("variables").find({user: args.user, targetId: args.targetId}).toArray();
+
+      //Finds the first variable that a Guesstimate string contains.
       const matchVariable = function(str) {
         for (let i = 0; i < allRelevantVariables.length; i++){
           const possibleVar = allRelevantVariables[i]["name"];
@@ -739,6 +737,7 @@ class StampsModule {
 
 
       const inputString = args.expression;
+      //Variable by variable, substitutes in raw expressions for variables detected in a Guesstimate string.
       const  percolateVariables = async function(str) {
         let firstFoundVariable = matchVariable(str);
         if (! firstFoundVariable) {
