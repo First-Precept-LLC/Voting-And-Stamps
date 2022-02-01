@@ -597,7 +597,9 @@ class StampsModule {
      updateVoteForTarget(stampType: String, fromId: String, fromName: String, toId: String, toTarget: String, collection: String, negative: Boolean): Boolean
      getUserStamps(user: String, collection: String): Float
      getContentScore(targets: [String], graph: String): [Float]
+     getContentScoreGlobal(targets: [String]): [Float]
      getUserScore(user: String, graph: String): Float
+     getUserScoreGlobal(user: String): Float
      saveVariable(user: String, proposalId: String, name: String, type: String, value: String) : Boolean
      calculateResult(user: String, proposalId: String, expression: String, collection: String): Float
      scoreUserByTag(user: String, collection: String, tag: String): Float
@@ -692,6 +694,39 @@ class StampsModule {
       let average_impact_rating = await stamps.utils.get_average_impact_by_user(args.user, args.graph);
       return average_impact_rating + total_user_votes;
     },
+     //Get the score of a piece of content, based on the votes for it and either predictions or resolutions of it, across all trust graphs.
+     getContentScoreGlobal: async (obj, args, context, info) => {
+      const stamps = new StampsModule();
+      await stamps.init();
+      let resultData = [] as any;
+      
+      for (let i = 0; i < args.targets.length; i++) {
+        let graphs = stamps.utils.get_graphs();
+        let total_proposal_votes = 0;
+        let average_impact_rating = 0;
+        for (let j = 0; j < graphs.length; i++) {
+          total_proposal_votes += await stamps.utils.get_votes_by_target(args.targets[i], graphs[j]);
+          average_impact_rating += (await stamps.utils.get_average_impact_by_target(args.targets[i], graphs[j]))/graphs.length;
+        }
+        resultData.push(average_impact_rating + total_proposal_votes);
+      }
+  
+      return resultData;
+    },
+    //Get the score of a user, based on the content they have created, across all trust graphs.
+    getUserScoreGlobal: async (obj, args, context, info) => {
+      const stamps = new StampsModule();
+      await stamps.init();
+      let graphs = stamps.utils.get_graphs();
+      let total_user_votes = 0;
+      let average_impact_rating = 0;     
+      for (let i = 0; i < graphs.length; i++) {
+        total_user_votes += await stamps.utils.get_votes_for_user(args.user, graphs[i]);
+        average_impact_rating += (await stamps.utils.get_average_impact_by_user(args.user, graphs[i]))/graphs.length;
+      }
+      return average_impact_rating + total_user_votes;
+    },
+    
 
 
     //Save a variable for use in a prediction.
