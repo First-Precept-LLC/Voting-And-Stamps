@@ -272,9 +272,9 @@ class Utilities {
   }
 	//Get the average impact of a piece of content.
   //Use resolutions if any exist, otherwise use predictions.
-  static async get_average_impact_by_target(id) {
-		let all_impact_votes = await Utilities.Predictions.find({contentId: id}).toArray();
-    let all_impact_resolutions = await Utilities.Resolutions.find({contentId: id}).toArray();
+  static async get_average_impact_by_target(id, graph) {
+		let all_impact_votes = await Utilities.Predictions.find({contentId: id, graph: graph}).toArray();
+    let all_impact_resolutions = await Utilities.Resolutions.find({contentId: id, graph: graph}).toArray();
     if (all_impact_resolutions.length > 0) {
       all_impact_votes = all_impact_resolutions;
     }
@@ -289,7 +289,7 @@ class Utilities {
         return total/all_impact_votes.length;
 	}
 	//Get the average impact of a user, using all pieces of content they have created.
-	static async get_average_impact_by_user(userwallet) {
+	static async get_average_impact_by_user(userwallet, graph) {
     let user_content = await Utilities.db.collection("contents").find({creator: userwallet}).toArray();
     console.log(user_content);
     
@@ -298,7 +298,7 @@ class Utilities {
 			return 0;
 		}
 		for (let i = 0; i < user_content.length; i++) {
-			total += await this.get_average_impact_by_target(user_content[i]._id);
+			total += await this.get_average_impact_by_target(user_content[i]._id, graph);
 		}
 		return total/user_content.length;
 	}
@@ -457,29 +457,40 @@ class StampsModule {
         users_matrix.set(i, i, -1.0);
       }
 
-      let start_set = this.utils.get_start_set(collection);
 
-      let start_indices;
+      let start_set = await this.utils.get_start_set(collection);
+
+      let start_indices = [] as any;
+      console.log(start_set);
+      console.log(targetIndex);
 
       if (start_set.length == 0) {
-        start_indices = [0];
+        start_indices.push(0);
       } else {
         for (let i = 0; i < start_set.length; i++) {
-          start_indices.push(targetIndex[start_set[i]]);
+          if (start_set[i] in targetIndex) {
+            start_indices.push(targetIndex[start_set[i]]);
+          }
+        }
+        if (start_indices.length == 0) {
+          start_indices.push(0);
         }
       }
 
       for (let i = 0; i < start_indices.length; i++) {
+        console.log(start_indices);
         users_matrix.set(start_indices[i], start_indices[i], 1.0);
       }
+
+      console.log("No, later.");
 
 
       let user_count_matrix = Matrix.zeros(user_count, 1);
       for (let i = 0; i < start_indices.length; i++) {
-        users_matrix.set(start_indices[i], 0, 1.0); //TODO: Is this the right dimension to use?
+        user_count_matrix.set(start_indices[i], 0, 1.0); //TODO: Is this the right dimension to use?
       }
 	    this.utils.scores[collection] = solve(users_matrix, user_count_matrix).to1DArray();
-		  console.log(this.utils.scores);		
+		  console.log(this.utils.scores);
         //this.print_all_scores(collection);
         //done
     }
@@ -593,8 +604,8 @@ class StampsModule {
      updateVote(stampType: String, fromId: String, fromName: String, toId: String, toTarget: String, targetType: String, collection: String, negative: Boolean): Boolean
      updateVoteForTarget(stampType: String, fromId: String, fromName: String, toId: String, toTarget: String, collection: String, negative: Boolean): Boolean
      getUserStamps(user: String, collection: String): Float
-     getContentScore(targets: [String]): [Float]
-     getUserScore(user: String): Float
+     getContentScore(targets: [String], graph: String): [Float]
+     getUserScore(user: String, graph: String): Float
      saveVariable(user: String, proposalId: String, name: String, type: String, value: String) : Boolean
      calculateResult(user: String, proposalId: String, expression: String, collection: String): Float
      scoreUserByTag(user: String, collection: String, tag: String): Float
@@ -667,34 +678,26 @@ class StampsModule {
        return resultData;
      },
      
-     //Get the score of a piece of content, based on the votes for it and either predictions or resolutions of it, across all trust graphs.
+     //Get the score of a piece of content, based on the votes for it and either predictions or resolutions of it, for a specific trust graph.
      getContentScore: async (obj, args, context, info) => {
       const stamps = new StampsModule();
       await stamps.init();
       let resultData = [] as any;
       
       for (let i = 0; i < args.targets.length; i++) {
-        let graphs = stamps.utils.get_graphs();
-        let total_proposal_votes = 0;
-        for (let j = 0; j < graphs.length; i++) {
-          total_proposal_votes += await stamps.utils.get_votes_by_target(args.targets[i], graphs[j]);
-        }
-        let average_impact_rating = await stamps.utils.get_average_impact_by_target(args.targets[i]);
+        let total_proposal_votes = await stamps.utils.get_votes_by_target(args.targets[i], args.graph);
+        let average_impact_rating = await stamps.utils.get_average_impact_by_target(args.targets[i], args.graph);
         resultData.push(average_impact_rating + total_proposal_votes);
       }
   
       return resultData;
     },
-    //Get the score of a user, based on the content they have created, across all trust graphs.
+    //Get the score of a user, based on the content they have created, for a specific trust graph.
     getUserScore: async (obj, args, context, info) => {
       const stamps = new StampsModule();
       await stamps.init();
-      let graphs = stamps.utils.get_graphs();
-      let total_user_votes = 0;     
-      for (let i = 0; i < graphs.length; i++) {
-        total_user_votes += await stamps.utils.get_votes_for_user(args.user, graphs[i]);
-      }
-      let average_impact_rating = await stamps.utils.get_average_impact_by_user(args.user);
+      let total_user_votes = await stamps.utils.get_votes_for_user(args.user, args.graph);
+      let average_impact_rating = await stamps.utils.get_average_impact_by_user(args.user, args.graph);
       return average_impact_rating + total_user_votes;
     },
 
