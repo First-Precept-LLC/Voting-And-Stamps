@@ -7,8 +7,9 @@ import { Resolution } from "./resolution.server";
 import { Prediction } from "./prediction.server";
 import { Value } from "./value.server";
 import { Chat } from "./chat.server";
+import { Goal } from "./goal.server";
 
-const models = [User, SampleModel, Content, Resolution, Prediction, Value, Chat];
+const models = [User, SampleModel, Content, Resolution, Prediction, Value, Chat, Goal];
 
 
 
