@@ -442,10 +442,6 @@ class StampsModule {
         let total_votes_by_user = await this.utils.get_votes_by_user(from_id, collection);
         if (total_votes_by_user != 0) {
             let score = (this.user_karma * votes_for_user) / total_votes_by_user;
-            console.log(users_matrix);
-            console.log(toi);
-            console.log(from_id_index);
-            console.log(users_matrix.get(toi, from_id_index));
             users_matrix.set(toi, from_id_index, users_matrix.get(toi, from_id_index) + score); 
         }
 
@@ -461,8 +457,6 @@ class StampsModule {
       let start_set = await this.utils.get_start_set(collection);
 
       let start_indices = [] as any;
-      console.log(start_set);
-      console.log(targetIndex);
 
       if (start_set.length == 0) {
         start_indices.push(0);
@@ -478,11 +472,9 @@ class StampsModule {
       }
 
       for (let i = 0; i < start_indices.length; i++) {
-        console.log(start_indices);
         users_matrix.set(start_indices[i], start_indices[i], 1.0);
       }
 
-      console.log("No, later.");
 
 
       let user_count_matrix = Matrix.zeros(user_count, 1);
@@ -773,10 +765,8 @@ class StampsModule {
    scoreUserByTag: async (obj, args, context, info) => {
      const db = mongoose.connection;
      const stamps = new StampsModule();
-     console.log("initting!");
      await stamps.init();
      const targets = await stamps.utils.get_content_by_tag(args.tag);
-     console.log(targets);
      let rawScores = [] as any;
      let weights = [] as any;
      for (let i = 0; i < targets.length; i++ ) {
