@@ -110,6 +110,7 @@ import { createMongooseConnector } from "@vulcanjs/mongo";
     
     //TODO: auto-modify this depending on votes on the goal? Or track how much people trust it to represent each value?
     //Comma-separated.
+    //Maybe remove this field, and instead fetch votecounts on each value?
     values: {
         type: String,
         optional: true,
