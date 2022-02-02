@@ -14,12 +14,9 @@ import models from "~/models/index.server";
 
 // will trigger seed
 import runSeed from "~/lib/api/runSeed";
-import { PredictionResolutionGroup, PredictionResolutionOverTime, nonMarketScore } from "~/lib/prediction-analysis/src/index";
+import { PredictionResolutionGroup, nonMarketScore } from "~/lib/prediction-analysis/src/index";
 
 import { Guesstimator } from "~/lib/guesstimator/src/index";
-import { delBasePath } from "next/dist/shared/lib/router/router";
-import { Calculate } from "@mui/icons-material";
-import { anyTypeAnnotation } from "@babel/types";
 
 const stampy_id = "stampy";
 
@@ -552,8 +549,6 @@ class StampsModule {
         this.calculate_stamps(collection);
     }
 
-
-
     static user_is_admin(username) {
         for(let i = 0; i < admin_usernames.length; i++) {
             if (username == admin_usernames[i]) {
@@ -713,6 +708,7 @@ class StampsModule {
   
       return resultData;
     },
+
     //Get the score of a user, based on the content they have created, across all trust graphs.
     getUserScoreGlobal: async (obj, args, context, info) => {
       const stamps = new StampsModule();
@@ -727,8 +723,6 @@ class StampsModule {
       return average_impact_rating + total_user_votes;
     },
     
-
-
     //Save a variable for use in a prediction.
     saveVariable: async (obj, args, context, info) => {
       const db = mongoose.connection;
@@ -822,8 +816,6 @@ class StampsModule {
         finalResolution += parseFloat(trustedResolutions[i])/trustedResolutions.length; 
       }
 
-
-
       let userPrediction = (await stamps.utils.get_prediction(args.user, target)).score;
 
       if (userPrediction > finalResolution) {
@@ -871,7 +863,6 @@ class StampsModule {
       return {node: item._id, cursor: item.createdAt.toString()}
     });
 
-
     const applyCursorsToEdges = function(allEdges, after) {
       let edges = allEdges;
       let afterEdge = allEdges.filter(function(edge) { return edge.cursor == after})[0];
@@ -892,13 +883,11 @@ class StampsModule {
       }
 
       return edges;
-
     }
 
     let finalEdges = edgesToReturn(allEdges, first, after);
 
     return {
-
       edges: finalEdges,
 
       pageInfo: {
