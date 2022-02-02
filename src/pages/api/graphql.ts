@@ -61,12 +61,12 @@ class Utilities {
     }
 
     constructor() {
-        if(Utilities.__instance != null) {
-            throw "This class is a singleton!"
-        } else {
-            Utilities.db = mongoose.connection;
-            Utilities.__instance = this;
-        }
+      if(Utilities.__instance != null) {
+          throw "This class is a singleton!"
+      } else {
+          Utilities.db = mongoose.connection;
+          Utilities.__instance = this;
+      }
 
     }
 
@@ -567,19 +567,6 @@ class StampsModule {
  const vulcanRawSchema = buildApolloSchema(models);
  console.log(vulcanRawSchema);
  const vulcanSchema = makeExecutableSchema(vulcanRawSchema);
- 
- /*function normal(mu, sigma, nsamples){
-   if(!nsamples) nsamples = 6
-   if(!sigma) sigma = 1
-   if(!mu) mu=0
- 
-   var run_total = 0
-   for(var i=0 ; i<nsamples ; i++){
-      run_total += Math.random()
-   }
- 
-   return sigma*(run_total - nsamples/2)/(nsamples/2) + mu
- }*/
  
  /**
   * Example custom Apollo server, written by hand
