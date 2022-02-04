@@ -19,7 +19,6 @@ import { PredictionResolutionGroup, nonMarketScore } from "~/lib/prediction-anal
 import { Guesstimator } from "~/lib/guesstimator/src/index";
 
 const stampy_id = "stampy";
-
 const {Matrix, solve} = require('ml-matrix');
 
 const readline = require('readline');
