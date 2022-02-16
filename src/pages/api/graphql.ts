@@ -309,6 +309,63 @@ class Utilities {
       return values[0].startSet.split(",");
     }
   }
+
+  //get the range of numbers of votes for all pieces of content on a given trust graph. Used for normalization.
+  static async get_vote_range(graph) {
+    let targetTable = Utilities.UserVotes;
+    let allUserVotes = await targetTable.find({graph: graph}).toArray();
+    let min = 99999;
+    let max = -99999;
+    for (let i = 0; i < allUserVotes.length; i++) {
+      let count = allUserVotes[i].votecount;
+      if (count > max) {
+        max = count;
+      }
+
+      if (count < min) {
+        min = count;
+      }
+
+    }
+
+    return [min, max];
+
+  }
+
+  //
+  static async get_prediction_range(graph) {
+    let targetTable = Utilities.Predictions;
+    let allResolutions = await targetTable.find({graph: graph}).toArray();
+    let min = 99999;
+    let max = -99999;
+    for (let i = 0; i < allResolutions.length; i++) {
+      let count = allResolutions[i].score;
+      if (count > max) {
+        max = count;
+      }
+
+      if (count < min) {
+        min = count;
+      }
+    }
+  }
+
+  static async get_resolution_range(graph) {
+    let targetTable = Utilities.Resolutions;
+    let allResolutions = await targetTable.find({graph: graph}).toArray();
+    let min = 99999;
+    let max = -99999;
+    for (let i = 0; i < allResolutions.length; i++) {
+      let count = allResolutions[i].score;
+      if (count > max) {
+        max = count;
+      }
+
+      if (count < min) {
+        min = count;
+      }
+    }
+  }
 	
 
 }
@@ -658,11 +715,23 @@ class StampsModule {
       const stamps = new StampsModule();
       await stamps.init();
       let resultData = [] as any;
+
+      let vote_range = await stamps.utils.get_vote_range(args.graph);
+      let prediction_range = await stamps.utils.get_prediction_range(args.graph);
+      let resolution_range = await stamps.utils.get_resolution_range(args.graph);
       
       for (let i = 0; i < args.targets.length; i++) {
         let total_proposal_votes = await stamps.utils.get_votes_by_target(args.targets[i], args.graph);
+        let normalized_proposal_votes = (total_proposal_votes - vote_range[0])/(vote_range[1] - vote_range[0]); 
         let average_impact_rating = await stamps.utils.get_average_impact_by_target(args.targets[i], args.graph);
-        resultData.push(average_impact_rating + total_proposal_votes);
+        let all_impact_resolutions = await Utilities.Resolutions.find({contentId: args.targets[i], graph: args.graph}).toArray();
+        let normalized_impact_rating;
+        if (all_impact_resolutions.length > 0) {
+           normalized_impact_rating = (average_impact_rating - resolution_range[0])/(resolution_range[1] - resolution_range[0]);
+        } else {
+           normalized_impact_rating = (average_impact_rating - prediction_range[0])/(prediction_range[1] - prediction_range[0]);
+        }
+        resultData.push(normalized_impact_rating + normalized_proposal_votes);
       }
   
       return resultData;
@@ -671,23 +740,51 @@ class StampsModule {
     getUserScore: async (obj, args, context, info) => {
       const stamps = new StampsModule();
       await stamps.init();
+      let vote_range = await stamps.utils.get_vote_range(args.graph);
+      let prediction_range = await stamps.utils.get_prediction_range(args.graph);
+      let resolution_range = await stamps.utils.get_resolution_range(args.graph);
       let total_user_votes = await stamps.utils.get_votes_for_user(args.user, args.graph);
+      let normalized_user_votes = (total_user_votes - vote_range[0])/(vote_range[1] - vote_range[0]); 
       let average_impact_rating = await stamps.utils.get_average_impact_by_user(args.user, args.graph);
-      return average_impact_rating + total_user_votes;
+      let all_impact_resolutions = await Utilities.Resolutions.find({user: args.user, graph: args.graph}).toArray();
+      let normalized_impact_rating;
+      if (all_impact_resolutions.length > 0) {
+          normalized_impact_rating = (average_impact_rating - resolution_range[0])/(resolution_range[1] - resolution_range[0]);
+      } else {
+          normalized_impact_rating = (average_impact_rating - prediction_range[0])/(prediction_range[1] - prediction_range[0]);
+      }
+      return normalized_impact_rating + normalized_user_votes;
     },
      //Get the score of a piece of content, based on the votes for it and either predictions or resolutions of it, across all trust graphs.
      getContentScoreGlobal: async (obj, args, context, info) => {
       const stamps = new StampsModule();
       await stamps.init();
       let resultData = [] as any;
+
+      let vote_ranges = [] as any;
+      let prediction_ranges = [] as any;
+      let resolution_ranges = [] as any;
+
+      let graphs = stamps.utils.get_graphs();
+      for (let i = 0; i < graphs.length; i++ ){
+        vote_ranges.push(await stamps.utils.get_vote_range(args.graph));
+        prediction_ranges.push(await stamps.utils.get_prediction_range(args.graph));
+        resolution_ranges.push(await stamps.utils.get_resolution_range(args.graph));
+      }
       
       for (let i = 0; i < args.targets.length; i++) {
-        let graphs = stamps.utils.get_graphs();
         let total_proposal_votes = 0;
         let average_impact_rating = 0;
         for (let j = 0; j < graphs.length; i++) {
-          total_proposal_votes += await stamps.utils.get_votes_by_target(args.targets[i], graphs[j]);
-          average_impact_rating += (await stamps.utils.get_average_impact_by_target(args.targets[i], graphs[j]))/graphs.length;
+          let proposal_votes = await stamps.utils.get_votes_by_target(args.targets[i], graphs[j]);
+          total_proposal_votes += (proposal_votes - vote_ranges[j][0])/(vote_ranges[j][1] - vote_ranges[j][0]); 
+          let impact_rating = (await stamps.utils.get_average_impact_by_target(args.targets[i], graphs[j]))/graphs.length;
+          let all_impact_resolutions = await Utilities.Resolutions.find({contentId: args.targets[i], graph: args.graph}).toArray();
+          if (all_impact_resolutions.length > 0) {
+            average_impact_rating += (impact_rating - resolution_ranges[j][0])/(resolution_ranges[j][1] - resolution_ranges[j][0]);
+          } else {
+            average_impact_rating = (impact_rating - prediction_ranges[j][0])/(prediction_ranges[j][1] - prediction_ranges[j][0]);
+          }
         }
         resultData.push(average_impact_rating + total_proposal_votes);
       }
@@ -699,12 +796,28 @@ class StampsModule {
     getUserScoreGlobal: async (obj, args, context, info) => {
       const stamps = new StampsModule();
       await stamps.init();
+      let vote_ranges = [] as any;
+      let prediction_ranges = [] as any;
+      let resolution_ranges = [] as any;
       let graphs = stamps.utils.get_graphs();
+      for (let i = 0; i < graphs.length; i++ ){
+        vote_ranges.push(await stamps.utils.get_vote_range(args.graph));
+        prediction_ranges.push(await stamps.utils.get_prediction_range(args.graph));
+        resolution_ranges.push(await stamps.utils.get_resolution_range(args.graph));
+      }
       let total_user_votes = 0;
       let average_impact_rating = 0;     
       for (let i = 0; i < graphs.length; i++) {
-        total_user_votes += await stamps.utils.get_votes_for_user(args.user, graphs[i]);
-        average_impact_rating += (await stamps.utils.get_average_impact_by_user(args.user, graphs[i]))/graphs.length;
+        let user_votes = await stamps.utils.get_votes_for_user(args.user, graphs[i]);
+        total_user_votes += (user_votes - vote_ranges[i][0])/(vote_ranges[i][1] - vote_ranges[i][0]); 
+        let impact_rating = (await stamps.utils.get_average_impact_by_user(args.user, graphs[i]))/graphs.length;
+        let all_impact_resolutions = await Utilities.Resolutions.find({contentId: args.targets[i], graph: args.graph}).toArray();
+        if (all_impact_resolutions.length > 0) {
+          average_impact_rating += (impact_rating - resolution_ranges[j][0])/(resolution_ranges[j][1] - resolution_ranges[j][0]);
+        } else {
+          average_impact_rating = (impact_rating - prediction_ranges[j][0])/(prediction_ranges[j][1] - prediction_ranges[j][0]);
+        }
+
       }
       return average_impact_rating + total_user_votes;
     },
