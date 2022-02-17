@@ -7,11 +7,11 @@ import {
   import { createMongooseConnector } from "@vulcanjs/mongo";
 
 
-  export interface ChatTypeServer extends VulcanDocument {
+  export interface TrainingTypeServer extends VulcanDocument {
     creator?: string;
-    chatId?: string;
+    trainingId?: string;
     description?: string;
-    subject?: string;
+    viewedUsers?: string;
   }
 
   
@@ -35,7 +35,7 @@ import {
 
     //This ID is referenced in the externalId of any content of type 'chat'.
 
-    chatId: {
+    trainingId: {
         type: String,
         optional: true,
         canRead: ["guests"],
@@ -64,7 +64,7 @@ import {
     },
 
 
-    //the content of the message itself.
+    //the content of the training itself.
     description: {
         type: String,
         optional: true,
@@ -72,39 +72,32 @@ import {
         canCreate: ["members"]
     },
 
-    //This is either the id of another chat message, if this is a reply, or the id of a non-chat piece of content.
-    //Which of the two it is depends on the isBase field.
-    subject: {
+    //This is the comma-separated list of users who have viewed this training, added to when a user does so.
+    viewedUsers: {
         type: String,
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"]
-    },
-
-    isBase: {
-        type: Boolean,
-        optional: true,
-        canRead: ["guests"],
-        canCreate: ["members"]
+        canCreate: ["members"],
+        canUpdate: ["members"]
     }
   };
 
   export const modelDef: CreateGraphqlModelOptionsServer = {
-    name: "Chat",
+    name: "Training",
     graphql: {
-      typeName: "Chat",
-      multiTypeName: "Chats",
+      typeName: "Training",
+      multiTypeName: "Trainings",
     },
     schema,
     permissions: {
       canCreate: ["members"], // Users should be able to create contents
-      canUpdate: ["owners", "admins"],
+      canUpdate: ["members"],
       canDelete: ["owners", "admins"],
       canRead: ["members", "admins"],
     },
   };
 
-  export const Chat = createGraphqlModelServer(modelDef);
+  export const Training = createGraphqlModelServer(modelDef);
 
-  export const ChatConnector = createMongooseConnector<ChatTypeServer>(Chat);
+  export const TrainingConnector = createMongooseConnector<TrainingTypeServer>(Training);
 
