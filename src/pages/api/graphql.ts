@@ -813,9 +813,9 @@ class StampsModule {
         let impact_rating = (await stamps.utils.get_average_impact_by_user(args.user, graphs[i]))/graphs.length;
         let all_impact_resolutions = await Utilities.Resolutions.find({contentId: args.targets[i], graph: args.graph}).toArray();
         if (all_impact_resolutions.length > 0) {
-          average_impact_rating += (impact_rating - resolution_ranges[j][0])/(resolution_ranges[j][1] - resolution_ranges[j][0]);
+          average_impact_rating += (impact_rating - resolution_ranges[j][0])/(resolution_ranges[i][1] - resolution_ranges[j][0]);
         } else {
-          average_impact_rating = (impact_rating - prediction_ranges[j][0])/(prediction_ranges[j][1] - prediction_ranges[j][0]);
+          average_impact_rating = (impact_rating - prediction_ranges[j][0])/(prediction_ranges[i][1] - prediction_ranges[j][0]);
         }
 
       }
