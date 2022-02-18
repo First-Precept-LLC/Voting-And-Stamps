@@ -13858,6 +13858,11 @@ js-levenshtein@^1.1.6:
   resolved "https://registry.yarnpkg.com/js-levenshtein/-/js-levenshtein-1.1.6.tgz#c6cee58eb3550372df8deb85fad5ce66ce01d59d"
   integrity sha512-X2BB11YZtrRqY4EnQcLX5Rh373zbK4alC1FW7D7MBhL2gtcC17cTnr6DmfHZeS0s2rTHjUTMMHfG7gO8SSdw+g==
 
+js-regression@^1.0.10:
+  version "1.0.10"
+  resolved "https://registry.yarnpkg.com/js-regression/-/js-regression-1.0.10.tgz#14f864b01fc2d361defee3b42e5fa13d606c17a8"
+  integrity sha1-FPhksB/C02He/uO0Ll+hPWBsF6g=
+
 js-string-escape@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/js-string-escape/-/js-string-escape-1.0.1.tgz#e2625badbc0d67c7533e9edc1068c587ae4137ef"
@@ -15135,12 +15140,19 @@ ml-array-rescale@^1.3.6:
     ml-array-max "^1.2.3"
     ml-array-min "^1.2.2"
 
-ml-matrix@^6.8.2:
+ml-matrix@^6.4.1, ml-matrix@^6.8.2:
   version "6.8.2"
   resolved "https://registry.yarnpkg.com/ml-matrix/-/ml-matrix-6.8.2.tgz#79849c909afa114f8227c5b52a2040e2e5381daf"
   integrity sha512-5o2gVLFyieDSgsStEU5mqty4MZqfeytYA/gJqBSw5/Xuob0X2UrFX/k7FDh+YAwjzG/1l8nYa0oDaJ0sGs/RlA==
   dependencies:
     ml-array-rescale "^1.3.6"
+
+ml-regression-multivariate-linear@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/ml-regression-multivariate-linear/-/ml-regression-multivariate-linear-2.0.3.tgz#e1d660ccea46c812a2749af494e2a8d4ac1d68cf"
+  integrity sha512-G8tBqf8bEhowiVP9rUeYjoc6mCSsA7yxo3fCr8hjaVVmLBAZEXoyeHj5zQZJh/eAp6423kSaabP3emWMwRcnbw==
+  dependencies:
+    ml-matrix "^6.4.1"
 
 module-deps@^6.2.3:
   version "6.2.3"

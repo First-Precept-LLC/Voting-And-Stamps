@@ -998,6 +998,21 @@ class StampsModule {
     }
 
 
+  },
+
+  getTrainingEffectiveness: async (obj, args, context, info) => {
+    const db = mongoose.connection;
+    const stamps = new StampsModule();
+    await stamps.init();
+    let trainingId = args.training;
+    let training = await db.collection("training").find({_id: trainingId}).toArray()[0];
+    let viewedUsers = training.viewedUsers.split(",");
+    let nonViewedUsers = (await stamps.utils.get_users(args.graph)).filter(user => ! (user in viewedUsers));
+    
+
+    //TODO: do some kind of statistical analysis to find how effective the training is.
+
+    
   }
     
  }
