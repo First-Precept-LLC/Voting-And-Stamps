@@ -23,6 +23,7 @@ const {Matrix, solve} = require('ml-matrix');
 
 const readline = require('readline');
 const f = require('fs');
+const cron = require('node-cron');
 
 
 
@@ -738,6 +739,7 @@ class StampsModule {
     },
     //Get the score of a user, based on the content they have created, for a specific trust graph.
     getUserScore: async (obj, args, context, info) => {
+      const db = mongoose.connection;
       const stamps = new StampsModule();
       await stamps.init();
       let vote_range = await stamps.utils.get_vote_range(args.graph);
@@ -753,6 +755,15 @@ class StampsModule {
       } else {
           normalized_impact_rating = (average_impact_rating - prediction_range[0])/(prediction_range[1] - prediction_range[0]);
       }
+
+      let userScore = normalized_impact_rating + normalized_user_votes;
+      let insertedObj = {
+        user: args.user,
+        graph: args.graph,
+        score: userScore,
+        isImpact: true
+      }
+      await db.collection("scores").findOneAndUpdate({user: args.user, graph: args.graph, isImpact: true}, {$set: insertedObj}, {upsert: true});
       return normalized_impact_rating + normalized_user_votes;
     },
      //Get the score of a piece of content, based on the votes for it and either predictions or resolutions of it, across all trust graphs.
@@ -948,7 +959,7 @@ class StampsModule {
     for (let i = 0; i < weights.length; i++) {
       finalScore += rawScores[i] * weights[i]/totalWeights;
     }
-    db.collection("users").findOneAndUpdate({user: args.user, tag: args.tag, graph: args.collection}, {$set: {user: args.user, tag: args.tag, graph: args.collection, score: finalScore}}, {upsert: true});
+    db.collection("scores").findOneAndUpdate({user: args.user, tag: args.tag, graph: args.collection}, {$set: {user: args.user, tag: args.tag, graph: args.collection, score: finalScore, isImpact: false}}, {upsert: true});
     return finalScore;
   },
   //Generate a page of content.
@@ -1008,7 +1019,7 @@ class StampsModule {
     let training = await db.collection("training").find({_id: trainingId}).toArray()[0];
     let viewedUsers = training.viewedUsers.split(",");
     let nonViewedUsers = (await stamps.utils.get_users(args.graph)).filter(user => ! (user in viewedUsers));
-    
+
 
     //TODO: do some kind of statistical analysis to find how effective the training is.
 
@@ -1038,6 +1049,17 @@ class StampsModule {
          }
        : false,
  });
+
+ cron.schedule('0 0 0 * * *', async () => {
+   const db = mongoose.connection;
+   const stamps = new StampsModule();
+   await stamps.init();
+   let allScores = await db.collection("scores").find({}).toArray();
+   for (let i = 0; i < allScores.length; i++) {
+     allScores[i].createdAt = new Date();
+     await db.collection("pastscores").insertOne(allScores[i]);
+   }
+ })
  
  const app = express();
  
