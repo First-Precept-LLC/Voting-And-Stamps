@@ -5,6 +5,8 @@ import {
     VulcanGraphqlSchemaServer,
   } from "@vulcanjs/graphql/server";
   import { createMongooseConnector } from "@vulcanjs/mongo";
+import { User } from "./user.server";
+import { Content } from "./content.server";
 
 
   export interface UserVoteTypeServer extends VulcanDocument {
@@ -46,7 +48,7 @@ import {
 
     },
     user: {
-      type: String,
+      type: User,
       optional: true,
       canRead: ["guests"],
       canCreate: ["members"]
@@ -54,7 +56,7 @@ import {
     },
   
     votedFor: {
-      type: String,
+      type: User,
       optional: true,
       canRead: ["guests"],
       canCreate: ["members"]
@@ -62,7 +64,7 @@ import {
     },
 
     targetTransaction: {
-        type: String,
+        type: Content,
         optional: true,
         canRead: ["guests"],
         canCreate: ["members"]
@@ -70,7 +72,7 @@ import {
     },
 
     targetProposal: {
-        type: String,
+        type: Content,
         optional: true,
         canRead: ["guests"],
         canCreate: ["members"]

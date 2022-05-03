@@ -5,6 +5,7 @@ import {
     VulcanGraphqlSchemaServer,
   } from "@vulcanjs/graphql/server";
   import { createMongooseConnector } from "@vulcanjs/mongo";
+import { User } from "./user.server";
 
 
   export interface ContentTypeServer extends VulcanDocument {
@@ -54,7 +55,7 @@ import {
 
     },
     creator: {
-      type: String,
+      type: User,
       optional: true,
       canRead: ["guests"],
       canCreate: ["members"]

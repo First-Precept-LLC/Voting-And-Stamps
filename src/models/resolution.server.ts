@@ -5,6 +5,8 @@ import {
     VulcanGraphqlSchemaServer,
   } from "@vulcanjs/graphql/server";
   import { createMongooseConnector } from "@vulcanjs/mongo";
+import { User } from "./user.server";
+import { Content } from "./content.server";
 
 
   export interface ResolutionTypeServer extends VulcanDocument {
@@ -41,7 +43,7 @@ import {
       },
     },
     user: {
-      type: String,
+      type: User,
       optional: true,
       canRead: ["guests"],
       canCreate: ["members"],
@@ -49,7 +51,7 @@ import {
   
     //The piece of content being resolved.
     contentId: {
-      type: String,
+      type: Content,
       optional: true,
       canRead: ["guests"],
       canCreate: ["members"]

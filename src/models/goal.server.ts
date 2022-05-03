@@ -5,6 +5,7 @@ import {
     VulcanGraphqlSchemaServer,
   } from "@vulcanjs/graphql/server";
 import { createMongooseConnector } from "@vulcanjs/mongo";
+import { User } from "./user.server";
 
 
 
@@ -56,7 +57,7 @@ import { createMongooseConnector } from "@vulcanjs/mongo";
 
 
     creator: {
-      type: String,
+      type: User,
       optional: true,
       canRead: ["guests"],
       canCreate: ["members"]

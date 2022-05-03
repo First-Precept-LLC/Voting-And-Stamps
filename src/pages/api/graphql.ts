@@ -1050,16 +1050,22 @@ class StampsModule {
        : false,
  });
 
- cron.schedule('0 0 0 * * *', async () => {
+ console.log("huh?")
+
+ let task = cron.schedule('0 * * * * *', async () => {
+   console.log("aiee!")
    const db = mongoose.connection;
-   const stamps = new StampsModule();
-   await stamps.init();
    let allScores = await db.collection("scores").find({}).toArray();
    for (let i = 0; i < allScores.length; i++) {
+     console.log(i);
      allScores[i].createdAt = new Date();
      await db.collection("pastscores").insertOne(allScores[i]);
    }
- })
+ });
+
+ task.start();
+
+
  
  const app = express();
  

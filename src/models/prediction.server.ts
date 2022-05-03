@@ -5,12 +5,14 @@ import {
     VulcanGraphqlSchemaServer,
   } from "@vulcanjs/graphql/server";
   import { createMongooseConnector } from "@vulcanjs/mongo";
+  import { User } from "./user.server";
+import { Content } from "./content.server";
 
 
   export interface PredictionTypeServer extends VulcanDocument {
     user?: string;
     proposalId?: string;
-    score?: string;
+    score?: number;
     collection?: string;
   }
 
@@ -41,7 +43,7 @@ import {
       canCreate: ["members"]
     },
     user: {
-      type: String,
+      type: User,
       optional: true,
       canRead: ["guests"],
       canCreate: ["members"]
@@ -49,7 +51,7 @@ import {
   
     //The piece of content being predicted.
     contentId: {
-      type: String,
+      type: Content,
       optional: true,
       canRead: ["guests"],
       canCreate: ["members"]
