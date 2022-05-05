@@ -6,6 +6,7 @@ import {
   } from "@vulcanjs/graphql/server";
 import { createMongooseConnector } from "@vulcanjs/mongo";
 import { User } from "./user.server";
+import { Content } from "./content.server";
 
 
 
@@ -57,7 +58,13 @@ import { User } from "./user.server";
 
 
     creator: {
-      type: User,
+      type: String,
+      relation: {
+        fieldName: "user",
+        kind: "hasOne",
+        model: User,
+        typeName: "User",
+      },
       optional: true,
       canRead: ["guests"],
       canCreate: ["members"]
@@ -104,6 +111,12 @@ import { User } from "./user.server";
     //External ID from the contents table maps here.
     contentId: {
         type: String,
+        relation: {
+         fieldName: "content",
+         kind: "hasOne",
+         model: Content,
+         typeName: "Content",
+        },
         optional: true,
         canRead: ["guests"],
         canCreate: ["members"]

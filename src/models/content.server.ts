@@ -55,7 +55,13 @@ import { User } from "./user.server";
 
     },
     creator: {
-      type: User,
+      type: String,
+      relation: {
+        fieldName: "user",
+        kind: "hasOne",
+        model: User,
+        typeName: "User",
+      },
       optional: true,
       canRead: ["guests"],
       canCreate: ["members"]

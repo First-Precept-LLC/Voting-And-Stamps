@@ -17,6 +17,7 @@ import runSeed from "~/lib/api/runSeed";
 import { PredictionResolutionGroup, nonMarketScore } from "~/lib/prediction-analysis/src/index";
 
 import { Guesstimator } from "~/lib/guesstimator/src/index";
+import user from "./account/user";
 
 const stampy_id = "stampy";
 const {Matrix, solve} = require('ml-matrix');
@@ -142,7 +143,7 @@ class Utilities {
     static async update_vote(userwallet, user_name, voted_for, voted_for_target, target_type, vote_quantity, collection) {
 		    let targetTable = Utilities.UserVotes;
         let insertedObj = {
-            user: userwallet,
+            user: Utilities.db.collection("users").findOne({username: userwallet}),
             sourceName: user_name,
             votedFor: voted_for,
             target: voted_for_target,
@@ -157,7 +158,7 @@ class Utilities {
   //Find all the votes a user has made.
   static async get_votes_by_user(userwallet, collection){
 		let targetTable = Utilities.UserVotes;
-    let allUserVotes = await targetTable.find({user: userwallet, graph: collection}).toArray();
+    let allUserVotes = await targetTable.find({user: Utilities.db.collection("users").findOne({username: userwallet}), graph: collection}).toArray();
     let total = 0;
     for (let i = 0; i < allUserVotes.length; i++) {
         total += allUserVotes[i].votecount;

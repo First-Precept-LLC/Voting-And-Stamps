@@ -43,7 +43,13 @@ import { Content } from "./content.server";
       },
     },
     user: {
-      type: User,
+      type: String,
+      relation: {
+        fieldName: "user",
+        kind: "hasOne",
+        model: User,
+        typeName: "User",
+      },
       optional: true,
       canRead: ["guests"],
       canCreate: ["members"],
@@ -51,7 +57,13 @@ import { Content } from "./content.server";
   
     //The piece of content being resolved.
     contentId: {
-      type: Content,
+      type: String,
+      relation: {
+        fieldName: "content",
+        kind: "hasOne",
+        model: Content,
+        typeName: "Content",
+      },
       optional: true,
       canRead: ["guests"],
       canCreate: ["members"]

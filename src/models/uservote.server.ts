@@ -7,6 +7,7 @@ import {
   import { createMongooseConnector } from "@vulcanjs/mongo";
 import { User } from "./user.server";
 import { Content } from "./content.server";
+import user from "~/pages/api/account/user";
 
 
   export interface UserVoteTypeServer extends VulcanDocument {
@@ -48,7 +49,13 @@ import { Content } from "./content.server";
 
     },
     user: {
-      type: User,
+      type: String,
+      relation: {
+        fieldName: "user",
+        kind: "hasOne",
+        model: User,
+        typeName: "User",
+      },
       optional: true,
       canRead: ["guests"],
       canCreate: ["members"]
@@ -56,7 +63,13 @@ import { Content } from "./content.server";
     },
   
     votedFor: {
-      type: User,
+      type: String,
+      relation: {
+        fieldName: "user",
+        kind: "hasOne",
+        model: User,
+        typeName: "User",
+      },
       optional: true,
       canRead: ["guests"],
       canCreate: ["members"]
@@ -64,18 +77,30 @@ import { Content } from "./content.server";
     },
 
     targetTransaction: {
-        type: Content,
-        optional: true,
-        canRead: ["guests"],
-        canCreate: ["members"]
+      type: String,
+      relation: {
+        fieldName: "content",
+        kind: "hasOne",
+        model: Content,
+        typeName: "Content",
+      },
+      optional: true,
+      canRead: ["guests"],
+      canCreate: ["members"]
 
     },
 
     targetProposal: {
-        type: Content,
-        optional: true,
-        canRead: ["guests"],
-        canCreate: ["members"]
+      type: String,
+      relation: {
+        fieldName: "content",
+        kind: "hasOne",
+        model: Content,
+        typeName: "Content",
+      },
+      optional: true,
+      canRead: ["guests"],
+      canCreate: ["members"]
 
     },
 
