@@ -749,7 +749,7 @@ class StampsModule {
       let total_user_votes = await stamps.utils.get_votes_for_user(args.user, args.graph);
       let normalized_user_votes = (total_user_votes - vote_range[0])/(vote_range[1] - vote_range[0]); 
       let average_impact_rating = await stamps.utils.get_average_impact_by_user(args.user, args.graph);
-      let all_impact_resolutions = await Utilities.Resolutions.find({user: args.user, graph: args.graph}).toArray();
+      let all_impact_resolutions = await Utilities.Resolutions.find({creator: args.user, graph: args.graph}).toArray();
       let normalized_impact_rating;
       if (all_impact_resolutions.length > 0) {
           normalized_impact_rating = (average_impact_rating - resolution_range[0])/(resolution_range[1] - resolution_range[0]);
@@ -764,7 +764,7 @@ class StampsModule {
         score: userScore,
         isImpact: true
       }
-      await db.collection("scores").findOneAndUpdate({user: args.user, graph: args.graph, isImpact: true}, {$set: insertedObj}, {upsert: true});
+      await db.collection("scores").findOneAndUpdate({scorerId: args.user, graph: args.graph, isImpact: true}, {$set: insertedObj}, {upsert: true});
       return normalized_impact_rating + normalized_user_votes;
     },
      //Get the score of a piece of content, based on the votes for it and either predictions or resolutions of it, across all trust graphs.
@@ -916,7 +916,7 @@ class StampsModule {
       const predictors = stamps.utils.get_predictors_by_proposal(target, args.collection);
       let trustedResolutions = [] as any;
       for (let i = 0; i < resolutions.length; i++) {
-        if (! predictors.includes(resolutions[i].user) && (!resolvingUsers || resolvingUsers.includes(resolutions[i].user)) && resolutions[i].graph == args.collection){
+        if (! predictors.includes(resolutions[i].creator) && (!resolvingUsers || resolvingUsers.includes(resolutions[i].creator)) && resolutions[i].graph == args.collection){
           trustedResolutions.push(resolutions[i]);
         }
       }
@@ -960,7 +960,7 @@ class StampsModule {
     for (let i = 0; i < weights.length; i++) {
       finalScore += rawScores[i] * weights[i]/totalWeights;
     }
-    db.collection("scores").findOneAndUpdate({user: args.user, tag: args.tag, graph: args.collection}, {$set: {user: args.user, tag: args.tag, graph: args.collection, score: finalScore, isImpact: false}}, {upsert: true});
+    db.collection("scores").findOneAndUpdate({scorerId: args.user, tag: args.tag, graph: args.collection}, {$set: {user: args.user, tag: args.tag, graph: args.collection, score: finalScore, isImpact: false}}, {upsert: true});
     return finalScore;
   },
   //Generate a page of content.

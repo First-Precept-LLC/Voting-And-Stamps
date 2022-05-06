@@ -45,7 +45,7 @@ import { Content } from "./content.server";
     user: {
       type: String,
       relation: {
-        fieldName: "user",
+        fieldName: "predictor",
         kind: "hasOne",
         model: User,
         typeName: "User",

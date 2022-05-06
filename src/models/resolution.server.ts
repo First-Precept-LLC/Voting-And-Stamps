@@ -42,7 +42,7 @@ import { Content } from "./content.server";
         return new Date();
       },
     },
-    user: {
+    creator: {
       type: String,
       relation: {
         fieldName: "user",

@@ -51,7 +51,7 @@ import user from "~/pages/api/account/user";
     user: {
       type: String,
       relation: {
-        fieldName: "user",
+        fieldName: "voter",
         kind: "hasOne",
         model: User,
         typeName: "User",

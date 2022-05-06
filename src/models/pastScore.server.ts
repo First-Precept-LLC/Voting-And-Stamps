@@ -42,7 +42,7 @@ import { User } from "./user.server";
         return new Date();
       },
     },
-    user: {
+    scorerId: {
       type: String,
       relation: {
         fieldName: "user",

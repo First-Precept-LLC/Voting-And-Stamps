@@ -5,6 +5,7 @@ import {
     VulcanGraphqlSchemaServer,
   } from "@vulcanjs/graphql/server";
 import { createMongooseConnector } from "@vulcanjs/mongo";
+import { User } from "./user.server";
 
 
 var cloudinary = require('cloudinary');
@@ -58,6 +59,12 @@ var cloudinary = require('cloudinary');
 
     creator: {
       type: String,
+      relation: {
+        fieldName: "user",
+        kind: "hasOne",
+        model: User,
+        typeName: "User",
+      },
       optional: true,
       canRead: ["guests"],
       canCreate: ["members"]
