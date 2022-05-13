@@ -1,6 +1,38 @@
 import React from 'react';
+import Value from "~/components/kelvin/value";
+
+
+import { routes } from "~/lib/routes";
+import { useRouter } from "next/router";
+import { apiRoutes } from "~/lib/api/apiRoutes";
 
 const Detail = (props) => {
+
+    let valuesList = [];
+
+    const router = useRouter();
+
+    let body = props;
+
+
+    try {
+        const res = await fetch(apiRoutes.kelvin.values.href, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        if (res.status === 200) {
+          //TODO: iterate over the content found, and push a Value component of each into the values list
+        } else {
+          throw new Error(await res.text());
+        }
+      } catch (error) {
+        console.error("An unexpected error happened occurred:", error);
+      }
+    }
+
+
+    //TODO: populate values list with all existing values
 
     //TODO: make this dependent on the props passed in?
 
@@ -71,84 +103,7 @@ const Detail = (props) => {
 
         </div>
         <div className="flex flex-col px-10">
-            <div className="flex shadow shadow-md rounded-md py-4 px-6 my-2 items-center justify-between">
-                <div className="flex">
-                    <div className="flex flex-col justify-start items-start mr-2">
-                        <i className="fa-solid text-kelvinDark mr-2 fa-rocket text-xl"></i>
-                    </div>
-                    <div className="mr-8">
-                        <h6 className="leading-none mb-2 ">Modern</h6>
-                        <p className="text-gray-400">Short description of value here accommodates two lines</p>
-                    </div>
-                </div>
-                <div className="flex flex-col items-end">
-                    <div className="flex">
-                        <p className="text-kelvinDark bg-kelvinLight px-3 py-2  font-bold rounded">32</p>
-                    </div>
-                    <div className="flex my-4">
-                        <button type="button"
-                            className="focus:outline-none text-white bg-kelvinDark hover:bg-kelvinBold focus:ring-4 focus:ring-kelvinDark font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-kelvinDark dark:hover:bg-kelvinBold dark:focus:ring-kelvinDark"><i
-                                className="fa-solid text-white fa-thumbs-up"
-                                onClick={() => {return;}}></i></button>
-                        <label htmlFor="" className="p-2 mx-2 font-medium text-lg">5</label>
-                        <button type="button"
-                            className="focus:outline-none text-white bg-kelvinDark hover:bg-kelvinBold focus:ring-4 focus:ring-kelvinDark font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-kelvinDark dark:hover:bg-kelvinBold dark:focus:ring-kelvinDark"><i
-                                className="fa-solid text-white fa-thumbs-down"
-                                onClick={() => {return;} //TODO: have these buttons update running variables tracking votes; potentially abstract away their function
-                                  }></i></button> /
-                    </div>
-                </div>
-            </div>
-            <div className="flex shadow shadow-md rounded-md py-4 px-6 my-2 items-center justify-between">
-                <div className="flex">
-                    <div className="flex flex-col justify-start items-start mr-2">
-                        <i className="fa-solid text-kelvinDark mr-2 fa-rocket text-xl"></i>
-                    </div>
-                    <div className="mr-8">
-                        <h6 className="leading-none mb-2 ">Modern</h6>
-                        <p className="text-gray-400">Short description of value here accommodates two lines</p>
-                    </div>
-                </div>
-                <div className="flex flex-col items-end">
-                    <div className="flex">
-                        <p className="text-kelvinDark bg-kelvinLight px-3 py-2  font-bold rounded">32</p>
-                    </div>
-                    <div className="flex my-4">
-                        <button type="button"
-                            className="focus:outline-none text-white bg-kelvinDark hover:bg-kelvinBold focus:ring-4 focus:ring-kelvinDark font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-kelvinDark dark:hover:bg-kelvinBold dark:focus:ring-kelvinDark"><i
-                                className="fa-solid text-white fa-thumbs-up"></i></button>
-                        <label htmlFor="" className="p-2 mx-2 font-medium text-lg">5</label>
-                        <button type="button"
-                            className="focus:outline-none text-white bg-kelvinDark hover:bg-kelvinBold focus:ring-4 focus:ring-kelvinDark font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-kelvinDark dark:hover:bg-kelvinBold dark:focus:ring-kelvinDark"><i
-                                className="fa-solid text-white fa-thumbs-down"></i></button>
-                    </div>
-                </div>
-            </div>
-            <div className="flex shadow shadow-md rounded-md py-4 px-6 my-2 items-center justify-between">
-                <div className="flex">
-                    <div className="flex flex-col justify-start items-start mr-2">
-                        <i className="fa-solid text-kelvinDark mr-2 fa-rocket text-xl"></i>
-                    </div>
-                    <div className="mr-8">
-                        <h6 className="leading-none mb-2 ">Modern</h6>
-                        <p className="text-gray-400">Short description of value here accommodates two lines</p>
-                    </div>
-                </div>
-                <div className="flex flex-col items-end">
-                    <div className="flex">
-                        <p className="text-kelvinDark bg-kelvinLight px-3 py-2  font-bold rounded">32</p>
-                    </div>
-                    <div className="flex my-4">
-                        <button type="button"
-                            className="focus:outline-none text-white bg-kelvinDark hover:bg-kelvinBold focus:ring-4 focus:ring-kelvinDark font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-kelvinDark dark:hover:bg-kelvinBold dark:focus:ring-kelvinDark"><i
-                                className="fa-solid text-white fa-thumbs-up"></i></button>
-                        <label htmlFor="" className="p-2 mx-2 font-medium text-lg">5</label>
-                        <button type="button"
-                            className="focus:outline-none text-white bg-kelvinDark hover:bg-kelvinBold focus:ring-4 focus:ring-kelvinDark font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-kelvinDark dark:hover:bg-kelvinBold dark:focus:ring-kelvinDark"><i
-                                className="fa-solid text-white fa-thumbs-down"></i></button>
-                    </div>
-                </div>
-            </div>
+            {valuesList}
         </div>
         <div className="flex px-10 mt-4">
             <button type="button"

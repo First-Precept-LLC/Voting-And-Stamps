@@ -31,4 +31,16 @@ export const apiRoutes = {
       method: "GET",
     },
   },
+  kelvin: {
+
+    card: {
+      href: "/api/kelvin/card",
+      method: "GET"
+    },
+
+    values: {
+      href: "/api/kelvin/values",
+      method: "GET"
+    }
+  }
 };
