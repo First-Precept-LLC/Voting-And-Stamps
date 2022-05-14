@@ -25,5 +25,11 @@ export const routes = {
     profile: {
       href: "/account/profile",
     },
+    index: {
+      href: "/kelvin/index"
+    },
+    detail: {
+      href: "/kelvin/detail" //TODO: add props somehow
+    }
   },
 };
