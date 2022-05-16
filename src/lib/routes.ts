@@ -24,12 +24,14 @@ export const routes = {
     },
     profile: {
       href: "/account/profile",
-    },
+    }
+  },
+  kelvin: {
     index: {
       href: "/kelvin/index"
     },
     detail: {
       href: "/kelvin/detail" //TODO: add props somehow
     }
-  },
+  }
 };

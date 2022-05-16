@@ -36,12 +36,6 @@ const Detail = async (props) => {
       }
     
 
-
-    //TODO: populate values list with all existing values
-
-    //TODO: make this dependent on the props passed in?
-
-
    return (
     <>
     <head>
@@ -101,7 +95,10 @@ const Detail = async (props) => {
                     <button type="submit"
                         className="text-white absolute right-2.5 bottom-2.5 bg-kelvinMedium hover:bg-kelvinDark focus:ring-4 focus:outline-none focus:ring-kelvinMedium font-medium rounded-lg text-sm px-4 py-2 dark:bg-kelvinMedium dark:hover:bg-kelvinDark dark:focus:ring-blue-800"
                         onClick={
-                            () => {return;} //TODO: search for content filtered by the search input; redirect to a results page
+                            () => {
+                                let filterString = document.getElementById("default-search")?.textContent; //TODO: does this in fact get the inside of the input?
+                                router.push(routes.kelvin.index.href); //TODO: use filter string
+                            }
                         }>Search</button>
                 </div>
             </form>
