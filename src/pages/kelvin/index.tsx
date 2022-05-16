@@ -3,11 +3,12 @@ import { PassThrough } from "stream";
 import { routes } from "~/lib/routes";
 import { useRouter } from "next/router";
 import { apiRoutes } from "~/lib/api/apiRoutes";
+import Card from "~/components/kelvin/card";
 
 
-const Index = (props) => {
+const Index = async (props) => {
 
-    let cardsList = [];
+    let cardsList = [] as any;
 
     const router = useRouter();
 
@@ -21,15 +22,17 @@ const Index = (props) => {
           body: JSON.stringify(body),
         });
         if (res.status === 200) {
-          //TODO: iterate over the content found, and push a Card component of each into the cards list
-          //Potentially send one request per card instead?
+          let rawCards = (await res.json()).results;
+          for(let i = 0; i < rawCards.length; i++) {
+              let card = rawCards[i];
+              cardsList.push(<Card name={card.name} description={card.description} id={card._id}/>);
+          }
         } else {
           throw new Error(await res.text());
         }
       } catch (error) {
         console.error("An unexpected error happened occurred:", error);
       }
-    }
 
 
     return (

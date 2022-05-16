@@ -6,9 +6,9 @@ import { routes } from "~/lib/routes";
 import { useRouter } from "next/router";
 import { apiRoutes } from "~/lib/api/apiRoutes";
 
-const Detail = (props) => {
+const Detail = async (props) => {
 
-    let valuesList = [];
+    let valuesList = [] as any;
 
     const router = useRouter();
 
@@ -22,14 +22,19 @@ const Detail = (props) => {
           body: JSON.stringify(body),
         });
         if (res.status === 200) {
-          //TODO: iterate over the content found, and push a Value component of each into the values list
+          let rawValues = (await res.json()).results;
+          for(let i = 0; i < rawValues.length; i++) {
+              let value = rawValues[i];
+              valuesList.push(<Value name={value.name} description={value.description} contentId={value.contentId} valueId={value._id} />)
+
+          }
         } else {
           throw new Error(await res.text());
         }
       } catch (error) {
         console.error("An unexpected error happened occurred:", error);
       }
-    }
+    
 
 
     //TODO: populate values list with all existing values
