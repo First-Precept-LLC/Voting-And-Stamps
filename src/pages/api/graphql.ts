@@ -674,7 +674,7 @@ class StampsModule {
      endCursor: String
    }
     `;
- const resolvers = {
+ export const resolvers = {
    Query: {
      getUservotes: async (obj, args, context, info) => {
        const db = mongoose.connection;

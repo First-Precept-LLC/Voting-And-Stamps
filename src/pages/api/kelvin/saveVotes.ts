@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import mongoose from "mongoose";
-import testServer from "~/pages/api/graphql"
+import {resolvers, testServer} from "~/pages/api/graphql"
 
 
 
@@ -13,6 +13,11 @@ export default async function saveVotes(
 ) {
     let userVotes = mongoose.connection.collection("uservotes");
     let savedVotes = req.body.savedVotes;
+    for(let i = 0; i < savedVotes.length; i++) {
+        let vote = savedVotes[i];
+        //TODO: update the vote, potentially using executeOperation
+        
+    }
     //TODO: use updateVote from api/graphql
 
 
