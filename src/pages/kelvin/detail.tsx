@@ -97,7 +97,7 @@ const Detail = async (props) => {
                         onClick={
                             () => {
                                 let filterString = document.getElementById("default-search")?.textContent; //TODO: does this in fact get the inside of the input?
-                                router.push(routes.kelvin.index.href); //TODO: use filter string
+                                router.push(routes.kelvin.index.href + "?nameFilter=" + filterString);
                             }
                         }>Search</button>
                 </div>

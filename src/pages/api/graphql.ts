@@ -372,7 +372,7 @@ class Utilities {
 
 }
 
-class StampsModule {
+export class StampsModule {
     utils: any;
     //Strengths of votes.
     red_stamp_value: number;
