@@ -3,6 +3,9 @@ import { useState } from "react";
 const Value = ({name, description, contentId, valueId}) => {
     let [upvoted, setUpvoted] = useState(0);
     let [downvoted, setDownvoted] = useState(0);
+    let [valueName, setName] = useState(name);
+    let [contentID, setContentId] = useState(contentId);
+    let [valueID, setValueId] = useState(valueId);
     return (
     <div className="flex shadow shadow-md rounded-md py-4 px-6 my-2 items-center justify-between">
         <div className="flex">

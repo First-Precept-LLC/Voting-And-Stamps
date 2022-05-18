@@ -13,18 +13,23 @@ export default async function saveVotes(
     req: NextApiRequest,
     res: NextApiResponse
 ) {
-    let userVotes = mongoose.connection.collection("uservotes");
     let savedVotes = req.body.savedVotes;
+    let toTarget = req.body.toTarget;
+    let contents = mongoose.connection.collection("contents");
+    let targetContent = await contents.findOne({_id: toTarget});
+    let fullSuccess = false;
+
     for(let i = 0; i < savedVotes.length; i++) {
         let vote = savedVotes[i];
         const stamps = new StampsModule();
         await stamps.init();
-        const success = await stamps.update_vote(vote.stampType, vote.fromId, vote.fromName, vote.toId, vote.toTarget, vote.targetType, vote.collection, vote.negative); //negative is true in the case of a downvote, and false otherwise.
-        return success;
-        //TODO: update the vote, potentially using executeOperation
+        const success = await stamps.update_vote(vote.stampType, vote.fromId, vote.fromName, targetContent?.creator, toTarget, targetContent?.contentType, vote.collection, vote.negative); //negative is true in the case of a downvote, and false otherwise.
+        fullSuccess = fullSuccess && success;
         
     }
-    //TODO: use updateVote from api/graphql
+
+    return res.status(200).send({success: fullSuccess});
+
 
 
 }

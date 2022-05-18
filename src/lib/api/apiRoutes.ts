@@ -41,6 +41,11 @@ export const apiRoutes = {
     values: {
       href: "/api/kelvin/values",
       method: "GET"
+    },
+
+    saveVotes: {
+      href: "api/kelvin/saveVotes",
+      method: "POST"
     }
   }
 };
