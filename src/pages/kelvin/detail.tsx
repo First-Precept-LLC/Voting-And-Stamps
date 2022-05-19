@@ -5,12 +5,16 @@ import Value from "~/components/kelvin/value";
 import { routes } from "~/lib/routes";
 import { useRouter } from "next/router";
 import { apiRoutes } from "~/lib/api/apiRoutes";
+import { useUser } from "~/components/account/hooks";
+
 
 const Detail = async (props) => {
 
     let valuesList = [] as any;
 
     const router = useRouter();
+
+    const user = useUser({ redirectTo: routes.account.login.href });
 
     let body = props;
 
@@ -120,13 +124,18 @@ const Detail = async (props) => {
                             let negative = value.downvoted > 0;
                             let stampType = "stamp";
                             try {
+                                let userId = user?._id
+                                let userName = user?.email
                                 const res = await fetch(apiRoutes.kelvin.saveVotes.href, {
                                     method: "POST",
                                     headers: { "Content-Type": "application/json" },
                                     body: JSON.stringify({
                                         negative: negative,
                                         stampType: stampType,
-                                        collection: value.name
+                                        collection: value.name,
+                                        fromId: userId,
+                                        fromName: userName
+
                                         //TODO: add information about current user
                                     })
                                 });

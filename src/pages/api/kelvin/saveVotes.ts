@@ -15,6 +15,8 @@ export default async function saveVotes(
 ) {
     let savedVotes = req.body.savedVotes;
     let toTarget = req.body.toTarget;
+    let fromId = req.body.fromId;
+    let fromName = req.body.fromName;
     let contents = mongoose.connection.collection("contents");
     let targetContent = await contents.findOne({_id: toTarget});
     let fullSuccess = false;
@@ -23,7 +25,7 @@ export default async function saveVotes(
         let vote = savedVotes[i];
         const stamps = new StampsModule();
         await stamps.init();
-        const success = await stamps.update_vote(vote.stampType, vote.fromId, vote.fromName, targetContent?.creator, toTarget, targetContent?.contentType, vote.collection, vote.negative); //negative is true in the case of a downvote, and false otherwise.
+        const success = await stamps.update_vote(vote.stampType, fromId, fromName, targetContent?.creator, toTarget, targetContent?.contentType, vote.collection, vote.negative); //negative is true in the case of a downvote, and false otherwise.
         fullSuccess = fullSuccess && success;
         
     }
