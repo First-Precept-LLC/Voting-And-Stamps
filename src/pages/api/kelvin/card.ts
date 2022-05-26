@@ -10,7 +10,6 @@ export default async function cards(
     res: NextApiResponse
 ) {
    let contents = mongoose.connection.collection("contents");
-   let nameFilter = req.body.nameFilter;
-   let cards = await contents.find({name: {$regex: nameFilter}}).toArray();
+   let cards = await contents.find({}).toArray();
    return res.status(200).send({results: cards});
 }

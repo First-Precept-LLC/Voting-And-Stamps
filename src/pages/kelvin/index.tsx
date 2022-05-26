@@ -19,10 +19,9 @@ const Index = async (props) => {
         const res = await fetch(apiRoutes.kelvin.card.href, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
         });
         if (res.status === 200) {
-          let rawCards = (await res.json()).results;
+          let rawCards = (await res.json()).results.filter(card => card.name.includes(props.nameFilter));
           for(let i = 0; i < rawCards.length; i++) {
               let card = rawCards[i];
               cardsList.push(<Card name={card.name} description={card.description} id={card._id}/>);
