@@ -8,7 +8,8 @@ export default async function values(
     req: NextApiRequest,
     res: NextApiResponse
 ) {
-    let values = mongoose.connection.collection("values");
+    let db = mongoose.connection;
+    let values = db.collection("values");
     let allValues = await values.find({}).toArray();
     return res.status(200).send({results: allValues});
 }

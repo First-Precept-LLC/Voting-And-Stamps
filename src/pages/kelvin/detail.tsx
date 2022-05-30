@@ -126,7 +126,7 @@ const Detail = async (props) => {
                             try {
                                 let userId = user?._id
                                 let userName = user?.email
-                                const res = await fetch(apiRoutes.kelvin.saveVotes.href, {
+                                const res = await fetch("http://localhost:3000" + apiRoutes.kelvin.saveVotes.href, {
                                     method: "POST",
                                     headers: { "Content-Type": "application/json" },
                                     body: JSON.stringify({

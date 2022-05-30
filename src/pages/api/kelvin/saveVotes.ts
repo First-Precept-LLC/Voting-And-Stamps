@@ -17,7 +17,8 @@ export default async function saveVotes(
     let toTarget = req.body.toTarget;
     let fromId = req.body.fromId;
     let fromName = req.body.fromName;
-    let contents = mongoose.connection.collection("contents");
+    let db = mongoose.connection;
+    let contents = db.collection("contents");
     let targetContent = await contents.findOne({_id: toTarget});
     let fullSuccess = false;
 

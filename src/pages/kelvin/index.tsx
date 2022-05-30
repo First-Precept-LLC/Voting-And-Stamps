@@ -16,7 +16,7 @@ const Index = async (props) => {
 
 
     try {
-        const res = await fetch(apiRoutes.kelvin.card.href, {
+        const res = await fetch("http://localhost:3000" + apiRoutes.kelvin.card.href, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
         });
