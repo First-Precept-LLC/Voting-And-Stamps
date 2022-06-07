@@ -6,12 +6,15 @@ import {
   } from "@vulcanjs/graphql/server";
 
 import { createMongooseConnector } from "@vulcanjs/mongo";
+import { ProcessTemplate } from "./process_template.server";
 
-
-export interface ValueTypeServer extends VulcanDocument {
-    title?: string;
-    description?: string;
-    icon?: string;
+export interface ProcessTypeServer extends VulcanDocument {
+    name?: string;
+    parentProcessTemplate?: string;
+    progress?: number;
+    status?: string;
+    dueDate?: Date;
+    //TODO: add user?
   }
 
   
@@ -33,8 +36,7 @@ export interface ValueTypeServer extends VulcanDocument {
 
     },
 
-    //This name will be the value's graph field in uservotes.
-    title: {
+    name: {
         type: String,
         optional: true,
         canRead: ["guests"],
@@ -53,55 +55,36 @@ export interface ValueTypeServer extends VulcanDocument {
 
     },
 
-    description: {
+    parentProcessTemplate: {
         type: String,
-        optional: true,
-        canRead: ["guests"],
-        canCreate: ["members"]
-    },
-
-    //The public ID of the image, stored in Cloudinary. Supply a URL for imageUrl in the request, and it will automatically be uploaded, 
-    //with the public ID of the uploaded image occupying this field.
-    /*image: {
-        type: String,
-        optional: true,
-        canRead: ["guests"],
-        canCreate: ["members"],
-        onCreate: (self) => {
-            console.log("go!");
-            console.log(self);
-            let resultId;
-            cloudinary.v2.uploader.upload(self.document.imageUrl,
-            { public_id: self.document.name }, 
-            function(error, result) {
-               console.log(result); 
-               resultId =  result.public_id;
-            });
-
-            return resultId;
-
+        relation: {
+          fieldName: "processTemplate",
+          kind: "hasOne",
+          model: ProcessTemplate,
+          typeName: "ProcessTemplates",
         },
+        optional: true,
+        canRead: ["guests"],
+        canCreate: ["members"]
+  
     },
 
-    imageUrl: {
+    dueDate: {
+        type: Date,
+        optional: true,
+        canRead: ["guests"],
+        canCreate: ["members"]
+    },
+
+    status: {
         type: String,
         optional: true,
         canRead: ["guests"],
         canCreate: ["members"]
     },
 
-
-    //Users who begin with stamps for this value. If unset, defaults to the creator. Comma-separated IDs.
-    startSet: {
-        type: String,
-        optional: true,
-        canRead: ["guests"],
-        canCreate: ["members"]
-    }*/
-
-    //The icon out of a pregenerated list to use for this value
-    icon: {
-        type: String,
+    progress: {
+        type: Number,
         optional: true,
         canRead: ["guests"],
         canCreate: ["members"]
@@ -109,10 +92,10 @@ export interface ValueTypeServer extends VulcanDocument {
   };
 
   export const modelDef: CreateGraphqlModelOptionsServer = {
-    name: "Value",
+    name: "Process",
     graphql: {
-      typeName: "Value",
-      multiTypeName: "Values",
+      typeName: "Process",
+      multiTypeName: "Processes",
     },
     schema,
     permissions: {
@@ -123,6 +106,6 @@ export interface ValueTypeServer extends VulcanDocument {
     },
   };
 
-  export const Value = createGraphqlModelServer(modelDef);
+  export const Process = createGraphqlModelServer(modelDef);
 
-  export const ValueConnector = createMongooseConnector<ValueTypeServer>(Value);
+  export const ProcessConnector = createMongooseConnector<ProcessTypeServer>(Process);
