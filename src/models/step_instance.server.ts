@@ -63,7 +63,7 @@ export interface StepInstanceTypeServer extends VulcanDocument {
           fieldName: "process",
           kind: "hasOne",
           model: Process,
-          typeName: "Processes",
+          typeName: "Process",
         },
         optional: true,
         canRead: ["guests"],
@@ -77,7 +77,7 @@ export interface StepInstanceTypeServer extends VulcanDocument {
           fieldName: "step",
           kind: "hasOne",
           model: Step,
-          typeName: "Steps",
+          typeName: "Step",
         },
         optional: true,
         canRead: ["guests"],
@@ -108,10 +108,10 @@ export interface StepInstanceTypeServer extends VulcanDocument {
   };
 
   export const modelDef: CreateGraphqlModelOptionsServer = {
-    name: "Process",
+    name: "StepInstance",
     graphql: {
-      typeName: "Process",
-      multiTypeName: "Processes",
+      typeName: "StepInstance",
+      multiTypeName: "StepInstances",
     },
     schema,
     permissions: {

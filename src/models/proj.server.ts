@@ -58,7 +58,7 @@ export interface ProjTypeServer extends VulcanDocument {
           fieldName: "org",
           kind: "hasOne",
           model: Org,
-          typeName: "Orgs",
+          typeName: "Org",
         },
         optional: true,
         canRead: ["guests"],

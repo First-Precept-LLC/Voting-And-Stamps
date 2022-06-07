@@ -14,9 +14,9 @@ import models from "~/models/index.server";
 
 // will trigger seed
 import runSeed from "~/lib/api/runSeed";
-import { PredictionResolutionGroup, nonMarketScore } from "~/lib/prediction-analysis/src/index";
+//import { PredictionResolutionGroup, nonMarketScore } from "~/lib/prediction-analysis/src/index";
 
-import { Guesstimator } from "~/lib/guesstimator/src/index";
+//import { Guesstimator } from "~/lib/guesstimator/src/index";
 import user from "./account/user";
 
 const stampy_id = "stampy";
@@ -848,7 +848,7 @@ export class StampsModule {
       return true;
     },
     //Calculate the result of a complex prediction, using a Guesstimate string.
-    calculateResult: async(obj, args, context, info) => {
+    /*calculateResult: async(obj, args, context, info) => {
 
 
       const db = mongoose.connection;
@@ -899,10 +899,10 @@ export class StampsModule {
       } else {
         return -999;
       }
-   },
+   },*/
 
    //Get a user's score for a particular tag and collection
-   scoreUserByTag: async (obj, args, context, info) => {
+   /*scoreUserByTag: async (obj, args, context, info) => {
      const db = mongoose.connection;
      const stamps = new StampsModule();
      await stamps.init();
@@ -963,6 +963,7 @@ export class StampsModule {
     db.collection("scores").findOneAndUpdate({scorerId: args.user, tag: args.tag, graph: args.collection}, {$set: {user: args.user, tag: args.tag, graph: args.collection, score: finalScore, isImpact: false}}, {upsert: true});
     return finalScore;
   },
+  */
   //Generate a page of content.
   getContentPage: async (obj, args, context, info) => {
     let first = args.first;

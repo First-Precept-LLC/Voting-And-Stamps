@@ -10,8 +10,14 @@ import { Chat } from "./chat.server";
 import { Goal } from "./goal.server";
 import { Training } from "./training.server";
 import { PastScore } from "./pastScore.server";
+import { Proj } from "./proj.server";
+import { ProcessTemplate } from "./process_template.server";
+import { Process } from "./process.server";
+import { Org } from "./org.server";
+import { StepInstance } from "./step_instance.server";
+import { Step } from "./step.server";
 
-const models = [User, SampleModel, Content, Resolution, Prediction, Value, Chat, Goal, Training, PastScore];
+const models = [User, SampleModel, Content, Resolution, Prediction, Value, Chat, Goal, Training, PastScore, Proj, ProcessTemplate, Process, Org, StepInstance, Step];
 
 
 

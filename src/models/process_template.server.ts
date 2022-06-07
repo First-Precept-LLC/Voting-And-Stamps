@@ -59,7 +59,7 @@ export interface ProcessTemplateTypeServer extends VulcanDocument {
           fieldName: "proj",
           kind: "hasOne",
           model: Proj,
-          typeName: "Projs",
+          typeName: "Proj",
         },
         optional: true,
         canRead: ["guests"],
