@@ -63,7 +63,7 @@ import { Content } from "./content.server";
         fieldName: "user",
         kind: "hasOne",
         model: User,
-        typeName: "User",
+        typeName: "VulcanUser",
       },
       optional: true,
       canRead: ["guests"],

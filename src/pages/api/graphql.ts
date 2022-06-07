@@ -640,6 +640,7 @@ export class StampsModule {
      getContentScoreGlobal(targets: [String]): [Float]
      getUserScore(user: String, graph: String): Float
      getUserScoreGlobal(user: String): Float
+     getTrainingEffectiveness(training: String, graph: String): Float
      saveVariable(user: String, proposalId: String, name: String, type: String, value: String) : Boolean
      calculateResult(user: String, proposalId: String, expression: String, collection: String): Float
      scoreUserByTag(user: String, collection: String, tag: String): Float

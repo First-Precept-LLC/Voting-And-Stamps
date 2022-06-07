@@ -48,7 +48,7 @@ import { Content } from "./content.server";
         fieldName: "predictor",
         kind: "hasOne",
         model: User,
-        typeName: "User",
+        typeName: "VulcanUser",
       },
       optional: true,
       canRead: ["guests"],
