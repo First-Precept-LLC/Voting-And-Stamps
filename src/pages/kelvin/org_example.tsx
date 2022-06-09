@@ -5,7 +5,7 @@ const OrgExample = (props) => {
 
   const CREATE_ORG = gql`
   mutation createOrg($name: String!, $vision: String!) {
-    createOrg(inputt: {data: {name: $name, vision: $vision}}) {
+    createOrg(input: {data: {name: $name, vision: $vision}}) {
       data {vision}
     }
   }`;
