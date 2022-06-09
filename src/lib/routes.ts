@@ -32,6 +32,9 @@ export const routes = {
     },
     detail: {
       href: "/kelvin/detail" //TODO: add props somehow
+    },
+    orgexample: {
+      href: "/kelvin/org_example"
     }
   }
 };
