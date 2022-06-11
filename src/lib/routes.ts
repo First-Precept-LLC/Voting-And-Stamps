@@ -35,6 +35,9 @@ export const routes = {
     },
     orgexample: {
       href: "/kelvin/org_example"
+    },
+    projexample: {
+      href: "/kelvin/proj_example"
     }
   }
 };

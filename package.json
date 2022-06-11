@@ -92,6 +92,7 @@
     "express": "4.17.1",
     "financejs": "^4.1.0",
     "flowbite": "^1.4.5",
+    "fs": "^0.0.1-security",
     "graphql": "15.4.0",
     "graphql-tag": "2.10.3",
     "gray-matter": "^4.0.2",
