@@ -38,6 +38,9 @@ export const routes = {
     },
     projexample: {
       href: "/kelvin/proj_example"
+    },
+    processtemplateexample: {
+      href: "/routes/kelvin/process_template_example"
     }
   }
 };
