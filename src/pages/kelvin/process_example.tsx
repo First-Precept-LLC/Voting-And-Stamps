@@ -1,33 +1,33 @@
 import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
 
 
-const ProcessTemplateExample = (props) => {
+const ProcessExample = (props) => {
 
-  const CREATE_PROCESS_TEMPLATE = gql`
-  mutation createProcessTemplate($name: String!, $parentProject: String!, $estimatedDuration: Float!, $description: String!) {
-    createProcessTemplate(input: {data: {name: $name, parentProject: $parentProject, estimatedDuration: $estimatedDuration, description: $description}}) {
+  const CREATE_PROCESS = gql`
+  mutation createProcess($name: String!, $parentProcessTemplate: String!, $progress: Float!, $status: String!, $dueDate: Date!) {
+    createProcess(input: {data: {name: $name, parentProcessTemplate: $parentProcessTemplate, progress: $progress, status: $status, dueDate: $dueDate}}) {
       data {_id, name }
     }
   }`;
 
-  const PROJ_QUERY = gql`
-    query proj($nameFilter: String!) {
-        proj(input: {filter: {name: {_in: [$nameFilter]}}}) {
+  const PROCESS_TEMPLATE_QUERY = gql`
+    query processTemplate($nameFilter: String!) {
+        processTemplate(input: {filter: {name: {_in: [$nameFilter]}}}) {
           result {_id}
         }
     }`;
 
-  const GET_PROCESS_TEMPLATE = gql`
-    query processTemplate($id: String!) {
-      processTemplate(input: {id: $id}) {
+  const GET_PROCESS = gql`
+    query process($id: String!) {
+      process(input: {id: $id}) {
         result {name}
       }
   }`;
   
 
-  let example_filter = {nameFilter: "An Example Project"}
+  let example_filter = {nameFilter: "An Example Process Template"}
   const {loading: queryLoading, data: queryData, error: queryError} = useQuery(
-    PROJ_QUERY,
+    PROCESS_TEMPLATE_QUERY,
     {
       notifyOnNetworkStatusChange: true,
       variables: example_filter
@@ -36,14 +36,15 @@ const ProcessTemplateExample = (props) => {
 
 
   let example_vars = {
-    "name": "An Example Process Template",
-    "parentProject": queryData ? queryData["proj"]["result"]["_id"] : "",
-    "estimatedDuration": 0,
-    "description": "Do Nothing"
+    "name": "An Example Process",
+    "parentProcessTemplate": queryData ? queryData["processTemplate"]["result"]["_id"] : "",
+    "progress": 0,
+    "status": "Complete",
+    "dueDate": Date.now()
   };
 
   let [createExample, {loading, data, error}] = useMutation(
-    CREATE_PROCESS_TEMPLATE,
+    CREATE_PROCESS,
     {
       variables: example_vars,
        
@@ -56,7 +57,7 @@ const ProcessTemplateExample = (props) => {
 
   let example_id = {id: ""}
   const {loading: processLoading, data: processData, error: processError, refetch} = useQuery(
-    GET_PROCESS_TEMPLATE,
+    GET_PROCESS,
     {
       notifyOnNetworkStatusChange: true,
       variables: example_id
@@ -76,17 +77,18 @@ const ProcessTemplateExample = (props) => {
       </div>
   } else {
     example_id = data ? {id: data._id} : {id: ""};
+    console.log(processData);
       return <div>
             <button onClick={() => {
               createExample({variables: example_vars});
-            }}>Create an example process template!</button>
+            }}>Create an example process!</button>
             <button onClick={
               
               () => {
-                refetch({id: data["createProcessTemplate"]["data"]["_id"]});
+                refetch({id: data["createProcess"]["data"]["_id"]});
               }
-            }> Get the new process template's name!</button>
-            Process template name: {processData ? processData["processTemplate"]["result"]["name"] : ""}
+            }> Get the new process's name!</button>
+            Process name: {processData ? processData["process"]["result"]["name"] : ""}
         </div>
   }
 
@@ -94,4 +96,4 @@ const ProcessTemplateExample = (props) => {
 
 }
 
-export default ProcessTemplateExample;
+export default ProcessExample;
