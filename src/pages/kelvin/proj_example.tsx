@@ -43,7 +43,6 @@ const ProjExample = (props) => {
     }
   )
 
-  console.log(queryData);
 
   let example_vars = {
     "name": "An Example Project",
@@ -81,10 +80,7 @@ const ProjExample = (props) => {
             <button onClick={
               
               () => {
-                console.log("Here's the data!");
-                console.log(data);
                 refetch({id: data["createProj"]["data"]["_id"]});
-                console.log(projData);
               }
             }> Get the new project's name!</button>
 

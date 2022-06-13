@@ -34,7 +34,6 @@ const ProcessTemplateExample = (props) => {
     }
   )
 
-  console.log(queryData);
 
   let example_vars = {
     "name": "An Example Process Template",
@@ -77,8 +76,6 @@ const ProcessTemplateExample = (props) => {
       </div>
   } else {
     example_id = data ? {id: data._id} : {id: ""};
-    console.log("EEh?");
-    console.log(processData);
       return <div>
             <button onClick={() => {
               createExample({variables: example_vars});
@@ -86,10 +83,7 @@ const ProcessTemplateExample = (props) => {
             <button onClick={
               
               () => {
-                console.log("Here's the data!");
-                console.log(data);
                 refetch({id: data["createProcessTemplate"]["data"]["_id"]});
-                console.log(processData);
               }
             }> Get the new project's name!</button>
             Process template name: {processData ? processData["processTemplate"]["result"]["name"] : ""}
