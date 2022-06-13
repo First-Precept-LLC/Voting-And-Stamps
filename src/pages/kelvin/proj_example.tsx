@@ -17,14 +17,29 @@ const ProjExample = (props) => {
         }
     }`;
 
+    const GET_PROJ = gql`
+      query proj($id: String!) {
+        proj(input: {id: $id}) {
+          result {name}
+        }
+    }`;
   
 
   let example_filter = {nameFilter: "An Example"}
-  const {loading: queryLoading, data: queryData, error: queryError, refetch} = useQuery(
+  const {loading: queryLoading, data: queryData, error: queryError} = useQuery(
     ORG_QUERY,
     {
       notifyOnNetworkStatusChange: true,
       variables: example_filter
+    }
+  )
+
+  let example_id = {id: ""}
+  const {loading: projLoading, data: projData, error: projError, refetch} = useQuery(
+    GET_PROJ,
+    {
+      notifyOnNetworkStatusChange: true,
+      variables: example_id
     }
   )
 
@@ -58,13 +73,23 @@ const ProjExample = (props) => {
           {error.graphQLErrors[0] ? error.graphQLErrors[0].message : error.message}
       </div>
   } else {
-      return <div>
+    example_id = data ? {id: data._id} : {id: ""};
+    return <div>
             <button onClick={() => {
               createExample({variables: example_vars});
-              console.log("Here's the data!");
-              console.log(data);
             }}>Create an example project!</button>
-            Project name: {data ? data["createProj"]["data"]["name"] : ""}
+            <button onClick={
+              
+              () => {
+                console.log("Here's the data!");
+                console.log(data);
+                refetch({id: data["createProj"]["data"]["_id"]});
+                console.log(projData);
+              }
+            }> Get the new project's name!</button>
+
+
+            Project name: {projData ? projData["proj"]["result"]["name"] : ""}
         </div>
   }
 
