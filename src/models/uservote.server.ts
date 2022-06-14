@@ -26,7 +26,7 @@ import user from "~/pages/api/account/user";
       type: String,
       optional: true,
       canRead: ["guests"],
-      canCreate: ["members"]
+      canCreate: ["members", "guests"]
 
     },
     // userId is the _id of the owner of the document
@@ -35,7 +35,7 @@ import user from "~/pages/api/account/user";
       type: String,
       optional: true,
       canRead: ["guests"],
-      canCreate: ["members"]
+      canCreate: ["members", "guests"]
 
     },
     createdAt: {
@@ -45,7 +45,7 @@ import user from "~/pages/api/account/user";
       onCreate: () => {
         return new Date();
       },
-      canCreate: ["members"]
+      canCreate: ["members", "guests"]
 
     },
     user: {
@@ -58,7 +58,7 @@ import user from "~/pages/api/account/user";
       },
       optional: true,
       canRead: ["guests"],
-      canCreate: ["members"]
+      canCreate: ["members", "guests"]
 
     },
   
@@ -72,7 +72,7 @@ import user from "~/pages/api/account/user";
       },
       optional: true,
       canRead: ["guests"],
-      canCreate: ["members"]
+      canCreate: ["members", "guests"]
 
     },
 
@@ -86,7 +86,7 @@ import user from "~/pages/api/account/user";
       },
       optional: true,
       canRead: ["guests"],
-      canCreate: ["members"]
+      canCreate: ["members", "guests"]
 
     },
 
@@ -100,7 +100,7 @@ import user from "~/pages/api/account/user";
       },
       optional: true,
       canRead: ["guests"],
-      canCreate: ["members"]
+      canCreate: ["members", "guests"]
 
     },
 
@@ -108,7 +108,7 @@ import user from "~/pages/api/account/user";
         type: Number,
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"]
+        canCreate: ["members", "guests"]
 
     },
 
@@ -116,7 +116,7 @@ import user from "~/pages/api/account/user";
       type: String,
       optional: true,
       canRead: ["guests"],
-      canCreate: ["members"]
+      canCreate: ["members", "guests"]
 
     },
   };
@@ -129,7 +129,7 @@ import user from "~/pages/api/account/user";
     },
     schema,
     permissions: {
-      canCreate: ["members"], // Users should be able to vote
+      canCreate: ["members", "guests"], // Users should be able to vote
       canUpdate: ["owners", "admins"],
       canDelete: ["owners", "admins"],
       canRead: ["members", "admins"],

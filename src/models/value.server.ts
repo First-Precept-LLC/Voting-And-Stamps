@@ -21,7 +21,7 @@ export interface ValueTypeServer extends VulcanDocument {
       type: String,
       optional: true,
       canRead: ["guests"],
-      canCreate: ["members"]
+      canCreate: ["members", "guests"]
     },
     // userId is the _id of the owner of the document
     // Here, it guarantees that the user belongs to group "owners" for his own data
@@ -29,7 +29,7 @@ export interface ValueTypeServer extends VulcanDocument {
       type: String,
       optional: true,
       canRead: ["guests"],
-      canCreate: ["members"]
+      canCreate: ["members", "guests"]
 
     },
 
@@ -38,7 +38,7 @@ export interface ValueTypeServer extends VulcanDocument {
         type: String,
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"]
+        canCreate: ["members", "guests"]
     },
 
 
@@ -49,7 +49,7 @@ export interface ValueTypeServer extends VulcanDocument {
       onCreate: () => {
         return new Date();
       },
-      canCreate: ["members"]
+      canCreate: ["members", "guests"]
 
     },
 
@@ -57,7 +57,7 @@ export interface ValueTypeServer extends VulcanDocument {
         type: String,
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"]
+        canCreate: ["members", "guests"]
     },
 
     //The public ID of the image, stored in Cloudinary. Supply a URL for imageUrl in the request, and it will automatically be uploaded, 
@@ -66,7 +66,7 @@ export interface ValueTypeServer extends VulcanDocument {
         type: String,
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"],
+        canCreate: ["members", "guests"],
         onCreate: (self) => {
             console.log("go!");
             console.log(self);
@@ -87,7 +87,7 @@ export interface ValueTypeServer extends VulcanDocument {
         type: String,
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"]
+        canCreate: ["members", "guests"]
     },
 
 
@@ -96,7 +96,7 @@ export interface ValueTypeServer extends VulcanDocument {
         type: String,
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"]
+        canCreate: ["members", "guests"]
     }*/
 
     //The icon out of a pregenerated list to use for this value
@@ -104,7 +104,7 @@ export interface ValueTypeServer extends VulcanDocument {
         type: String,
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"]
+        canCreate: ["members", "guests"]
     }
   };
 
@@ -116,7 +116,7 @@ export interface ValueTypeServer extends VulcanDocument {
     },
     schema,
     permissions: {
-      canCreate: ["members"], 
+      canCreate: ["members", "guests"], 
       canUpdate: ["owners", "admins"],
       canDelete: ["owners", "admins"],
       canRead: ["members", "admins"],

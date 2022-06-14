@@ -24,7 +24,7 @@ export interface ProcessTypeServer extends VulcanDocument {
       type: String,
       optional: true,
       canRead: ["guests"],
-      canCreate: ["members"]
+      canCreate: ["members", "guests"]
     },
     // userId is the _id of the owner of the document
     // Here, it guarantees that the user belongs to group "owners" for his own data
@@ -32,7 +32,7 @@ export interface ProcessTypeServer extends VulcanDocument {
       type: String,
       optional: true,
       canRead: ["guests"],
-      canCreate: ["members"]
+      canCreate: ["members", "guests"]
 
     },
 
@@ -40,7 +40,7 @@ export interface ProcessTypeServer extends VulcanDocument {
         type: String,
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"]
+        canCreate: ["members", "guests"]
     },
 
 
@@ -51,7 +51,7 @@ export interface ProcessTypeServer extends VulcanDocument {
       onCreate: () => {
         return new Date();
       },
-      canCreate: ["members"]
+      canCreate: ["members", "guests"]
 
     },
 
@@ -65,7 +65,7 @@ export interface ProcessTypeServer extends VulcanDocument {
         },
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"]
+        canCreate: ["members", "guests"]
   
     },
 
@@ -73,21 +73,21 @@ export interface ProcessTypeServer extends VulcanDocument {
         type: Date,
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"]
+        canCreate: ["members", "guests"]
     },
 
     status: {
         type: String,
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"]
+        canCreate: ["members", "guests"]
     },
 
     progress: {
         type: Number,
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"]
+        canCreate: ["members", "guests"]
     }
   };
 
@@ -99,7 +99,7 @@ export interface ProcessTypeServer extends VulcanDocument {
     },
     schema,
     permissions: {
-      canCreate: ["members"], 
+      canCreate: ["members", "guests"], 
       canUpdate: ["owners", "admins"],
       canDelete: ["owners", "admins"],
       canRead: ["members", "admins"],
