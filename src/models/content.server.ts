@@ -22,7 +22,7 @@ import { User } from "./user.server";
       type: String,
       optional: true,
       canRead: ["guests"],
-      canCreate: ["members"]
+      canCreate: ["members", "guests"]
     },
     // userId is the _id of the owner of the document
     // Here, it guarantees that the user belongs to group "owners" for his own data
@@ -30,7 +30,7 @@ import { User } from "./user.server";
       type: String,
       optional: true,
       canRead: ["guests"],
-      canCreate: ["members"]
+      canCreate: ["members", "guests"]
 
     },
 
@@ -40,7 +40,7 @@ import { User } from "./user.server";
         type: String,
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"]
+        canCreate: ["members", "guests"]
     },
 
 
@@ -51,7 +51,7 @@ import { User } from "./user.server";
       onCreate: () => {
         return new Date();
       },
-      canCreate: ["members"]
+      canCreate: ["members", "guests"]
 
     },
     creator: {
@@ -64,7 +64,7 @@ import { User } from "./user.server";
       },
       optional: true,
       canRead: ["guests"],
-      canCreate: ["members"]
+      canCreate: ["members", "guests"]
 
     },
   
@@ -72,7 +72,7 @@ import { User } from "./user.server";
       type: String,
       optional: true,
       canRead: ["guests"],
-      canCreate: ["members"]
+      canCreate: ["members", "guests"]
 
     },
 
@@ -80,7 +80,7 @@ import { User } from "./user.server";
         type: String,
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"]
+        canCreate: ["members", "guests"]
 
     },
 
@@ -88,7 +88,7 @@ import { User } from "./user.server";
         type: String,
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"]
+        canCreate: ["members", "guests"]
     },
 
 
@@ -98,7 +98,7 @@ import { User } from "./user.server";
       type: String,
       optional: true,
       canRead: ["guests"],
-      canCreate: ["members"]
+      canCreate: ["members", "guests"]
     }
   };
 
@@ -110,7 +110,7 @@ import { User } from "./user.server";
     },
     schema,
     permissions: {
-      canCreate: ["members"], // Users should be able to create contents
+      canCreate: ["members", "guests"], // Users should be able to create contents
       canUpdate: ["owners", "admins"],
       canDelete: ["owners", "admins"],
       canRead: ["members", "admins"],

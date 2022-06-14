@@ -24,7 +24,7 @@ import { Content } from "./content.server";
       type: String,
       optional: true,
       canRead: ["guests"],
-      canCreate: ["members"]
+      canCreate: ["members", "guests"]
     },
     // userId is the _id of the owner of the document
     // Here, it guarantees that the user belongs to group "owners" for his own data
@@ -32,7 +32,7 @@ import { Content } from "./content.server";
       type: String,
       optional: true,
       canRead: ["guests"],
-      canCreate: ["members"]
+      canCreate: ["members", "guests"]
 
     },
 
@@ -41,7 +41,7 @@ import { Content } from "./content.server";
         type: String,
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"]
+        canCreate: ["members", "guests"]
     },
 
 
@@ -52,7 +52,7 @@ import { Content } from "./content.server";
       onCreate: () => {
         return new Date();
       },
-      canCreate: ["members"]
+      canCreate: ["members", "guests"]
 
     },
 
@@ -67,7 +67,7 @@ import { Content } from "./content.server";
       },
       optional: true,
       canRead: ["guests"],
-      canCreate: ["members"]
+      canCreate: ["members", "guests"]
 
     },
 
@@ -75,21 +75,21 @@ import { Content } from "./content.server";
         type: String,
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"]
+        canCreate: ["members", "guests"]
     },
     //Refers to any parent goal that this goal has, by ID.
     parentGoal: {
         type: String,
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"]
+        canCreate: ["members", "guests"]
     },
 
     isComplete: {
         type: Boolean,
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"],
+        canCreate: ["members", "guests"],
         canUpdate: ["members"]
     },
 
@@ -97,7 +97,7 @@ import { Content } from "./content.server";
         type: Boolean,
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"],
+        canCreate: ["members", "guests"],
         canUpdate: ["members"]
     },
 
@@ -105,7 +105,7 @@ import { Content } from "./content.server";
         type: Date,
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"],
+        canCreate: ["members", "guests"],
     },
 
     //External ID from the contents table maps here.
@@ -119,7 +119,7 @@ import { Content } from "./content.server";
         },
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"]
+        canCreate: ["members", "guests"]
     },
     
     //TODO: auto-modify this depending on votes on the goal? Or track how much people trust it to represent each value?
@@ -129,7 +129,7 @@ import { Content } from "./content.server";
         type: String,
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"],
+        canCreate: ["members", "guests"],
         canUpdate: ["members"]
     },
 
@@ -137,7 +137,7 @@ import { Content } from "./content.server";
       type: String,
       optional: true,
       canRead: ["guests"],
-      canCreate: ["members"],
+      canCreate: ["members", "guests"],
       canUpdate: ["members"]
     }
   };
@@ -150,7 +150,7 @@ import { Content } from "./content.server";
     },
     schema,
     permissions: {
-      canCreate: ["members"], 
+      canCreate: ["members", "guests"], 
       canUpdate: ["owners", "admins"],
       canDelete: ["owners", "admins"],
       canRead: ["members", "admins"],
