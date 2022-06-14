@@ -13,6 +13,7 @@ import { VulcanComponentsProvider } from "@vulcanjs/react-ui";
 
 import debug from "debug";
 import AppLayout from "~/components/layout/AppLayout";
+import "../styles/global.scss";
 const debugPerf = debug("vns:perf");
 // @see https://nextjs.org/docs/advanced-features/measuring-performance
 export function reportWebVitals(metric) {
@@ -22,6 +23,9 @@ export function reportWebVitals(metric) {
 import { ApolloProvider } from "@apollo/client";
 import { useApollo } from "@vulcanjs/next-apollo";
 import { CacheProvider, EmotionCache } from "@emotion/react";
+import "@fortawesome/fontawesome-svg-core/styles.css";
+import { config } from "@fortawesome/fontawesome-svg-core";
+config.autoAddCss = false;
 
 // import environment from '@vulcanjs/multi-env-demo';
 // console.log('imported environment', environment); // should display "server"/"client" depending on the environment, this is just a test
@@ -97,9 +101,9 @@ function VNApp({
         {/** Provide MUI theme but also mui utilities like CSS baseline, StyledEngineProvider... */}
         <MuiThemeProvider>
           <ApolloProvider client={apolloClient}>
-            <AppLayout>
+            {/* <AppLayout> */}
               <Component {...pageProps} />
-            </AppLayout>
+            {/* </AppLayout> */}
           </ApolloProvider>
         </MuiThemeProvider>
       </VulcanComponentsProvider>

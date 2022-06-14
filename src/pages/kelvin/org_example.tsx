@@ -1,6 +1,5 @@
 import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
 
-
 const OrgExample = (props) => {
 
   const CREATE_ORG = gql`
@@ -26,12 +25,9 @@ const OrgExample = (props) => {
 
 
   let [createExample, {loading, data, error}] = useMutation(
-    CREATE_ORG,
-    {
-      // Setting this value to true will make the component rerender when
-      // the "networkStatus" changes, so we are able to know if it is fetching
-      // more data
-      notifyOnNetworkStatusChange: true,
+    CREATE_ORG,{
+      onCompleted: (data) => console.log("Data from mutation", data),
+  onError: (error) => console.error("Error creating a post", error),
     }
   );
 
