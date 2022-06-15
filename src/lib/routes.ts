@@ -35,6 +35,18 @@ export const routes = {
     },
     orgexample: {
       href: "/kelvin/org_example"
+    },
+    projexample: {
+      href: "/kelvin/proj_example"
+    },
+    processtemplateexample: {
+      href: "/routes/kelvin/process_template_example"
+    },
+    processexample: {
+      href: "/routes/kelvin/process_example"
+    },
+    stepexample: {
+      href: "/routes/kelvin/step_example"
     }
   }
 };

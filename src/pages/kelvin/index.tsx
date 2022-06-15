@@ -4,9 +4,11 @@ import { routes } from "~/lib/routes";
 import { useRouter } from "next/router";
 import { apiRoutes } from "~/lib/api/apiRoutes";
 import Card from "~/components/kelvin/card";
+import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
 
 
-const Index = async (props) => {
+
+const Index =  (props) => {
 
     let cardsList = [] as any;
 
@@ -14,13 +16,33 @@ const Index = async (props) => {
 
     let body = props;
 
+    const CARDS_QUERY = gql`
+    query contents($nameFilter: String!) {
+        contents(input: {filter: {name: {_in: [$nameFilter]}}}) {
+          results {_id, name, description}
+        }
+    }`;
 
-    try {
+    const {loading, data, error} = useQuery(
+        CARDS_QUERY,
+        {
+            variables: {nameFilter: props.nameFilter ? props.nameFilter : ""},
+            notifyOnNetworkStatusChange: true,
+        }
+
+    );
+
+
+
+
+    /*try {
         const res = await fetch("http://localhost:3000" + apiRoutes.kelvin.card.href, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
         });
         if (res.status === 200) {
+          console.log("what is it?");
+          console.log(await res.json());  
           let rawCards = (await res.json()).results.filter(card => card.name.includes(props.nameFilter));
           for(let i = 0; i < rawCards.length; i++) {
               let card = rawCards[i];
@@ -31,14 +53,31 @@ const Index = async (props) => {
         }
       } catch (error) {
         console.error("An unexpected error happened occurred:", error);
-      }
+      }*/
+
+    if (loading) {
+        return <div>Loading...</div>
+    }
+    
+    if (error) {
+        return <div>{error.message}</div>
+    }
 
 
+
+    if (data) {
+        let rawCards = data;
+        for(let i = 0; i < rawCards.length; i++) {
+            let card = rawCards[i];
+            cardsList.push(<Card name={card.name} description={card.description} id={card._id}/>);
+        }
+    }
+    
     return (
     <>
     <head>
         <meta charSet="UTF-8"/>
-        <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+        <meta httpEquiv="X-UA-Compatible" content="IE=edge"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
         <title>Project Kelvin Widget</title>
         <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
