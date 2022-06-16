@@ -7,7 +7,7 @@ function Sidemenu() {
       >
         <div className="flex flex-col ">
           <div className="flex flex-col">
-            <a href="#" className="text-kelvinDark mb-3">
+            <a href="/process-templates" className="text-kelvinDark mb-3">
               <i className="fa-solid  fa-chart-simple mr-1"></i> Process
               Templates
             </a>
@@ -18,11 +18,11 @@ function Sidemenu() {
           </div>
           <hr className="my-10" />
           <div className="flex flex-col">
-            <a href="#" className="text-kelvinDark mb-3">
+            <a href="/organizations" className="text-kelvinDark mb-3">
               <i className="fa-solid  fa-chart-simple mr-1"></i>
               Organizations
             </a>
-            <a href="#" className="text-kelvinDark mb-3">
+            <a href="/department" className="text-kelvinDark mb-3">
               <i className="fa-solid  fa-chart-simple mr-1"></i>
               Departments
             </a>
