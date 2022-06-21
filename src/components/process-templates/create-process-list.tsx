@@ -5,6 +5,7 @@ const CreateProcessList = (props) => {
     const [user,setUser] = useState('')
     const [date,setDate] = useState('')
     const { closeModal,processCreated } = props;
+    
     return (
         <>
             <div
@@ -45,6 +46,8 @@ const CreateProcessList = (props) => {
                                             className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                             placeholder=""
                                             required
+                                        
+                                          
                                         />
                                         <p className="text-xs opacity-50 mt-2">
                                             Default user is populated from the role selected while creating process
@@ -78,7 +81,7 @@ const CreateProcessList = (props) => {
                                 </button>
                                 <button
                                     type="button"
-                                    onClick={props.closeModal}
+                                    onClick={closeModal}
                                     className="text-black from-kelvinDark to-kelvinBold hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6"
                                     data-modal-toggle="success-modal"
                                 >

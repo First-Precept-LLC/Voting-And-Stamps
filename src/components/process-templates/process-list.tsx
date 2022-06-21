@@ -30,14 +30,14 @@ const ProcessList = (props) => {
                         <div
                             className="flex items-center w-full min-h-8 justify-between pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2 ">
                             <h6 className="mr-2 w-1/2">Start research development</h6>
-                            <p className="text-sm opacity-50 mr-2 font-normal w-32" style={{ marginRight: '27%' }}>R&D</p>
+                            <p className="text-sm opacity-50 mr-2 font-normal w-32" style={{ marginRight: '37%' }}>R&D</p>
                             <div className="flex items-center">
                                 <button onClick={createList}
                                     className="text-white bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-6 text-left w-44 text-center items-center mr-2"
                                     data-modal-toggle="large-modal">
                                     <i className="fa-solid fa-play text-white mt-1 mr-1 text-xs"></i>
                                     Create Processes</button>
-                                <button
+                                <button onClick={createList}
                                     className="text-white bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-6 text-left w-20 text-center "
                                     data-modal-toggle="large-modal">
                                     Edit</button>
@@ -50,7 +50,7 @@ const ProcessList = (props) => {
                         <div
                             className="flex items-center w-full min-h-8 justify-between pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2">
                             <h6 className="mr-2 w-1/2">Submiting Designs</h6>
-                            <p className="text-sm opacity-50 mr-2 font-normal w-32" style={{ marginRight: '27%' }}>R&D</p>
+                            <p className="text-sm opacity-50 mr-2 font-normal w-32" style={{ marginRight: '37%' }}>R&D</p>
                             <div className="flex items-center">
                                 <button onClick={createList}
                                     className="text-white bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-6 text-left w-44 text-center items-center mr-2"
@@ -58,7 +58,7 @@ const ProcessList = (props) => {
                                     <i className="fa-solid fa-play text-white mt-1 mr-1 text-xs"></i>
                                     Create Processes
                                 </button>
-                                <button
+                                <button onClick={createList}
                                     className="text-white bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-6 text-left w-20 text-center "
                                     data-modal-toggle="large-modal">
                                     Edit</button>

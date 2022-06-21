@@ -25,9 +25,6 @@ const CreateValue=(props)=>{
     const value=e.value
     setOption(value)
   }
-  // const handleChangeValues = (e) => {
-  //   console.log(e, array);
-  // }
 
     return (
         <>

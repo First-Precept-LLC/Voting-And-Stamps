@@ -8,29 +8,29 @@ function Sidemenu() {
         <div className="flex flex-col ">
           <div className="flex flex-col">
             <a href="/process-templates" className="text-kelvinDark mb-3">
-              <i className="fa-solid  fa-chart-simple mr-1"></i> Process
+              <i className="fa-solid  fa-circle mr-1"></i> Process
               Templates
             </a>
             <a href="#" className="text-kelvinDark mb-3">
-              <i className="fa-solid  fa-chart-simple mr-1"></i>
+              <i className="fa-solid  fa-circle mr-1"></i>
               Processes
             </a>
           </div>
           <hr className="my-10" />
           <div className="flex flex-col">
             <a href="/organizations" className="text-kelvinDark mb-3">
-              <i className="fa-solid  fa-chart-simple mr-1"></i>
+              <i className="fa-solid  fa-circle mr-1"></i>
               Organizations
             </a>
             <a href="/department" className="text-kelvinDark mb-3">
-              <i className="fa-solid  fa-chart-simple mr-1"></i>
+              <i className="fa-solid  fa-circle mr-1"></i>
               Departments
             </a>
             <a href="#" className="text-kelvinDark mb-3">
-              <i className="fa-solid  fa-chart-simple mr-1"></i> Roles
+              <i className="fa-solid  fa-circle mr-1"></i> Roles
             </a>
             <a href="#" className="text-kelvinDark mb-3">
-              <i className="fa-solid  fa-chart-simple mr-1"></i> Users
+              <i className="fa-solid  fa-circle mr-1"></i> Users
             </a>
           </div>
         </div>

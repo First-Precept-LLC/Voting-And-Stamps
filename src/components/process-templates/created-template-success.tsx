@@ -2,7 +2,7 @@ import React from 'react';
 
 const CreatedTemplateSuccess=(props)=>{
    
-    const {closeModal} = props;
+    const {closeModal,createdModal} = props;
    
    return (
        <>
@@ -44,7 +44,7 @@ const CreatedTemplateSuccess=(props)=>{
                    <div className="flex items-center p-6 space-x-2 rounded-b justify-center  dark:border-gray-600">
                       
                        <button type="button"
-                        //    onClick={createProcess}
+                           onClick={createdModal}
                            className="text-white bg-gradient-to-r from-kelvinDark  to-kelvinBold hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6"
                            data-modal-toggle="large-modal">View Process
                            TemplateList</button>
