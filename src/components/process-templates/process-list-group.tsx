@@ -90,70 +90,7 @@ const ProcessListGroup = (props) => {
                     </div>
                 </div>
             </div>
-                {/* <table>
-                    <tr>
-                        <td>Processes</td>
-                        <td>Process Template</td>
-                        <td>Due by</td>
-                        <td>Assignees</td>
-                        <td>Progress</td>
-                    </tr>
-                    <tr>
-                        <td>Research of Model v1</td>
-                        <td>Start research development</td>
-                        <td>by Aug 22, 2022</td>
-                        <td>Matt</td>
-                        <td><div className="w-32 bg-gray-200 rounded-full h-1.5">
-                            <div className="bg-kelvinBold h-1.5 rounded-full " style={{ width: '45%' }}></div>
-                        </div>
-                        </td>
-                        <td>
-                            <button
-                                className=" bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-2  h-6 text-left mr-2 w-24 text-center "
-                                data-modal-toggle="large-modal">
-                                On Track</button>
-                        </td>
-                        <td>
-                            <button
-                                className=" bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-2 h-6 text-left w-24 text-center "
-                                data-modal-toggle="large-modal">
-                                24 Votes</button>
-                        </td>
-                        <td>
-                            <a href="#" className=" px-4 hover:bg-kelvinLight rounded-full">
-                                <i className="fa-solid fa-ellipsis-vertical text-xl"></i>
-                            </a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Submission of Model v2</td>
-                        <td>Submitting Designs</td>
-                        <td>by Aug 28, 2022</td>
-                        <td>Saidutt</td>
-                        <td>
-                            <div className="w-32 bg-gray-200 rounded-full h-1.5">
-                                <div className="bg-kelvinBold h-1.5 rounded-full " style={{ width: '45%' }}></div>
-                            </div>
-                        </td>
-                        <td>
-                            <button
-                                className=" bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-2  h-6 text-left mr-2 w-24 text-center "
-                                data-modal-toggle="large-modal">
-                                On Track</button>
-                        </td>
-                        <td>
-                            <button
-                                className=" bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-2 h-6 text-left w-24 text-center "
-                                data-modal-toggle="large-modal">
-                                24 Votes</button>
-                        </td>
-                        <td>
-                            <a href="#" className=" px-4 hover:bg-kelvinLight rounded-full">
-                                <i className="fa-solid fa-ellipsis-vertical text-xl"></i>
-                            </a>
-                        </td>
-                    </tr>
-                </table> */}
+               
             </div>
         </>
     )

@@ -8,9 +8,10 @@ import VotingDetails from '../../components/process-templates/voting-details'
 import VotingSteps from '../../components/process-templates/voting-steps'
 import MainLayout from '../../components/layout/MainLayout';
 import { useState } from 'react';
-
+let id=1;
 function ProcessTemplates() {
-    const [fields, setFields] = useState([{ step: '' }]);
+    const [department,setDepartment]=useState(['US','CA','FR','DE']);
+    const [fields, setFields] = useState([{step:'',showPopup: false,id:`${id}`}]);
     const [project, setProject] = useState('')
     const [proName, setProName] = useState('')
     const [estDuration, setestDuration] = useState('')
@@ -18,6 +19,7 @@ function ProcessTemplates() {
     const [step, setStep] = useState('')
     const [stepTitle, setStepTitle] = useState('')
     const [text, setText] = useState('')
+    
     const [createModal, setShowCreateModal] = useState(false)
     const [processList, setProcessList] = useState(false)
     const [createDetails, setCreateDetails] = useState(false)
@@ -25,7 +27,11 @@ function ProcessTemplates() {
     const [onTrackModal, setOnTrackModal] = useState(false)
     const [votedModal, setVotedModal] = useState(false)
     const [votingStepModal, setVotingStepModal] = useState(false)
-
+    const [processName,setProcessName] = useState('')
+    const [user,setUser] = useState('')
+    const [date,setDate] = useState('')
+    // const [showPopupValue,setShowPopupValue]=useState(false)
+ 
     const [modal, setModal] = useState(false)
     const CreatePage = () => {
         setShowCreateModal(true)
@@ -42,7 +48,7 @@ function ProcessTemplates() {
             name: proName,
             duration: estDuration,
             description: desc,
-            step: step,
+            fields:fields,
             title: stepTitle,
             textDescription: text
 
@@ -77,7 +83,7 @@ function ProcessTemplates() {
         setVotedModal(false)
         setVotingStepModal(false)
         setModal(false)
-        console.log()
+        console.log(user, processName,date)
     }
     const createdModal = () => {
         setProcessModal(false);
@@ -135,10 +141,45 @@ function ProcessTemplates() {
         setOnTrackModal(true)
 
     }
+    const showPopupHandler=(id)=>{
+        console.log(id);
+        let array=[...fields];
+          array.forEach(element => {
+            if(element.id==id){
+                if(element.showPopup==true){
+                    element.showPopup=false;
+                }else{
+                    element.showPopup=true;
+                }
+             }
+            else{
+                element.showPopup=false;
+              }
+            
+          });
+          setFields(array);
+
+    }
     const handleAdd = () => {
+        id=id+1
         const values = [...fields];
-        values.push({ step: step });
+        values.push({ step: '' ,showPopup: false,id:`${id}`});
+        
+        
         setFields(values);
+    }
+    const deleteHandler=(id, index)=>{
+        let arr=[...fields];
+        console.log(arr);
+        
+        // let index = arr.findIndex(object => {
+        //     return object.id == id;
+        //   });
+        //   console.log(index);
+       // console.log(index, id, '$$$$$$$$$')
+          arr.splice(index,1);
+          setFields([...arr]);
+        
     }
     console.log(fields)
 
@@ -178,10 +219,15 @@ function ProcessTemplates() {
                                     <select id="countries" onChange={(e) => setProject(e.target.value)}
                                         className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                                         <option selected="">Select Department</option>
-                                        <option value="US">HR</option>
+                                        {department.map(value=>{
+                                            return(<option value={value}>HR</option>)
+                                        }
+
+                                        )}
+                                        {/* <option value="US">HR</option>
                                         <option value="CA">HR</option>
                                         <option value="FR">HR</option>
-                                        <option value="DE">HR</option>
+                                        <option value="DE">HR</option> */}
                                     </select>
 
                                 </div>
@@ -259,11 +305,17 @@ function ProcessTemplates() {
                                                 return (
                                                     <div
                                                         className="flex items-center w-full min-h-8 justify-between pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2 flex-wrap">
-
-                                                        <input style={{ border: 0 }} type='text' onChange={(e) => setStep(e.target.value)} />
-                                                        <button className="px-4">
-                                                            <i className="fa-solid fa-ellipsis-vertical"></i>
+                                                        <input key={item.id} style={{ border: 0 }} type='text' defaultValue={item.step} onChange={(e) => {item.step=e.target.value;}} />
+                                                        <button className="px-4" onClick={()=>{showPopupHandler(item.id)}}>
+                                                            <i className="fa-solid fa-ellipsis-vertical" ></i>
                                                         </button>
+                                                        {item.showPopup?
+                                                        <div style={{height:"30px",width:'30px'}}> 
+                                                            <button onClick={()=>{deleteHandler(item.id, index)}}>delete</button>
+                                                            
+                                                        </div>
+:null
+                                                        }
                                                     </div>
                                                 )
                                             })
@@ -383,7 +435,16 @@ function ProcessTemplates() {
 
                 {createModal ? <TemplateSuccess closeModal={closeModal} createProcess={createProcess} /> : null}
                 {processList ? <ProcessList createList={createList} /> : null}
-                {createDetails ? <CreateProcessList closeModal={closeModal} processCreated={processCreated} /> : null}
+                {createDetails ? <CreateProcessList 
+                            closeModal={closeModal} 
+                            processCreated={processCreated} 
+                            user={user} 
+                            setUser={setUser}
+                            date={date}
+                            setDate={setDate}
+                            processName={processName}
+                            setProcessName={setProcessName}
+                  /> : null}
                 {processModal ? <CreatedTemplateSuccess createdModal={createdModal} /> : null}
                 {modal ? <ProcessListGroup ontrackModal={ontrackModal} /> : null}
                 {onTrackModal ? <ViewProcess votedModal={showVotedModal} /> : null}

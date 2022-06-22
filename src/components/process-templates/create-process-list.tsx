@@ -1,10 +1,16 @@
 import React, { useState } from 'react';
 
 const CreateProcessList = (props) => {
-    const [processName,setProcessName] = useState('')
-    const [user,setUser] = useState('')
-    const [date,setDate] = useState('')
-    const { closeModal,processCreated } = props;
+  
+    const { closeModal,
+            processCreated,
+            
+            setProcessName,
+        
+            setUser,
+        
+            setDate
+          } = props;
     
     return (
         <>
