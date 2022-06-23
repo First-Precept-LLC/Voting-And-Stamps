@@ -37,7 +37,7 @@ export interface ProjTypeServer extends VulcanDocument {
         type: String,
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"]
+        canCreate: ["guests","members"]
     },
 
 
@@ -62,7 +62,7 @@ export interface ProjTypeServer extends VulcanDocument {
         },
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"]
+        canCreate: ["guests","members"]
   
     },
   };
@@ -75,10 +75,10 @@ export interface ProjTypeServer extends VulcanDocument {
     },
     schema,
     permissions: {
-      canCreate: ["members"], 
+      canCreate: ["guests","members","owners", "admins"], 
       canUpdate: ["owners", "admins"],
       canDelete: ["owners", "admins"],
-      canRead: ["members", "admins"],
+      canRead: ["guests","members", "admins"],
     },
   };
 

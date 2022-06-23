@@ -1,6 +1,43 @@
 import React from 'react'
+import { useState } from 'react'
 const ProcessListGroup = (props) => {
-    const {ontrackModal} =props
+    const {ontrackModal,
+        processListData,
+        setProcessListData
+    } =props
+    
+    
+    
+         
+     const deletePopupHandler=(id)=>{
+        
+        let arr=[...processListData];
+        arr.forEach(element => {
+            if(element.id==id){
+                if(element.deletePopup==true){
+                    element.deletePopup=false;
+                }else{
+                    element.deletePopup=true;
+                }
+             }
+            else{
+                element.deletePopup=false;
+              }
+            
+          });
+          setProcessListData(arr);
+
+     }
+     
+     const deleteHandler=(id)=>{
+        let arr=[...processListData];
+        let index = arr.findIndex(object => {
+                return object.id == id;
+              });
+              console.log(index);
+              arr.splice(index,1);
+              setProcessListData([...arr]);
+     }
     return (
         <>
             <div className="flex w-full p-8 flex-col">
@@ -34,34 +71,39 @@ const ProcessListGroup = (props) => {
                  
                 
                 <div className="flex bg-kelvinLight p-4 rounded-md w-full flex-wrap">
-                    <div
+                    {processListData.map(item=>{
+                        return(
+                            <>
+                                     <div key={item.id}
                         className="flex items-center w-full min-h-8 justify-between pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2 ">
-                        <h6 className="mr-2 "> Research of Model v1</h6>
-                        <h6 className="mr-2 text-black/50">Start research development</h6>
-                        <p className="text-sm opacity-50 mr-2 font-normal">by Aug 22, 2022</p>
-                        <p className="text-sm opacity-50 mr-2 font-normal">Matt</p>
+                        <h6 className="mr-2 "> {item.process}</h6>
+                        <h6 className="mr-2 text-black/50">{item.processTemplate}</h6>
+                        <p className="text-sm opacity-50 mr-2 font-normal">{item.dueBy}</p>
+                        <p className="text-sm opacity-50 mr-2 font-normal">{item.assignees}</p>
                         <div className="flex flex-col">
-                            <div className="mb-1 text-xs text-black/50"style={{textAlign:'center'}}>33%</div>
+                            <div className="mb-1 text-xs text-black/50"style={{textAlign:'center'}}>{item.percent}</div>
                             <div className="w-32 bg-gray-400 rounded-full h-1.5">
-                                <div className=" h-1.5 rounded-full " style={{width: '45%',background:"#6cef6c"}}></div>
+                                <div className=" h-1.5 rounded-full " style={{width: `${item.percent}`,background:"#6cef6c"}}></div>
                             </div>
                         </div>
                         <div className="flex">
                             <button 
-                            onClick={ontrackModal}
+                            onClick={()=>{ontrackModal(item.id)}}
                             className=" bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-2  h-6 text-left mr-2 w-24 text-center "
                                 data-modal-toggle="large-modal">
                                 On Track</button>
-                            {/* <button 
-                                className=" bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-2 h-6 text-left w-24 text-center "
-                                data-modal-toggle="large-modal">
-                                24 Votes</button> */}<p style={{lineHeight:'10px',textAlign:'center'}}><span style={{fontSize:'20px'}} >24</span><br/><span style={{fontSize:'10px'}}>Votes</span></p>
-                            <a href="#" className=" px-4 hover:bg-kelvinLight rounded-full">
+                           <p style={{lineHeight:'10px',textAlign:'center'}}><span style={{fontSize:'20px'}} >{item.votes}</span><br/><span style={{fontSize:'10px'}}>Votes</span></p>
+                            <a href="#" className=" px-4 hover:bg-kelvinLight rounded-full" onClick={()=>{deletePopupHandler(item.id)}}>
                                 <i className="fa-solid fa-ellipsis-vertical text-xl"></i>
                             </a>
+                            {item.deletePopup?<button onClick={()=>{deleteHandler(item.id)}}>delete</button>:null}
                         </div>
                     </div>
-                    <div
+                            </>
+                        )
+                    })}
+                   
+                    {/* <div
                         className="flex items-center w-full min-h-8 justify-between pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2 ">
                         <h6 className="mr-2 ">Submission of Model v2</h6>
                         <h6 className="mr-2 text-black/50">Submitting Designs</h6>
@@ -79,15 +121,12 @@ const ProcessListGroup = (props) => {
                                 className=" bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-2  h-6 text-left mr-2 w-24 text-center "
                                 data-modal-toggle="large-modal">
                                 On Track</button>
-                            {/* <button
-                                className=" bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-2 h-6 text-left w-24 text-center "
-                                data-modal-toggle="large-modal">
-                                24 Votes</button> */}<p style={{lineHeight:'10px',textAlign:'center'}}><span style={{fontSize:'20px'}} >2</span><br/><span style={{fontSize:'10px'}}>Votes</span></p>
+                          <p style={{lineHeight:'10px',textAlign:'center'}}><span style={{fontSize:'20px'}} >2</span><br/><span style={{fontSize:'10px'}}>Votes</span></p>
                             <a href="#" className=" px-4 hover:bg-kelvinLight rounded-full">
                                 <i className="fa-solid fa-ellipsis-vertical text-xl"></i>
                             </a>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
             </div>
                

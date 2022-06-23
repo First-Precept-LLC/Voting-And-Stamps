@@ -1,12 +1,13 @@
 import React from'react'
 
 const ViewProcess=(props)=>{
-    const {votedModal} = props;
+    const {votedModal,
+        processListSelectedData} = props;
     return (
         <>
         <div className="flex w-full p-8 flex-col">
             <div className="flex justify-between">
-                <h1 className="text-3xl mb-8">Research for Model V1</h1>
+                <h1 className="text-3xl mb-8">{processListSelectedData.process}</h1>
             </div>
 
 
@@ -14,11 +15,11 @@ const ViewProcess=(props)=>{
 
                 <div className="flex flex-col mb-4">
                     <div className="flex mb-4">
-                        <p className="text-kelvinDark p-2 px-4 border-2 mr-4 text-sm border-gray-300 rounded">Due by 14 jun,
-                            2022
+                        <p className="text-kelvinDark p-2 px-4 border-2 mr-4 text-sm border-gray-300 rounded">Due by {processListSelectedData.dueBy}
+                            
                         </p>
                         <div className="text-kelvinDark p-2 px-4 border-2 text-sm border-gray-300 rounded">Assignee <span
-                                className="text-white bg-kelvinDark p-1 px-2 ml-2 rounded text-sm">saidutt</span>
+                                className="text-white bg-kelvinDark p-1 px-2 ml-2 rounded text-sm">{processListSelectedData.assignees}</span>
                         </div>
                     </div>
                     <p className="text-kelvinBlack text-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime
@@ -58,16 +59,15 @@ const ViewProcess=(props)=>{
                     <div className="flex flex-col bg-kelvinLight p-8">
                         <h5 className="text-lg mb-4">Start Research</h5>
                         <div className="flex mb-4 flex-wrap">
-                            <p className="text-kelvinDark p-2 px-4 border-2 mr-4 text-sm border-gray-200 rounded">Due by 14
-                                jun,
-                                2022
+                            <p className="text-kelvinDark p-2 px-4 border-2 mr-4 text-sm border-gray-200 rounded">Due by {processListSelectedData.dueBy}
+                                
                             </p>
                             <div className="text-kelvinDark p-2 px-4 border-2 text-sm border-gray-200 rounded mr-2">Assignee
-                                <span className="text-white bg-kelvinDark p-1 px-2 ml-2 rounded text-sm">saidutt</span>
+                                <span className="text-white bg-kelvinDark p-1 px-2 ml-2 rounded text-sm">{processListSelectedData.assignees}</span>
                             </div>
                             <button onClick={votedModal} className="flex text-white bg-kelvinDark items-center px-2 rounded text-sm">
                                 {/* <!-- navigate to voting widget --> */}
-                                <i className="fa-solid fa-check-to-slot mr-1 text-white"></i>Votes (23)
+                                <i className="fa-solid fa-check-to-slot mr-1 text-white"></i>Votes ({processListSelectedData.votes})
                             </button>
                         </div>
                         <p className="text-black/75 text-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit.

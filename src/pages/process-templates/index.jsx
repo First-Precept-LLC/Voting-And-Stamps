@@ -7,6 +7,8 @@ import ViewProcess from '../../components/process-templates/view-process';
 import VotingDetails from '../../components/process-templates/voting-details'
 import VotingSteps from '../../components/process-templates/voting-steps'
 import MainLayout from '../../components/layout/MainLayout';
+import { gql, useMutation, useQuery as query, NetworkStatus ,useQuery} from '@apollo/client'
+
 import { useState } from 'react';
 let id=1;
 function ProcessTemplates() {
@@ -30,8 +32,42 @@ function ProcessTemplates() {
     const [processName,setProcessName] = useState('')
     const [user,setUser] = useState('')
     const [date,setDate] = useState('')
+    const [processListData,setProcessListData]=useState([
+        {process:'Research of Model v1',processTemplate:'Start research development',dueBy:'Aug 22, 2022',assignees:'Matt',votes:'24',id:'1',percent:'70%',deletePopup:false},
+        {process:'Submission of Model v2',processTemplate:'Submitting Designs',dueBy:'Aug 28, 2022',assignees:'Saidutt',votes:'2',id:'2',percent:'33%',deletePopup:false}
+
+         ]);
+    const [processListSelectedData,setProcessListSelectedData]=useState({});
     // const [showPopupValue,setShowPopupValue]=useState(false)
+
  
+    const GET_DOGS = gql`
+    query proj($nameFilter: String!) {
+        proj(input: $nameFilter) {
+          result {name}
+        }
+    }
+  `;
+  const { loading, error, data } = useQuery(GET_DOGS,{
+    notifyOnNetworkStatusChange: true,
+      variables: {nameFilter:'test'}
+  });
+
+
+  const createOrg=()=>{
+    createProjectValue({
+      variables:{
+        name:department,
+
+        // name:orgName,
+        // parent:vision,
+    
+      } 
+    })
+    
+  }
+  
+
     const [modal, setModal] = useState(false)
     const CreatePage = () => {
         setShowCreateModal(true)
@@ -95,7 +131,7 @@ function ProcessTemplates() {
         setShowCreateModal(false);
         setModal(true)
     }
-    const ontrackModal = () => {
+    const ontrackModal = (id) => {
         setProcessModal(false);
         setOnTrackModal(true)
         setVotedModal(false)
@@ -103,7 +139,12 @@ function ProcessTemplates() {
         setCreateDetails(false);
         setProcessList(false);
         setShowCreateModal(false);
-        setModal(false)
+        setModal(false);
+
+        setProcessListSelectedData(processListData.find(e=>(e.id===id)))
+          
+        
+
     }
     const showVotedModal = () => {
         setProcessModal(false);
@@ -446,8 +487,16 @@ function ProcessTemplates() {
                             setProcessName={setProcessName}
                   /> : null}
                 {processModal ? <CreatedTemplateSuccess createdModal={createdModal} /> : null}
-                {modal ? <ProcessListGroup ontrackModal={ontrackModal} /> : null}
-                {onTrackModal ? <ViewProcess votedModal={showVotedModal} /> : null}
+                {modal ? <ProcessListGroup 
+                ontrackModal={ontrackModal} 
+                processListData={processListData}
+                setProcessListData={setProcessListData}
+
+                
+                   /> : null}
+                {onTrackModal ? <ViewProcess votedModal={showVotedModal}
+                      processListSelectedData={processListSelectedData}
+                   /> : null}
                 {/* <VotingDetails /> */}
                 {votedModal ? <VotingDetails closeModal={closeVotingModal}  votingStepModal={showVotingStepModal} /> : null}
                 {votingStepModal ?<VotingSteps closeModal={closeVotingStepModal}  /> :null}

@@ -10,6 +10,7 @@ import CreateGoal from '../../components/organizations/create-goal'
 import CreateDepartment from '../../components/organizations/create-department'
 import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
 import { values } from 'lodash';
+import CreateProject from "../../components/organizations/create-projects"
 
 function Organization() {
   const [showCreateModal,setShowCreateModal] = useState(false);
@@ -20,10 +21,12 @@ function Organization() {
   const [showAddGoal,setShowAddGoal] = useState(false)
   const [showAddSkills,setShowAddSkills] = useState(false)
   const [showDepartment,setDepartment] = useState(false)
+  const [showProject,setProject]=useState(false);
   const [values,setValue] = useState([])
   const [goal,setGoal] = useState([])
   const [skill,setSkills] = useState([])
   const [departmentValue,setDepartmentValues] = useState([])
+  const [projectValues,setProjectValues]=useState([])
   const CREATE_ORG = gql`
   mutation createOrg($name: String!, $vision: String!) {
     createOrg(input: {data: {name: $name, vision: $vision}}) {
@@ -72,6 +75,7 @@ function Organization() {
     setShowAddGoal(false);
     setShowAddSkills(false);
     setDepartment(false);
+    setProject(false)
   }
   const showGoal=()=>{
     setShowCreateModal(false);
@@ -97,6 +101,15 @@ function Organization() {
     setShowAddSkills(false);
     setDepartment(true)
   }
+  const showProj=()=>{
+    setShowCreateModal(false);
+    setShowSuccessModal(false);
+    setShowOrgDetail(false);
+    setShowCreateValue(false);
+    setShowAddGoal(false);
+    setShowAddSkills(false);
+    setProject(true)
+  }
   const addValue = (data)=>{
     setValue([...values,data])
     console.log([...values,data]);
@@ -112,6 +125,9 @@ function Organization() {
   const depValue = (data)=>{
     setDepartmentValues([...departmentValue,data])
     console.log([...departmentValue,data])
+  }
+  const projValue=(data)=>{
+    setProjectValues([...projectValues,data])
   }
   return (
     <>
@@ -132,7 +148,7 @@ function Organization() {
         <script src="/tailwind.js"></script>
     </head>
       <MainLayout>
-        {(!showCreateModal && !showSuccessModal && !showOrgDetail && !showCreateValue && !showAddGoal && !showAddSkills && !showDepartment)?(<div className="flex w-full items-center justify-center">
+        {(!showCreateModal && !showSuccessModal && !showOrgDetail && !showCreateValue && !showAddGoal && !showAddSkills && !showDepartment && !showProject)?(<div className="flex w-full items-center justify-center">
           <div className="flex flex-col items-center">
             <img src="/img/org-empty.svg" alt="" />
             <h6 className="my-2 font-medium text-kelvinBlack">
@@ -158,15 +174,18 @@ function Organization() {
 
         {showSuccessModal?<SuccessOrganization closeModal={closeSuccessModal} orgData={orgData}/>:null}
 
-        {showOrgDetail?<OrganizationDetail values={values} goal={goal} skill={skill} departmentValue={departmentValue} showAdd={showAdd} showGoal={showGoal} showSkills={showSkills} showDep={showDep} orgData={orgData} showValue={showValue}/>:null}
+        {showOrgDetail?<OrganizationDetail values={values} goal={goal} skill={skill} departmentValue={departmentValue} projectValues={projectValues} showAdd={showAdd} showGoal={showGoal} showSkills={showSkills} showDep={showDep} showProj={showProj} orgData={orgData} showValue={showValue}/>:null}
         
         {showCreateValue? <CreateValue addValue={addValue} closeModal={closeValueModal}/>:null}
+        
         
         {showAddGoal?<CreateGoal createValue={createValue} closeModal={closeValueModal}/>:null}
 
         {showAddSkills?<CreateSkills skills={skills} closeModal={closeValueModal}/>:null}
 
         {showDepartment?<CreateDepartment depValue={depValue} closeModal={closeValueModal}/>:null}
+        {showProject?<CreateProject projValue={projValue} closeModal={closeValueModal}/>:null}
+        
 
         {/* CreateOrganization */}
         {/* <CreateValue/>

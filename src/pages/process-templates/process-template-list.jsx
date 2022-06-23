@@ -38,7 +38,7 @@ const ProcessList = (props) => {
     }
  
     const createList = () => {
-        setProcessModal(false);
+        setCreateDetails(true)
         setOnTrackModal(false)
         setVotedModal(false)
         setVotingStepModal(false)
@@ -48,46 +48,43 @@ const ProcessList = (props) => {
         setProcessModal(true);
         setOnTrackModal(false)
         setCreateDetails(false);
-        setProcessList(false);
+        // setProcessList(false);
         setVotedModal(false)
         setVotingStepModal(false)
         setModal(false)
         console.log()
     }
     const createdModal = () => {
-        setProcessModal(false);
+        setModal(true)
         setOnTrackModal(false)
         setVotedModal(false)
         setVotingStepModal(false)
         setCreateDetails(false);
-        setProcessList(false);
-        setModal(true)
+        setProcessModal(false);
+
     }
     const ontrackModal = () => {
-        setProcessModal(false);
         setOnTrackModal(true)
         setVotedModal(false)
         setVotingStepModal(false)
         setCreateDetails(false);
-        setProcessList(false);
+        setProcessModal(false);
         setModal(false)
     }
     const showVotedModal = () => {
-        setProcessModal(false);
         setOnTrackModal(false)
         setVotedModal(true)
         setVotingStepModal(false)
         setCreateDetails(false);
-        setProcessList(false);
+        setProcessModal(false);
         setModal(false)
     }
     const showVotingStepModal=()=>{
-        setProcessModal(false);
         setOnTrackModal(false)
         setVotedModal(false)
         setVotingStepModal(true)
         setCreateDetails(false);
-        setProcessList(false);
+        setProcessModal(false);
         setModal(false)
     }
 

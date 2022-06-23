@@ -1,19 +1,43 @@
 import React from "react";
 import Select from 'react-select'
+import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
+
+
 
 const CreateValue=(props)=>{
 
     const [orgName, setOrgName] = React.useState('');
     const [vision, setVision] = React.useState('');
     const [option, setOption] = React.useState('');
+    const CREATE_VALUE = gql`
+    mutation createValue($title: String!, $description: String!,$icon: String!) {
+      createValue(input: {data: {title: $title, description: $description, icon: $icon}}) {
+        data {_id }
+      }
+    }`;
+    let [createValue, {loading, data, error}] = useMutation(
+      CREATE_VALUE,{
+        onCompleted: (data) => {
+          props.addValue({
+            title:orgName,
+            description:vision,
+            icon:option
+          })
+          props.closeModal();
+        },
+        onError: (error) => console.error("Error creating a post", error),
+      }
+    );
+  
     const createOrg=()=>{
-      
-      props.addValue({
-        title:orgName,
-        icon:option,
-        description:vision
+      createValue({
+        variables:{
+          title:orgName,
+          description:vision,
+          icon:option,
+        } 
       })
-      props.closeModal();
+      
     }
     
     const options = [
