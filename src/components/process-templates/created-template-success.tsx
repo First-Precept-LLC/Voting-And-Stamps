@@ -8,7 +8,7 @@ const CreatedTemplateSuccess=(props)=>{
        <>
        <div id="success-modal" 
            className=" overflow-y-auto overflow-x-hidden md:inset-0 "
-           style={{zIndex:1}}
+           style={{zIndex:1, display: 'inline-grid', justifyContent: 'center'}}
            >
            <div className="relative p-4 w-full max-w-xl md:h-auto">
                
@@ -18,7 +18,9 @@ const CreatedTemplateSuccess=(props)=>{
                        <h3 className="text-xl font-medium text-gray-900 text-center">    
                        </h3>
                        <button type="button"
-                       onClick={closeModal}
+                    //    onClick={closeModal}
+                    onClick={createdModal}
+
                            className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
                            data-modal-toggle="large-modal">
                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
