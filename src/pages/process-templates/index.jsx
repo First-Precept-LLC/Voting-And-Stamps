@@ -7,21 +7,20 @@ import ViewProcess from '../../components/process-templates/view-process';
 import VotingDetails from '../../components/process-templates/voting-details'
 import VotingSteps from '../../components/process-templates/voting-steps'
 import MainLayout from '../../components/layout/MainLayout';
-import { gql, useMutation, useQuery as query, NetworkStatus ,useQuery} from '@apollo/client'
+import { gql, useMutation, useQuery as query, NetworkStatus, useQuery } from '@apollo/client'
 
-import { useState } from 'react';
-let id=1;
+import { useState, useEffect } from 'react';
+let id = 1;
 function ProcessTemplates() {
-    const [department,setDepartment]=useState(['US','CA','FR','DE']);
-    const [fields, setFields] = useState([{step:'',showPopup: false,id:`${id}`}]);
+    const [department, setDepartment] = useState(['US', 'CA', 'FR', 'DE']);
+    const [fields, setFields] = useState([{ step: '', showPopup: false, id: `${id}` }]);
     const [project, setProject] = useState('')
     const [proName, setProName] = useState('')
     const [estDuration, setestDuration] = useState('')
     const [desc, setDesc] = useState('')
     const [step, setStep] = useState('')
-    const [stepTitle, setStepTitle] = useState('')
-    const [text, setText] = useState('')
-    
+    const [stepDuration, setStepDuration] = useState('')
+    const [descriptionText, setDescriptionText] = useState('')
     const [createModal, setShowCreateModal] = useState(false)
     const [processList, setProcessList] = useState(false)
     const [createDetails, setCreateDetails] = useState(false)
@@ -29,47 +28,152 @@ function ProcessTemplates() {
     const [onTrackModal, setOnTrackModal] = useState(false)
     const [votedModal, setVotedModal] = useState(false)
     const [votingStepModal, setVotingStepModal] = useState(false)
-    const [processName,setProcessName] = useState('')
-    const [user,setUser] = useState('')
-    const [date,setDate] = useState('')
-    const [processListData,setProcessListData]=useState([
-        {process:'Research of Model v1',processTemplate:'Start research development',dueBy:'Aug 22, 2022',assignees:'Matt',votes:'24',id:'1',percent:'70%',deletePopup:false},
-        {process:'Submission of Model v2',processTemplate:'Submitting Designs',dueBy:'Aug 28, 2022',assignees:'Saidutt',votes:'2',id:'2',percent:'33%',deletePopup:false}
+    const [processName, setProcessName] = useState('')
+    const [user, setUser] = useState('')
+    const [date, setDate] = useState('')
+    const [processListData, setProcessListData] = useState([
+        { process: 'Research of Model v1', processTemplate: 'Start research development', dueBy: 'Aug 22, 2022', assignees: 'Matt', votes: '24', id: '1', percent: '70%', deletePopup: false },
+        { process: 'Submission of Model v2', processTemplate: 'Submitting Designs', dueBy: 'Aug 28, 2022', assignees: 'Saidutt', votes: '2', id: '2', percent: '33%', deletePopup: false }
 
-         ]);
-    const [processListSelectedData,setProcessListSelectedData]=useState({});
+    ]);
+    const [processListSelectedData, setProcessListSelectedData] = useState({});
     // const [showPopupValue,setShowPopupValue]=useState(false)
 
- 
+    const CREATE_PROCESS_TEMPLATE = gql`
+    mutation createProcessTemplate($name: String!, $parentProject: String!, $estimatedDuration: String!, $description: String!) {
+      createProcessTemplate(input: {data: {name: $name, parentProject: $parentProject, estimatedDuration: $estimatedDuration, description: $description}}) {
+        data {_id, name }
+      }
+    }`;
+
+    let [createProcessTemplate, { dataValue, loadingValue, errorValue }] = useMutation(
+        CREATE_PROCESS_TEMPLATE, {
+        onCompleted: (dataValue) => {
+            console.log(dataValue)
+            props.addValue({
+                name: proName,
+                parentProject: project,
+                estimatedDuration: estDuration,
+                description: desc,
+            })
+            props.closeModal();
+        },
+        onError: (errorValue) => console.error("Error creating a post", error),
+    }
+    );
+    console.log('11111111111@@@@@@')
+
+    const CREATE_STEP = gql`
+      mutation createStep($name: String!, $parentProcessTemplate: String!, $estimatedDuration: String!, $description: String!) {
+        createStep(input: {data: {name: $name, parentProcessTemplate: $parentProcessTemplate, estimatedDuration: $estimatedDuration, description: $description}}) {
+          data {_id, name }
+        }
+      }`;
+    console.log('@@@@@@', CREATE_STEP)
+    let [createStep, { dataProcess, loadingProcess, errorProcess }] = useMutation(
+        CREATE_STEP, {
+        onCompleted: (dataProcess) => {
+            console.log(dataProcess)
+            props.addValue({
+                name: 'nameValue',
+                parentProcessTemplate: 'parent',
+                estimatedDuration: stepDuration,
+                description: descriptionText,
+            })
+            props.closeModal();
+        },
+        onError: (errorProcess) => console.error("Error creating a post", error),
+    }
+    );
+
+
     const GET_DOGS = gql`
-    query proj($nameFilter: String!) {
-        proj(input: $nameFilter) {
-          result {name}
+    query projs($nameFilter: String!) {
+        projs(input: {filter:{name:{_neq:$nameFilter}}}) {
+          results {_id,name}
         }
     }
   `;
-  const { loading, error, data } = useQuery(GET_DOGS,{
-    notifyOnNetworkStatusChange: true,
-      variables: {nameFilter:'test'}
-  });
+    const { data, error, loading } = useQuery(GET_DOGS, {
+        notifyOnNetworkStatusChange: true,
+        variables: { nameFilter: "''" },
+        onCompleted: (dataValue) => {
+            console.log({ data })
+            setDepartment(data.projs.results);
+        }
+    });
+    console.log(data);
 
 
-  const createOrg=()=>{
-    createProjectValue({
-      variables:{
-        name:department,
+    console.log(department);
+    // Calculates output
 
-        // name:orgName,
-        // parent:vision,
-    
-      } 
-    })
-    
-  }
+    const createOrg = () => {
+        createProjectValue({
+            variables: {
+                name: department,
+
+            }
+        })
+
+    }
+
+    const CREATE_PROCESS = gql`
+    mutation  createProcess($userId:String!,$name: String!, $dueDate: Date!) {
+      createProcess(input: {data: {userId:$userId ,name: $name,dueDate: $dueDate}}) {
+        data {_id }
+      }
+    }`;
+    let [createProces, {loading:_loading, data:_data, error:_error}] = useMutation(
+      CREATE_PROCESS,{
+        onCompleted: (_data) => {
+          props.addValue({
+            name:processName,
+            userId:user,
+            dueDate:date
+          })
+          props.closeModal();
+        },
+        onError: (error) => console.error("Error creating a post", error),
+      }
+    );
   
+    const createProcessOrg=()=>{
+      createProces({
+        variables:{
+          userId:user,
+          name:processName,
+          dueDate:date
+          
+        } 
+      })
+      
+    }
+
+
+
 
     const [modal, setModal] = useState(false)
     const CreatePage = () => {
+        createStep({
+            variables: {
+                name: 'nameValue',
+                parentProcessTemplate: 'parent',
+                estimatedDuration: stepDuration,
+                description: descriptionText,
+            }
+        })
+        createProcessTemplate({
+            variables: {
+                name: proName,
+                parentProject: project,
+                estimatedDuration: estDuration,
+                description: desc,
+            }
+        })
+
+
+
         setShowCreateModal(true)
         setProcessList(false);
         setCreateDetails(false);
@@ -84,9 +188,9 @@ function ProcessTemplates() {
             name: proName,
             duration: estDuration,
             description: desc,
-            fields:fields,
-            title: stepTitle,
-            textDescription: text
+            fields: fields,
+            // title: stepDuration,
+            // textDescription: text
 
         })
     }
@@ -119,7 +223,8 @@ function ProcessTemplates() {
         setVotedModal(false)
         setVotingStepModal(false)
         setModal(false)
-        console.log(user, processName,date)
+        console.log(user, processName, date)
+        createProcessOrg();
     }
     const createdModal = () => {
         setProcessModal(false);
@@ -141,9 +246,9 @@ function ProcessTemplates() {
         setShowCreateModal(false);
         setModal(false);
 
-        setProcessListSelectedData(processListData.find(e=>(e.id===id)))
-          
-        
+        setProcessListSelectedData(processListData.find(e => (e.id === id)))
+
+
 
     }
     const showVotedModal = () => {
@@ -156,7 +261,7 @@ function ProcessTemplates() {
         setShowCreateModal(false);
         setModal(false)
     }
-    const showVotingStepModal=()=>{
+    const showVotingStepModal = () => {
         setProcessModal(false);
         setOnTrackModal(false)
         setVotedModal(false)
@@ -182,45 +287,45 @@ function ProcessTemplates() {
         setOnTrackModal(true)
 
     }
-    const showPopupHandler=(id)=>{
+    const showPopupHandler = (id) => {
         console.log(id);
-        let array=[...fields];
-          array.forEach(element => {
-            if(element.id==id){
-                if(element.showPopup==true){
-                    element.showPopup=false;
-                }else{
-                    element.showPopup=true;
+        let array = [...fields];
+        array.forEach(element => {
+            if (element.id == id) {
+                if (element.showPopup == true) {
+                    element.showPopup = false;
+                } else {
+                    element.showPopup = true;
                 }
-             }
-            else{
-                element.showPopup=false;
-              }
-            
-          });
-          setFields(array);
+            }
+            else {
+                element.showPopup = false;
+            }
+
+        });
+        setFields(array);
 
     }
     const handleAdd = () => {
-        id=id+1
+        id = id + 1
         const values = [...fields];
-        values.push({ step: '' ,showPopup: false,id:`${id}`});
-        
-        
+        values.push({ step: '', showPopup: false, id: `${id}` });
+
+
         setFields(values);
     }
-    const deleteHandler=(id, index)=>{
-        let arr=[...fields];
+    const deleteHandler = (id, index) => {
+        let arr = [...fields];
         console.log(arr);
-        
+
         // let index = arr.findIndex(object => {
         //     return object.id == id;
         //   });
         //   console.log(index);
-       // console.log(index, id, '$$$$$$$$$')
-          arr.splice(index,1);
-          setFields([...arr]);
-        
+        // console.log(index, id, '$$$$$$$$$')
+        arr.splice(index, 1);
+        setFields([...arr]);
+
     }
     console.log(fields)
 
@@ -243,7 +348,7 @@ function ProcessTemplates() {
                 <script src="/tailwind.js"></script>
             </head>
             <MainLayout>
-                {!createModal && !processList && !createDetails && !processModal && !modal && !onTrackModal && !votedModal && !votingStepModal?
+                {!createModal && !processList && !createDetails && !processModal && !modal && !onTrackModal && !votedModal && !votingStepModal ?
                     <div className="flex w-full p-8 flex-col">
                         <div className="flex justify-between">
                             <h1 className="text-3xl mb-8">Create Process Template</h1>
@@ -260,8 +365,8 @@ function ProcessTemplates() {
                                     <select id="countries" onChange={(e) => setProject(e.target.value)}
                                         className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                                         <option selected="">Select Department</option>
-                                        {department.map(value=>{
-                                            return(<option value={value}>HR</option>)
+                                        {department.map(value => {
+                                            return (<option value={value._id}>{value.name}</option>)
                                         }
 
                                         )}
@@ -346,16 +451,16 @@ function ProcessTemplates() {
                                                 return (
                                                     <div
                                                         className="flex items-center w-full min-h-8 justify-between pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2 flex-wrap">
-                                                        <input key={item.id} style={{ border: 0 }} type='text' defaultValue={item.step} onChange={(e) => {item.step=e.target.value;}} />
-                                                        <button className="px-4" onClick={()=>{showPopupHandler(item.id)}}>
+                                                        <input key={item.id} style={{ border: 0 }} type='text' defaultValue={item.step} onChange={(e) => { item.step = e.target.value; }} />
+                                                        <button className="px-4" onClick={() => { showPopupHandler(item.id) }}>
                                                             <i className="fa-solid fa-ellipsis-vertical" ></i>
                                                         </button>
-                                                        {item.showPopup?
-                                                        <div style={{height:"30px",width:'30px'}}> 
-                                                            <button onClick={()=>{deleteHandler(item.id, index)}}>delete</button>
-                                                            
-                                                        </div>
-:null
+                                                        {item.showPopup ?
+                                                            <div style={{ height: "30px", width: '30px' }}>
+                                                                <button onClick={() => { deleteHandler(item.id, index) }}>delete</button>
+
+                                                            </div>
+                                                            : null
                                                         }
                                                     </div>
                                                 )
@@ -383,7 +488,7 @@ function ProcessTemplates() {
                                                         clip-rule="evenodd"></path>
                                                 </svg>
                                             </div>
-                                            <input id="dropdownDividerButton" data-dropdown-toggle="dropdownDivider" type="date" onChange={(e) => setStepTitle(e.target.value)}
+                                            <input id="dropdownDividerButton" data-dropdown-toggle="dropdownDivider" type="date" onChange={(e) => setStepDuration(e.target.value)}
                                                 className="bg-white border-2 border-gray-300 text-gray-900 sm:text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  datepicker-input"
                                                 placeholder="Estimated Duration" readonly />
                                         </div>
@@ -423,7 +528,8 @@ function ProcessTemplates() {
                                         <form>
                                             <div className="mb-4 w-full bg-gray-100 rounded-lg border border-gray-300 ">
                                                 <div className="py-2 px-4 bg-white rounded-b-lg ">
-                                                    <textarea id="editor" rows="8" onChange={(e) => setText(e.target.value)}
+                                                    <textarea id="editor" rows="8" onChange={(e) =>
+                                                        setDescriptionText(e.target.value)}
                                                         className="block px-0 w-full text-sm text-gray-800 bg-white border-0  focus:ring-0" style={{ height: '50px' }}
                                                         placeholder="Enter Description" required=""></textarea>
                                                 </div>
@@ -476,31 +582,31 @@ function ProcessTemplates() {
 
                 {createModal ? <TemplateSuccess closeModal={closeModal} createProcess={createProcess} /> : null}
                 {processList ? <ProcessList createList={createList} /> : null}
-                {createDetails ? <CreateProcessList 
-                            closeModal={closeModal} 
-                            processCreated={processCreated} 
-                            user={user} 
-                            setUser={setUser}
-                            date={date}
-                            setDate={setDate}
-                            processName={processName}
-                            setProcessName={setProcessName}
-                  /> : null}
+                {createDetails ? <CreateProcessList
+                    closeModal={closeModal}
+                    processCreated={processCreated}
+                    user={user}
+                    setUser={setUser}
+                    date={date}
+                    setDate={setDate}
+                    processName={processName}
+                    setProcessName={setProcessName}
+                /> : null}
                 {processModal ? <CreatedTemplateSuccess createdModal={createdModal} /> : null}
-                {modal ? <ProcessListGroup 
-                ontrackModal={ontrackModal} 
-                processListData={processListData}
-                setProcessListData={setProcessListData}
+                {modal ? <ProcessListGroup
+                    ontrackModal={ontrackModal}
+                    processListData={processListData}
+                    setProcessListData={setProcessListData}
 
-                
-                   /> : null}
+
+                /> : null}
                 {onTrackModal ? <ViewProcess votedModal={showVotedModal}
-                      processListSelectedData={processListSelectedData}
-                   /> : null}
+                    processListSelectedData={processListSelectedData}
+                /> : null}
                 {/* <VotingDetails /> */}
-                {votedModal ? <VotingDetails closeModal={closeVotingModal}  votingStepModal={showVotingStepModal} /> : null}
-                {votingStepModal ?<VotingSteps closeModal={closeVotingStepModal}  /> :null}
-             
+                {votedModal ? <VotingDetails closeModal={closeVotingModal} votingStepModal={showVotingStepModal} /> : null}
+                {votingStepModal ? <VotingSteps closeModal={closeVotingStepModal} /> : null}
+
             </MainLayout >
 
         </>

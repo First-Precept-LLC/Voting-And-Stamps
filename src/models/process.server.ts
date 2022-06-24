@@ -14,6 +14,7 @@ export interface ProcessTypeServer extends VulcanDocument {
     progress?: number;
     status?: string;
     dueDate?: Date;
+    userId?: string;
     //TODO: add user?
   }
 
@@ -32,7 +33,7 @@ export interface ProcessTypeServer extends VulcanDocument {
       type: String,
       optional: true,
       canRead: ["guests"],
-      canCreate: ["members"]
+      canCreate: ["guests","members"]
 
     },
 
@@ -40,7 +41,7 @@ export interface ProcessTypeServer extends VulcanDocument {
         type: String,
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"]
+        canCreate: ["guests","members"]
     },
 
 
@@ -73,7 +74,7 @@ export interface ProcessTypeServer extends VulcanDocument {
         type: Date,
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"]
+        canCreate: ["guests","members"]
     },
 
     status: {
@@ -99,10 +100,10 @@ export interface ProcessTypeServer extends VulcanDocument {
     },
     schema,
     permissions: {
-      canCreate: ["members"], 
+      canCreate: ["guests","members","owners", "admins"], 
       canUpdate: ["owners", "admins"],
       canDelete: ["owners", "admins"],
-      canRead: ["members", "admins"],
+      canRead: ["guests","members", "admins"],
     },
   };
 

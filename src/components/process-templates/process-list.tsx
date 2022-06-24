@@ -4,8 +4,40 @@ import { useState } from 'react';
 const ProcessList = (props) => {
     const {createList} = props;
     const [templateList,setTemplateList]=useState([
-        {processTemplate:'Start research development',project:'R&D',id:'1'},
-        {processTemplate:'Submiting Designs',project:'R&D',id:'2'}])
+        {processTemplate:'Start research development',project:'R&D',id:'1',deletePopup:false},
+        {processTemplate:'Submiting Designs',project:'R&D',id:'2',deletePopup:false}])
+
+
+        const deletePopupHandler=(id)=>{
+        
+            let arr=[...templateList];
+            arr.forEach(element => {
+                if(element.id==id){
+                    if(element.deletePopup==true){
+                        element.deletePopup=false;
+                    }else{
+                        element.deletePopup=true;
+                    }
+                 }
+                else{
+                    element.deletePopup=false;
+                  }
+                
+              });
+              setTemplateList(arr);
+    
+         }
+         
+         const deleteHandler=(id)=>{
+            let arr=[...templateList];
+            let index = arr.findIndex(object => {
+                    return object.id == id;
+                  });
+                  console.log(index);
+                  arr.splice(index,1);
+                  setTemplateList([...arr]);
+         }
+
     return (
         <>
             <div className="flex w-full flex-col">
@@ -47,9 +79,11 @@ const ProcessList = (props) => {
                                         className="text-white bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-6 text-left w-20 text-center "
                                         data-modal-toggle="large-modal">
                                         Edit</button>
-                                    <a href="#" className=" px-4 hover:bg-kelvinLight rounded-full">
+                                    <a href="#" className=" px-4 hover:bg-kelvinLight rounded-full" onClick={()=>{deletePopupHandler(item.id)}}>
                                         <i className="fa-solid fa-ellipsis-vertical mt-1 text-xl"></i>
+                                        
                                     </a>
+                                    {item.deletePopup?<button onClick={()=>{deleteHandler(item.id)}}>delete</button>:null}
                                 </div>
                             </div>
                             )
