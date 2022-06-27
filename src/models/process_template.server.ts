@@ -22,7 +22,7 @@ export interface ProcessTemplateTypeServer extends VulcanDocument {
       type: String,
       optional: true,
       canRead: ["guests"],
-      canCreate: ["members"]
+      canCreate: ["guests","members"]
     },
     // userId is the _id of the owner of the document
     // Here, it guarantees that the user belongs to group "owners" for his own data
@@ -63,7 +63,7 @@ export interface ProcessTemplateTypeServer extends VulcanDocument {
         },
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"]
+        canCreate: ["guests","members"]
   
     },
 

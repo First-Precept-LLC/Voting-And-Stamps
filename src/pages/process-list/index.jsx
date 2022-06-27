@@ -1,12 +1,25 @@
-import React from 'react'
-import { useState } from 'react'
+import Link from 'next/link';
+import React from 'react';
+import { useState } from 'react';
+import MainLayout from '../../components/layout/MainLayout';
+import ViewProcess from '../../components/process-templates/view-process';
+import VotingDetails from '../../components/process-templates/voting-details';
+import VotingSteps from '../../components/process-templates/voting-steps';
+
+
 const ProcessListGroup = (props) => {
-    const {ontrackModal,
-        processListData,
-        setProcessListData
-    } =props
+ 
     
-    
+const [votedModal, setVotedModal] = useState(false)
+const [votingStepModal, setVotingStepModal] = useState(false)
+const [processListSelectedData, setProcessListSelectedData] = useState({});
+const [onTrackModal, setOnTrackModal] = useState(false)
+
+const [processListData, setProcessListData] = useState([
+    { process: 'Research of Model v1', processTemplate: 'Start research development', dueBy: 'Aug 22, 2022', assignees: 'Matt', votes: '24', id: '1', percent: '70%', deletePopup: false },
+    { process: 'Submission of Model v2', processTemplate: 'Submitting Designs', dueBy: 'Aug 28, 2022', assignees: 'Saidutt', votes: '2', id: '2', percent: '33%', deletePopup: false }
+
+]);
     
          
      const deletePopupHandler=(id)=>{
@@ -38,8 +51,66 @@ const ProcessListGroup = (props) => {
               arr.splice(index,1);
               setProcessListData([...arr]);
      }
+     
+     const showVotedModal = () => {
+        setOnTrackModal(false)
+        setVotedModal(true)
+        setVotingStepModal(false)
+        // setCreateDetails(false);
+        // setProcessModal(false);
+        // setModal(false)
+    }
+    const showVotingStepModal=()=>{
+        setOnTrackModal(false)
+        setVotedModal(false)
+        setVotingStepModal(true)
+        // setCreateDetails(false);
+        // setProcessModal(false);
+        // setModal(false)
+    }
+
+    const closeVotingModal = () => {
+        setVotedModal(false)
+        setOnTrackModal(true)
+
+    }
+    const closeVotingStepModal = () => {
+        setVotingStepModal(false)
+        setVotedModal(false)
+        setOnTrackModal(true)
+
+    }
+    const ontrackModal = (id) => {
+        setOnTrackModal(true)
+        setVotedModal(false)
+        setVotingStepModal(false)
+        // setCreateDetails(false);
+        // setProcessModal(false);
+        // setModal(false)
+        setProcessListSelectedData(processListData.find(e => (e.id === id)))
+
+    }
+
     return (
         <>
+          <head>
+                <meta charSet="UTF-8" />
+                <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                <title>Project Kelvin Widget</title>
+                <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+                <link rel="stylesheet" href="https://unpkg.com/flowbite@1.4.4/dist/flowbite.min.css" />
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js"
+                    integrity="sha512-6PM0qYu5KExuNcKt5bURAoT6KCThUmHRewN3zUFNaoI6Di7XJPTMoT6K0nsagZKk2OB4L7E3q1uQKHNHd4stIQ=="
+                    crossOrigin="anonymous" referrerPolicy="no-referrer"></script>
+                <link
+                    href="https://fonts.googleapis.com/css?family=Poppins:100,100italic,200,200italic,300,300italic,regular,italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic"
+                    rel="stylesheet" />
+                <link rel="stylesheet" href="./assets/css/style.css" />
+                <script src="/tailwind.js"></script>
+            </head>
+        <MainLayout>
+        {!onTrackModal && !votedModal && !votingStepModal?
             <div className="flex w-full p-8 flex-col">
                 <div className="flex justify-between">
                     <h1 className="text-3xl mb-8">Processes List</h1>
@@ -87,11 +158,15 @@ const ProcessListGroup = (props) => {
                             </div>
                         </div>
                         <div className="flex">
+                            <Link href='/research-model'>
                             <button 
-                            onClick={()=>{ontrackModal(item.id)}}
+                            //onClick={()=>{ontrackModal(item.id)}}
+                            
                             className=" bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-2  h-6 text-left mr-2 w-24 text-center "
                                 data-modal-toggle="large-modal">
                                 On Track</button>
+                                </Link>
+                               
                            <p style={{lineHeight:'10px',textAlign:'center'}}><span style={{fontSize:'20px'}} >{item.votes}</span><br/><span style={{fontSize:'10px'}}>Votes</span></p>
                             <a href="#" className=" px-4 hover:bg-kelvinLight rounded-full" onClick={()=>{deletePopupHandler(item.id)}}>
                                 <i className="fa-solid fa-ellipsis-vertical text-xl"></i>
@@ -107,6 +182,13 @@ const ProcessListGroup = (props) => {
             </div>
                
             </div>
+             : null
+            }
+
+           {onTrackModal ? <ViewProcess votedModal={showVotedModal} processListSelectedData={processListSelectedData} /> : null}
+            {votedModal ? <VotingDetails closeModal={closeVotingModal}  votingStepModal={showVotingStepModal} /> : null}
+            {votingStepModal ?<VotingSteps closeModal={closeVotingStepModal}  /> :null}
+        </MainLayout>
         </>
     )
 }

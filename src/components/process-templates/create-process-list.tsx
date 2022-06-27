@@ -1,17 +1,39 @@
 import React, { useState } from 'react';
+import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
+
 
 const CreateProcessList = (props) => {
-  
-    const { closeModal,
-            processCreated,
-            
-            setProcessName,
-        
-            setUser,
-        
-            setDate
-          } = props;
-    
+    const [processName, setProcessName] = useState('')
+    const [user, setUser] = useState('')
+    const [date, setDate] = useState('')
+
+    const {closeModal}=props;
+    const CREATE_PROCESS = gql`
+          mutation  createProcess($userId:String!,$name: String!, $dueDate: Date!) {
+            createProcess(input: {data: {userId:$userId ,name: $name,dueDate: $dueDate}}) {
+              data {_id}
+            }
+          }`;
+    let [createProces, { loading: _loading, data: _data, error: _error }] = useMutation(
+        CREATE_PROCESS, {
+        onCompleted: (_data) => {
+        props.nextProcess();
+
+        },
+        onError: (error) => console.error("Error creating a post", error),
+    }
+    );
+
+
+    const processCreated = () => {
+        createProces({
+            variables: {
+                name: processName,
+                userId: user,
+                dueDate: date
+            }
+        })
+    }
     return (
         <>
             <div
@@ -36,7 +58,7 @@ const CreateProcessList = (props) => {
                                         <input
                                             type="text"
                                             id="process"
-                                            onChange={(e)=>setProcessName(e.target.value)}
+                                            onChange={(e) => setProcessName(e.target.value)}
                                             className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                             placeholder="Title of the processes"
                                             required
@@ -48,12 +70,12 @@ const CreateProcessList = (props) => {
                                         <input
                                             type="text"
                                             id="user"
-                                            onChange={(e)=>setUser(e.target.value)}
+                                            onChange={(e) => setUser(e.target.value)}
                                             className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                             placeholder=""
                                             required
-                                        
-                                          
+
+
                                         />
                                         <p className="text-xs opacity-50 mt-2">
                                             Default user is populated from the role selected while creating process
@@ -64,7 +86,7 @@ const CreateProcessList = (props) => {
                                         <input
                                             type="date"
                                             id="date"
-                                            onChange={(e)=>setDate(e.target.value)}
+                                            onChange={(e) => setDate(e.target.value)}
                                             className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                             placeholder="John"
                                             required
@@ -75,7 +97,7 @@ const CreateProcessList = (props) => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex items-center space-x-2 rounded-b dark:border-gray-600" style={{ paddingLeft: '235px',marginTop:'-17px' }}>
+                            <div className="flex items-center space-x-2 rounded-b dark:border-gray-600" style={{ paddingLeft: '235px', marginTop: '-17px' }}>
 
                                 <button
                                     type="button"

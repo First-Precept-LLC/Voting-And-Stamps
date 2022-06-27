@@ -1,11 +1,28 @@
 import React from 'react';
 import { useState } from 'react';
+import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
 
 const ProcessList = (props) => {
     const {createList} = props;
     const [templateList,setTemplateList]=useState([
         {processTemplate:'Start research development',project:'R&D',id:'1',deletePopup:false},
         {processTemplate:'Submiting Designs',project:'R&D',id:'2',deletePopup:false}])
+
+        const GET_PROCESS = gql`
+        query process($nameFilter: String!) {
+            process(input: {filter:{name:{_neq:$nameFilter}}}) {
+              result {_id,name}
+            }
+        }`;
+        const { data, error, loading } = useQuery(GET_PROCESS, {
+            notifyOnNetworkStatusChange: true,
+            variables: { nameFilter: "''" },
+            onCompleted: (dataValue) => {
+                console.log(data.process.result);
+              //  setTemplateList(data.p);
+              //  console.log(templateList);
+            }
+        });
 
 
         const deletePopupHandler=(id)=>{
