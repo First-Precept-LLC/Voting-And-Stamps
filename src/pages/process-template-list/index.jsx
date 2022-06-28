@@ -48,7 +48,7 @@ const ProcessTemplateList = (props) => {
             variables: { nameFilter: getUserId() },
             onCompleted: (dataValue) => {
                 console.log(dataValue.processTemplates.results);
-               setTemplateList(dataValue.processTemplates.results);
+                setProcessListData(dataValue.processTemplates.results);
                templateList.forEach(e=>{
                 e.deletePopup=false
                })
@@ -269,7 +269,7 @@ const ProcessTemplateList = (props) => {
             return(
                 <div
                 className="flex items-center w-full min-h-8 justify-between pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2 ">
-                <h6 className="mr-2 w-1/2">{item.processTemplate}</h6>
+                <h6 className="mr-2 w-1/2">{item.name}</h6>
                 <p className="text-sm opacity-50 mr-2 font-normal w-32" style={{ marginRight: '37%' }}>{item.project}</p>
                 <div className="flex items-center">
                     <button onClick={createList}
