@@ -11,6 +11,7 @@ import CreateDepartment from '../../components/organizations/create-department'
 import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
 import { values } from 'lodash';
 import CreateProject from "../../components/organizations/create-projects"
+import {getUserId} from '../../services/user.service';
 
 function Organization() {
   const [showCreateModal,setShowCreateModal] = useState(false);
@@ -27,9 +28,10 @@ function Organization() {
   const [skill,setSkills] = useState([])
   const [departmentValue,setDepartmentValues] = useState([])
   const [projectValues,setProjectValues]=useState([])
+ 
   const CREATE_ORG = gql`
-  mutation createOrg($name: String!, $vision: String!) {
-    createOrg(input: {data: {name: $name, vision: $vision}}) {
+  mutation createOrg($name: String!, $vision: String!, $userId: String!) {
+    createOrg(input: {data: {name: $name, vision: $vision, userId: $userId}}) {
       data {_id}
     }
   }`;
@@ -44,6 +46,69 @@ function Organization() {
     setShowSuccessModal(false);
     setShowOrgDetail(true);
   }
+  
+  const GET_ORG = gql`
+        query org($nameFilter: String!) {
+            org(input: {filter:{userId:{_eq:$nameFilter}}}) {
+              result {_id,name,vision}
+            }
+        }`;
+    const { data1, error1, loading1 } = useQuery(GET_ORG, {
+          notifyOnNetworkStatusChange: true,
+          variables: { nameFilter: getUserId() },
+          onCompleted: (dataValue) => {
+              console.log(data1,dataValue.org.result,"!!!!!!!!!!!!!!!!!!");
+              if(dataValue.org){
+                setOrgData(dataValue.org.result)
+                closeSuccessModal();
+              }
+            //  setTemplateList(data.p);
+            //  console.log(templateList);
+          }
+      });
+
+      const GET_VALUES = gql`
+        query values($nameFilter: String!) {
+            values(input: {filter:{userId:{_eq:$nameFilter}}}) {
+              results {_id,title,description,icon}
+            }
+        }`;
+    const { dataValues, error2, loading2 } = useQuery(GET_VALUES, {
+          notifyOnNetworkStatusChange: true,
+          variables: { nameFilter: getUserId() },
+          onCompleted: (dataValue) => {
+              console.log(dataValue,dataValues,"!!!!!!!!!!!!!!!!!!");
+              if(dataValue.values){
+                setValue(dataValue.values.results)
+              }
+            //  setTemplateList(data.p);
+            //  console.log(templateList);
+          }
+      });
+
+
+      const GET_PROJS = gql`
+      query projs($nameFilter: String!) {
+          projs(input: {filter:{userId:{_eq:$nameFilter}}}) {
+            results {_id,name,parent}
+          }
+      }`;
+  const { data3, error3, loading3 } = useQuery(GET_PROJS, {
+        notifyOnNetworkStatusChange: true,
+        variables: { nameFilter: getUserId() },
+        onCompleted: (dataValue) => {
+            console.log(dataValue,dataValues,"!!!!!!!!!!!!!!!!!!");
+            if(dataValue.projs){
+              setProjectValues(dataValue.projs.results)
+            }
+          //  setTemplateList(data.p);
+          //  console.log(templateList);
+        }
+    });
+
+      
+
+      
   let [createExample, {loading, data, error}] = useMutation(
     CREATE_ORG,{
       onCompleted: (data) => {
@@ -59,7 +124,7 @@ function Organization() {
   const createOrg=(data)=>{
     console.log(data)
     setOrgData(data)
-    createExample({variables: {name:data.orgName,vision:data.vision}});
+    createExample({variables: {name:data.orgName,vision:data.vision,userId: getUserId()}});
   }
   const showAdd=()=>{
     setShowCreateModal(false);
@@ -112,7 +177,7 @@ function Organization() {
   }
   const addValue = (data)=>{
     setValue([...values,data])
-    console.log([...values,data]);
+    console.log([...values,data,"hi11111"]);
   }
   const createValue = (data)=>{
     setGoal([...goal,data])
@@ -128,6 +193,8 @@ function Organization() {
   }
   const projValue=(data)=>{
     setProjectValues([...projectValues,data])
+    console.log([...projectValues,data,"hi22222222"]);
+
   }
   return (
     <>

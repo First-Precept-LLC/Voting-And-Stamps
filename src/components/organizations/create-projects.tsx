@@ -1,11 +1,35 @@
 import React from "react";
 import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
+import { getUserId } from "~/services/user.service";
 
 const CreateProject=(props)=>{
     const [projName,setProjName] = React.useState('');
+
+
+    const GET_ORG_Project = gql`
+    query proj($nameFilter: String!) {
+      proj(input: {filter:{userId:{_eq:$nameFilter}}}) {
+          result {_id,proj}
+        }
+    }`;
+const { data:data2, error:error2, loading:loading2 } = useQuery(GET_ORG_Project, {
+      notifyOnNetworkStatusChange: true,
+      variables: { nameFilter: getUserId() },
+      onCompleted: (dataValue) => {
+          console.log(data2,dataValue,"hiiiiiiii");
+          // if(dataValue.value){
+          //   setOrgData(dataValue.org.result)
+          //   closeSuccessModal();
+          // }
+        //  setTemplateList(data.p);
+        //  console.log(templateList);
+      }
+  });
+
+
     const CREATE_PROJ = gql`
-    mutation createProj($name: String!, $parent: String!) {
-      createProj(input: {data: {name: $name, parent: $parent}}) {
+    mutation createProj($name: String!, $parent: String!, $userId: String!) {
+      createProj(input: {data: {name: $name, parent: $parent, userId: $userId}}) {
         data {_id, name }
       }
     }`;
@@ -13,7 +37,8 @@ const CreateProject=(props)=>{
         CREATE_PROJ,{
           onCompleted: (data) => {
             props.projValue({
-                title:projName
+                title:projName,
+                userId: getUserId()
               })
             props.closeModal();
           },
@@ -22,7 +47,7 @@ const CreateProject=(props)=>{
       );
     const createOrg=()=>{
       
-      createProjectData({variables:{'name':projName,'parent':'62a76b7f75bb9b447ffb6b22'}});
+      createProjectData({variables:{'name':projName,'parent':'62a76b7f75bb9b447ffb6b22',userId: getUserId()}});
       
     }
 

@@ -24,9 +24,9 @@ const CreateOrganization=(props)=>{
         <div
           id="large-modal"
           className=" overflow-y-auto overflow-x-hidden w-full"
-          style={{zIndex:1}}
+          style={{zIndex:1,display:'flex',justifyContent:'center'}}
         >
-          <div className="relative p-4 w-full max-w-4xl h-full md:h-auto">
+          <div className="relative p-4 w-full max-w-xl h-full md:h-auto">
             <div className="relative bg-white rounded-lg shadow ">
               <div className="flex justify-between items-center p-5 rounded-t">
                 <h3 className="text-xl font-medium text-gray-900 "></h3>

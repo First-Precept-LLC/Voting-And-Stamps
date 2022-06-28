@@ -1,34 +1,27 @@
 import TemplateSuccess from '../../components/process-templates/template-success';
-import CreateProcessList from '../../components/process-templates/create-process-list';
-// import ProcessList from '../../components/process-templates/process-list';
-import CreatedTemplateSuccess from '../../components/process-templates/created-template-success';
-import ProcessListGroup from '../../components/process-templates/process-list-group';
-import ViewProcess from '../../components/process-templates/view-process';
-import VotingDetails from '../../components/process-templates/voting-details'
-import VotingSteps from '../../components/process-templates/voting-steps'
 import MainLayout from '../../components/layout/MainLayout';
 import { gql, useMutation, useQuery as query, NetworkStatus, useQuery } from '@apollo/client'
 import { useState, useEffect } from 'react';
-import ProcessTemplateList from './process-template-list';
+import { getUserId } from '../../services/user.service';
 let id = 1;
 function ProcessTemplates() {
     const [department, setDepartment] = useState(['US', 'CA', 'FR', 'DE']);
     // const [fields, setFields] = useState([{ step: '', showPopup: false, id: `${id}` }]);
     const [project, setProject] = useState('')
     const [proName, setProName] = useState('')
-    const [estDuration, setestDuration] = useState('')
+    const [estDuration, setestDuration] = useState([])
     const [desc, setDesc] = useState('')
     const [step, setStep] = useState('')
-    // const [stepDuration, setStepDuration] = useState('')
-    // const [descriptionText, setDescriptionText] = useState('')
+    const [stepDuration, setStepDuration] = useState('')
+    const [descriptionText, setDescriptionText] = useState('')
     const [createModal, setShowCreateModal] = useState(false)
     const [processName, setProcessName] = useState('')
     const [user, setUser] = useState('')
     const [date, setDate] = useState('')
     const [showDate, setShowDate] = useState(false)
-    const [fields, setFields] = useState([{ step: 'step1', duration: '', description: 'thw data', showPopup: false, id: `${id}`, selected: true }]);
+    const [processShowDate, setProcessShowDate] = useState(false)
     const [selectedStep,setSelectedStep]=useState({});
-    const [processListSelectedData, setProcessListSelectedData] = useState({});
+    const [fields, setFields] = useState([{ step: '',duration:[],description:'', showPopup: false, id: `${id}` ,selected:true}]);
     // const [showPopupValue,setShowPopupValue]=useState(false)
 
     const CREATE_PROCESS_TEMPLATE = gql`
@@ -42,17 +35,20 @@ function ProcessTemplates() {
         CREATE_PROCESS_TEMPLATE, {
         onCompleted: (dataValue) => {
             console.log(dataValue)
-
-            createStep({
-                variables: {
-                    estimatedDuration: stepDuration,
-                    description: descriptionText,
-                }
+            fields.forEach(item=>{
+                createStep({
+                    variables: {
+                        name:item.step,
+                        estimatedDuration: item.duration.toString(),
+                        description: item.description,
+                    }
+                })
             })
+            
             props.addValue({
                 name: proName,
                 parentProject: project,
-                estimatedDuration: estDuration,
+                estimatedDuration: estDuration.toString(),
                 description: desc,
             })
         },
@@ -60,8 +56,8 @@ function ProcessTemplates() {
     }
     );
     const CREATE_STEP = gql`
-      mutation createStep($estimatedDuration: String!, $description: String!) {
-        createStep(input: {data: {estimatedDuration: $estimatedDuration, description: $description}}) {
+      mutation createStep($name: String!,$estimatedDuration: String!, $description: String!) {
+        createStep(input: {data: {name: $name, estimatedDuration: $estimatedDuration, description: $description}}) {
           data {_id, name }
         }
       }`;
@@ -79,14 +75,14 @@ function ProcessTemplates() {
 
     const GET_PROJECTS = gql`
     query projs($nameFilter: String!) {
-        projs(input: {filter:{name:{_neq:$nameFilter}}}) {
-          results {_id,name}
+        projs(input: {filter:{userId:{_eq:$nameFilter}}}) {
+          results {_id,name,parent}
         }
     }
   `;
     const { data, error, loading } = useQuery(GET_PROJECTS, {
         notifyOnNetworkStatusChange: true,
-        variables: { nameFilter: "''" },
+        variables: { nameFilter: getUserId()},
         onCompleted: (dataValue) => {
             console.log({ data })
             setDepartment(data.projs.results);
@@ -149,7 +145,7 @@ function ProcessTemplates() {
             variables: {
                 name: proName,
                 parentProject: project,
-                estimatedDuration: estDuration,
+                estimatedDuration: estDuration.toString(),
                 description: desc,
             }
         })
@@ -191,7 +187,7 @@ function ProcessTemplates() {
     const handleAdd = () => {
         id = id + 1
         const values = [...fields];
-        values.push({ step: '', showPopup: false, id: `${id}`, description: '', duration: '' });
+        values.push({ step: '', showPopup: false, id: `${id}`, description: '', duration: [] });
         setFields(values);
     }
     const deleteHandler = (id, index) => {
@@ -203,8 +199,11 @@ function ProcessTemplates() {
     }
     console.log(fields)
 
-    const estimatedDate = () => {
+    const stepEstimatedDate = () => {
         setShowDate(!showDate)
+    }
+    const estimatedDate = () => {
+        setProcessShowDate(!processShowDate)
     }
     const selectedDecriptionHandler=(value)=>{
         let step = JSON.parse(JSON.stringify(selectedStep))
@@ -244,6 +243,51 @@ function ProcessTemplates() {
         
     }
 
+    const daysHandler=(value)=>{
+        
+        let step={...selectedStep}
+        step.duration[0]=`${value.days}days `
+        setSelectedStep({...step})
+        
+        
+    }
+    const hrsHandler=(value)=>{
+       
+        let step={...selectedStep}
+        step.duration[1]=`${value.hrs}hrs `
+        setSelectedStep({...step})
+    }
+    const minsHandler=(value)=>{
+   
+        let step={...selectedStep}
+        step.duration[2]=`${value.mins}mins `
+        setSelectedStep({...step})
+    }
+
+    const processDaysHandler=(value)=>{
+        
+        
+        estDuration[0]=`${value.days}days `
+        setSelectedStep({...step})
+        
+        
+    }
+    const processHrsHandler=(value)=>{
+       
+      
+        estDuration[1]=`${value.hrs}hrs `
+        setSelectedStep({...step})
+    }
+    const processMinsHandler=(value)=>{
+   
+       
+        estDuration[2]=`${value.mins}mins `
+        setSelectedStep({...step})
+    }
+
+    console.log(selectedStep);
+    console.log(fields);
+
     return (
         <>
             <head>
@@ -280,7 +324,7 @@ function ProcessTemplates() {
                                     <label for="countries" className="text-xs font-bold mb-2">Project</label>
                                     <select id="countries" onChange={(e) => setProject(e.target.value)}
                                         className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                                        <option selected="">Select Department</option>
+                                        <option selected="">Select Project</option>
                                         {department.map(value => {
                                             return (<option value={value._id}>{value.name}</option>)
                                         }
@@ -312,14 +356,13 @@ function ProcessTemplates() {
                                         </div>
                                         <input id="dropdownDividerButton"
                                             onChange={(e) => setestDuration(e.target.value)}
-
-
+                                            value={estDuration}
                                             data-dropdown-toggle="dropdownDivider"
                                             className="bg-white border-2 border-gray-300 text-gray-900 sm:text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5"
-                                            placeholder="Estimated Duration" readonly />
+                                            placeholder="Estimated Duration" disabled readonly />
                                     </div>
                                 </div>
-                                {showDate ?
+                                {processShowDate ?
                                     <div id="dropdownDivider"
                                         className="z-10 p-4 bg-kelvinLight divide-y divide-gray-100 rounded rounded-lg shadow w-80 "
                                         data-popper-reference-hidden="" data-popper-escaped="" data-popper-placement="top"
@@ -333,17 +376,17 @@ function ProcessTemplates() {
                                             aria-labelledby="dropdownDividerButton">
                                             <li className="">
                                                 <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-kelvinDark">Days</a>
-                                                <input type="number" name="" id=""
+                                                <input type="number" name="" id=""  value={parseInt(estDuration[0])} onChange={(e)=>{processDaysHandler({days:`${e.target.value}`})}}
                                                     className="w-20 bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
                                             </li>
                                             <li>
                                                 <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-kelvinDark  ">Hours</a>
-                                                <input type="number" name="" id=""
+                                                <input type="number" name="" id=""  value={parseInt(estDuration[1])} onChange={(e)=>{processHrsHandler({hrs:`${e.target.value}`})}}
                                                     className="w-20 bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
                                             </li>
                                             <li>
                                                 <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-kelvinDark  ">Minutes</a>
-                                                <input type="number" name="" id=""
+                                                <input type="number" name="" id="" value={parseInt(estDuration[2])} onChange={(e)=>{processMinsHandler({mins:`${e.target.value}`})}}
                                                     className="w-20 bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
                                             </li>
                                         </ul>
@@ -400,7 +443,7 @@ function ProcessTemplates() {
                                     <h5 className="text-xl mb-4">{selectedStep.step}</h5>
                                     <div className="flex flex-col mb-8">
                                         <h4 className="mb-2">Estimated Duration</h4>
-                                        <div className="relative">
+                                        <div className="relative" onClick={stepEstimatedDate} >
                                             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                                 <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="kelvinBold"
                                                     viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -409,41 +452,44 @@ function ProcessTemplates() {
                                                         clip-rule="evenodd"></path>
                                                 </svg>
                                             </div>
-                                            <input id="dropdownDividerButton" data-dropdown-toggle="dropdownDivider" type="date" onChange={(e) => selectedDurationHandler(e.target.value)}
+                                            <input id="dropdownDividerButton" data-dropdown-toggle="dropdownDivider" onChange={(e) => selectedDurationHandler(e.target.value)}
                                                 className="bg-white border-2 border-gray-300 text-gray-900 sm:text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  datepicker-input"
-                                                placeholder="Estimated Duration" readonly />
+                                                placeholder="Estimated Duration" disabled
+                                                value={selectedStep.duration} />
                                         </div>
                                     </div>
 
+                                 {showDate ?
                                     <div id="dropdownDivider"
-                                        className="z-10 hidden p-4 bg-kelvinLight divide-y divide-gray-100 rounded rounded-lg shadow w-80 "
+                                        className="z-10 p-4 bg-kelvinLight divide-y divide-gray-100 rounded rounded-lg shadow w-80 "
                                         data-popper-reference-hidden="" data-popper-escaped="" data-popper-placement="top"
-                                        style={{ position: "absolute", inset: "auto auto 0px 0px", margin: "0px", transform: "translate3d(352.5px, 19px, 0px)" }}>
+                                        style={{ position: 'absolute', inset: 'auto auto 0px 0px', top:'250px', right:'1px',height:'200px', margin: '0px', transform: 'translate3d(352.5px, 19px, 0px)' }}>
                                         <div className="py-1">
                                             <a href="#"
                                                 className="block px-4 py-2 text-xs text-center text-gray-700 hover:bg-gray-100">Dynamic
                                                 Estimated Duration</a>
                                         </div>
-
                                         <ul className="py-1 flex text-sm text-gray-700 dark:text-gray-200 justify-between"
                                             aria-labelledby="dropdownDividerButton">
                                             <li className="">
                                                 <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-kelvinDark">Days</a>
-                                                <input type="number" name="" id=""
+                                                <input type="number" name="" id="" value={parseInt(selectedStep.duration[0])}onChange={(e)=>{daysHandler({days:`${e.target.value}`})}}  
                                                     className="w-20 bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
                                             </li>
                                             <li>
                                                 <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-kelvinDark  ">Hours</a>
-                                                <input type="number" name="" id=""
+                                                <input type="number" name="" id="" value={parseInt(selectedStep.duration[1])} onChange={(e)=>{hrsHandler({hrs:`${e.target.value}`})}}
                                                     className="w-20 bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
                                             </li>
                                             <li>
                                                 <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-kelvinDark  ">Minutes</a>
-                                                <input type="number" name="" id=""
+                                                <input type="number" name="" id=""  value={parseInt(selectedStep.duration[2])} onChange={(e)=>{minsHandler({mins:`${e.target.value}`})}}
                                                     className="w-20 bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
                                             </li>
                                         </ul>
+
                                     </div>
+                                    : null}
                                     <div className="flex flex-col mb-4">
                                         <h4 className="mb-2">Description</h4>
                                         <form>

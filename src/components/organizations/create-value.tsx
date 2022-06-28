@@ -1,6 +1,7 @@
 import React from "react";
 import Select from 'react-select'
 import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
+import { getUserId } from "~/services/user.service";
 
 
 
@@ -9,9 +10,32 @@ const CreateValue=(props)=>{
     const [orgName, setOrgName] = React.useState('');
     const [vision, setVision] = React.useState('');
     const [option, setOption] = React.useState('');
+
+    const GET_ORG_Value = gql`
+    query values($nameFilter: String!) {
+        values(input: {filter:{userId:{_eq:$nameFilter}}}) {
+          results {_id,values}
+        }
+    }`;
+const { data:data2, error:error2, loading:loading2 } = useQuery(GET_ORG_Value, {
+      notifyOnNetworkStatusChange: true,
+      variables: { nameFilter: getUserId() },
+      onCompleted: (dataValue) => {
+          console.log(data2,dataValue,"hiiiiiiii");
+          // if(dataValue.value){
+          //   setOrgData(dataValue.org.result)
+          //   closeSuccessModal();
+          // }
+        //  setTemplateList(data.p);
+        //  console.log(templateList);
+      }
+  });
+
+
+    
     const CREATE_VALUE = gql`
-    mutation createValue($title: String!, $description: String!,$icon: String!) {
-      createValue(input: {data: {title: $title, description: $description, icon: $icon}}) {
+    mutation createValue($title: String!, $description: String!,$icon: String!, $userId: String!) {
+      createValue(input: {data: {title: $title, description: $description, icon: $icon, userId: $userId}}) {
         data {_id }
       }
     }`;
@@ -21,7 +45,9 @@ const CreateValue=(props)=>{
           props.addValue({
             title:orgName,
             description:vision,
-            icon:option
+            icon:option,
+            userId: getUserId()
+
           })
           props.closeModal();
         },
@@ -35,6 +61,7 @@ const CreateValue=(props)=>{
           title:orgName,
           description:vision,
           icon:option,
+          userId: getUserId()
         } 
       })
       

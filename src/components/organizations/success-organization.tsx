@@ -5,9 +5,9 @@ const SuccessOrganization=(props)=>{
         <>
         <div id="success-modal" 
             className=" overflow-y-auto overflow-x-hidden w-full md:inset-0 h-modal md:h-full"
-            style={{zIndex:1}}
+            style={{zIndex:1,display:'flex',justifyContent:'center'}}
             >
-            <div className="relative p-4 w-full max-w-4xl h-full md:h-auto">
+            <div className="relative p-4 w-full max-w-xl h-full md:h-auto">
                 
                 <div className="relative bg-white rounded-lg shadow ">
                     

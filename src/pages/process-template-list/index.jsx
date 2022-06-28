@@ -4,17 +4,18 @@ import MainLayout from '../../components/layout/MainLayout';
 import CreateProcessList from '../../components/process-templates/create-process-list';
 import CreatedTemplateSuccess from '../../components/process-templates/created-template-success';
 import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
-
+import { getUserId } from '../../services/user.service';
 
 const ProcessTemplateList = (props) => {
 
     // const {createList} = props;
     const [processListSelectedData, setProcessListSelectedData] = useState({});
     const [processListData, setProcessListData] = useState([
-        { process: 'Research of Model v1', processTemplate: 'Start research development', dueBy: 'Aug 22, 2022', assignees: 'Matt', votes: '24', id: '1', percent: '70%', deletePopup: false },
-        { process: 'Submission of Model v2', processTemplate: 'Submitting Designs', dueBy: 'Aug 28, 2022', assignees: 'Saidutt', votes: '2', id: '2', percent: '33%', deletePopup: false }
+        { process: 'Research of Model v1', processTemplate: 'Start research development',project:'R&D', dueBy: 'Aug 22, 2022', assignees: 'Matt', votes: '24', id: '1', percent: '70%', deletePopup: false },
+        { process: 'Submission of Model v2', processTemplate: 'Submitting Designs',project:'R&D', dueBy: 'Aug 28, 2022', assignees: 'Saidutt', votes: '2', id: '2', percent: '33%', deletePopup: false }
 
     ]);
+    const [pro,setPro]=useState([]);
 
     const [templateList,setTemplateList]=useState([
         {processTemplate:'Start research development',project:'R&D',id:'1',deletePopup:false},
@@ -35,6 +36,57 @@ const ProcessTemplateList = (props) => {
               //  console.log(templateList);
             }
         });
+        const GET_PROCESS_TEMPLATES = gql`
+        query processTemplates($nameFilter: String!) {
+            processTemplates(input: {filter:{name:{_neq:$nameFilter}}}) {
+              results {_id,name,
+                parentProject}
+            }
+        }`;
+        const { data1, error1, loading1 } = useQuery(GET_PROCESS_TEMPLATES, {
+            notifyOnNetworkStatusChange: true,
+            variables: { nameFilter: getUserId() },
+            onCompleted: (dataValue) => {
+                console.log(dataValue.processTemplates.results);
+               setTemplateList(dataValue.processTemplates.results);
+               templateList.forEach(e=>{
+                e.deletePopup=false
+               })
+              //  console.log(templateList);
+            }
+        });
+        const GET_PROJECTS = gql`
+        query projs($nameFilter: String!) {
+            projs(input: {filter:{userId:{_eq:$nameFilter}}}) {
+              results {_id,name}
+            }
+        }
+      `;
+        const { data2, error3, loading3 } = useQuery(GET_PROJECTS, {
+            notifyOnNetworkStatusChange: true,
+            variables: { nameFilter: getUserId()},
+            onCompleted: (dataValue) => {
+                console.log(dataValue.projs.results);
+                setPro(dataValue.projs.results);
+                
+            }
+        });
+        // let array=[];
+        // console.log(pro);
+        // console.log(templateList);
+        // pro.forEach((e)=>{
+        //     console.log(e);
+        //     templateList.forEach(e1=>{
+        //         console.log(e);
+        //         if(e._id==e1.parentProject){
+        //            console.log("***************")
+        //             // let obj={...e1,project:`${e.name}`};
+        //             // console.log(obj);
+        //             // array.push(obj);
+        //         }
+        //     })
+        // });
+        // console.log(array);
 
 
         const deletePopupHandler=(id)=>{
@@ -213,7 +265,7 @@ const ProcessTemplateList = (props) => {
         </h4>
     </div>
     <div className="flex bg-kelvinLight p-4 rounded-md w-full flex-wrap">
-        {templateList.map(item=>{
+        {processListData.map(item=>{
             return(
                 <div
                 className="flex items-center w-full min-h-8 justify-between pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2 ">
