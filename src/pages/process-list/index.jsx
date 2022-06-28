@@ -94,14 +94,14 @@ const ProcessListGroup = (props) => {
 
     const GET_PROJECTS = gql`
         query processes($nameFilter: String!) {
-            processes(input: {filter:{userId:{_eq:$nameFilter}}}) {
-              results {_id,name}
+            processes(input: {filter:{userId:{_neq:$nameFilter}}}) {
+              results {_id,name,dueDate}
             }
         }
       `;
         const { data2, error3, loading3 } = useQuery(GET_PROJECTS, {
             notifyOnNetworkStatusChange: true,
-            variables: { nameFilter: getUserId()},
+            variables: { nameFilter: "''"},
             onCompleted: (dataValue) => {
                 console.log(dataValue.processes.results);
                 setProcessListData(dataValue.processes.results);
@@ -165,9 +165,9 @@ const ProcessListGroup = (props) => {
                                         <>
                                             <div key={item.id}
                                                 className="flex items-center w-full min-h-8 justify-between pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2 ">
-                                                <h6 className="mr-2 "> {item.process}</h6>
+                                                <h6 className="mr-2 "> {item.process || item.name}</h6>
                                                 <h6 className="mr-2 text-black/50">{item.processTemplate}</h6>
-                                                <p className="text-sm opacity-50 mr-2 font-normal">{item.dueBy}</p>
+                                                <p className="text-sm opacity-50 mr-2 font-normal">{item.dueDate}</p>
                                                 <p className="text-sm opacity-50 mr-2 font-normal">{item.assignees}</p>
                                                 <div className="flex flex-col">
                                                     <div className="mb-1 text-xs text-black/50" style={{ textAlign: 'center' }}>{item.percent}</div>
