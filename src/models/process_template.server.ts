@@ -13,7 +13,7 @@ export interface ProcessTemplateTypeServer extends VulcanDocument {
     parentProject?: string;
     estimatedDuration?: string;
     description?: string;
-  }
+   }
 
   
   export const schema: VulcanGraphqlSchemaServer = {
@@ -30,7 +30,7 @@ export interface ProcessTemplateTypeServer extends VulcanDocument {
       type: String,
       optional: true,
       canRead: ["guests"],
-      canCreate: ["members"]
+      canCreate: ["guests","members"]
 
     },
 

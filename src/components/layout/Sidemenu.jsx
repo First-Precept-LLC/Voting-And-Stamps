@@ -7,9 +7,9 @@ function Sidemenu() {
       >
         <div className="flex flex-col ">
           <div className="flex flex-col">
-            <a href="/create-process-templates" className="text-kelvinDark mb-3">
+            <a href="/create-process-template" className="text-kelvinDark mb-3">
               <i className="fa-solid  fa-circle mr-1"></i> Create Process
-              Templates
+              Template
             </a>
             <a href="/process-template-list" className="text-kelvinDark mb-3">
               <i className="fa-solid  fa-circle mr-1"></i>

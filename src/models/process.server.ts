@@ -66,7 +66,7 @@ export interface ProcessTypeServer extends VulcanDocument {
         },
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"]
+        canCreate: ["guests","members"]
   
     },
 
@@ -81,14 +81,14 @@ export interface ProcessTypeServer extends VulcanDocument {
         type: String,
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"]
+        canCreate: ["guests","members"]
     },
 
     progress: {
         type: Number,
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"]
+        canCreate: ["guests","members"]
     }
   };
 

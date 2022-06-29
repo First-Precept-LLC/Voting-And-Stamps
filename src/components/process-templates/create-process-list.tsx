@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
+import { getUserId } from '~/services/user.service';
 
 
 const CreateProcessList = (props) => {
@@ -7,10 +8,11 @@ const CreateProcessList = (props) => {
     const [user, setUser] = useState('')
     const [date, setDate] = useState('')
 
-    const {closeModal}=props;
+
+    const {closeModal,processItemName,userId}=props;
     const CREATE_PROCESS = gql`
-          mutation  createProcess($userId:String!,$name: String!, $dueDate: Date!) {
-            createProcess(input: {data: {userId:$userId ,name: $name,dueDate: $dueDate}}) {
+          mutation  createProcess($userId:String!,$name: String!, $dueDate: Date!,$parentProcessTemplate:String!) {
+            createProcess(input: {data: {userId:$userId ,name: $name,dueDate: $dueDate,parentProcessTemplate:$parentProcessTemplate}}) {
               data {_id}
             }
           }`;
@@ -25,12 +27,14 @@ const CreateProcessList = (props) => {
     );
 
 
-    const processCreated = () => {
+    const processCreated = (parentProcessTemplate) => {
         createProces({
             variables: {
                 name: processName,
-                userId: user,
-                dueDate: date
+                userId: getUserId(),
+                dueDate: date,
+                parentProcessTemplate:parentProcessTemplate
+
             }
         })
     }
@@ -51,30 +55,30 @@ const CreateProcessList = (props) => {
                             <div className="px-6 space-y-6 flex justify-center">
                                 <div className="flex flex-col w-1/2 mx-8">
                                     <div className="flex flex-col mb-8">
-                                        <h2 className="text-3xl mb-2">Create Process from template-How to plan for MVP</h2>
+                                        <h2 className="text-3xl mb-2">Create Process from template-{processItemName}</h2>
                                     </div>
                                     <div className="flex flex-col mb-8">
-                                        <h4 className="text-lg mb-2">process Title</h4>
+                                        <h4 className="text-lg mb-2">Process Title</h4>
                                         <input
                                             type="text"
                                             id="process"
                                             onChange={(e) => setProcessName(e.target.value)}
                                             className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                                            placeholder="Title of the processes"
+                                            placeholder="Title of the process"
                                             required
                                         />
                                     </div>
 
                                     <div className="flex flex-col mb-8">
                                         <h4 className="text-lg mb-2">User</h4>
-                                        <input
+                                        <input 
                                             type="text"
                                             id="user"
+                                            value={userId}
                                             onChange={(e) => setUser(e.target.value)}
                                             className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                             placeholder=""
                                             required
-
 
                                         />
                                         <p className="text-xs opacity-50 mt-2">
@@ -101,11 +105,11 @@ const CreateProcessList = (props) => {
 
                                 <button
                                     type="button"
-                                    onClick={processCreated}
+                                    onClick={()=>{processCreated(processItemName)}}
                                     className="text-white bg-gradient-to-r from-kelvinDark  to-kelvinBold hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6"
                                     data-modal-toggle="success-modal"
                                 >
-                                    Create Processes
+                                    Create Process
                                 </button>
                                 <button
                                     type="button"

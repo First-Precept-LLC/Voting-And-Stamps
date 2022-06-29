@@ -7,7 +7,7 @@ import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
 import VotingDetails from '../../components/process-templates/voting-details';
 import VotingSteps from '../../components/process-templates/voting-steps';
 
-
+import { useRouter } from "next/router";
 const ViewProcess=(props)=>{
            
 const [votedModal, setVotedModal] = useState(false)
@@ -20,6 +20,11 @@ const [processListData, setProcessListData] = useState([
     { process: 'Submission of Model v2', processTemplate: 'Submitting Designs', dueBy: 'Aug 28, 2022', assignees: 'Saidutt', votes: '2', id: '2', percent: '33%', deletePopup: false }
 
 ]);
+
+// const router = useRouter();
+// const {dueDate} = router.dueDate;
+// console.log(dueDate);
+
     
          
      const deletePopupHandler=(id)=>{
@@ -120,7 +125,7 @@ const [processListData, setProcessListData] = useState([
 
                 <div className="flex flex-col mb-4">
                     <div className="flex mb-4">
-                        <p className="text-kelvinDark p-2 px-4 border-2 mr-4 text-sm border-gray-300 rounded">Due by {processListSelectedData.dueBy}
+                        <p className="text-kelvinDark p-2 px-4 border-2 mr-4 text-sm border-gray-300 rounded">Due by {processListSelectedData.dueDate}
                             
                         </p>
                         <div className="text-kelvinDark p-2 px-4 border-2 text-sm border-gray-300 rounded">Assignee <span

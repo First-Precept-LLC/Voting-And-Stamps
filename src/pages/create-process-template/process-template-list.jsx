@@ -3,21 +3,16 @@ import { useState } from 'react';
 import MainLayout from '../../components/layout/MainLayout';
 import CreateProcessList from '../../components/process-templates/create-process-list';
 import CreatedTemplateSuccess from '../../components/process-templates/created-template-success';
+import ProcessListGroup from '../../components/process-templates/process-list-group';
+import ViewProcess from '../../components/process-templates/view-process';
+import VotingDetails from '../../components/process-templates/voting-details';
+import VotingSteps from '../../components/process-templates/voting-steps';
 import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
-import { getUserId } from '../../services/user.service';
+
 
 const ProcessTemplateList = (props) => {
 
     // const {createList} = props;
-    const [processListSelectedData, setProcessListSelectedData] = useState({});
-    const [processItemName,setProcessItemName]=useState('')
-    const [userId,setUserId] = useState('');
-    const [processListData, setProcessListData] = useState([
-        { process: 'Research of Model v1', processTemplate: 'Start research development',project:'R&D', dueBy: 'Aug 22, 2022', assignees: 'Matt', votes: '24', id: '1', percent: '70%', deletePopup: false },
-        { process: 'Submission of Model v2', processTemplate: 'Submitting Designs',project:'R&D', dueBy: 'Aug 28, 2022', assignees: 'Saidutt', votes: '2', id: '2', percent: '33%', deletePopup: false }
-
-    ]);
-    const [pro,setPro]=useState([]);
 
     const [templateList,setTemplateList]=useState([
         {processTemplate:'Start research development',project:'R&D',id:'1',deletePopup:false},
@@ -38,57 +33,6 @@ const ProcessTemplateList = (props) => {
               //  console.log(templateList);
             }
         });
-        const GET_PROCESS_TEMPLATES = gql`
-        query processTemplates($nameFilter: String!) {
-            processTemplates(input: {filter:{name:{_neq:$nameFilter}}}) {
-              results {_id,name,
-                parentProject,userId,}
-            }
-        }`;
-        const { data1, error1, loading1 } = useQuery(GET_PROCESS_TEMPLATES, {
-            notifyOnNetworkStatusChange: true,
-            variables: { nameFilter: getUserId() },
-            onCompleted: (dataValue) => {
-                console.log(dataValue.processTemplates.results);
-                setProcessListData(dataValue.processTemplates.results);
-            //    templateList.forEach(e=>{
-            //     e.deletePopup=false
-            //    })
-              //  console.log(templateList);
-            }
-        });
-        const GET_PROJECTS = gql`
-        query projs($nameFilter: String!) {
-            projs(input: {filter:{userId:{_eq:$nameFilter}}}) {
-              results {_id,name,userId}
-            }
-        }
-      `;
-        const { data2, error3, loading3 } = useQuery(GET_PROJECTS, {
-            notifyOnNetworkStatusChange: true,
-            variables: { nameFilter: getUserId()},
-            onCompleted: (dataValue) => {
-                console.log(dataValue.projs.results);
-                setPro(dataValue.projs.results);
-                
-            }
-        });
-        // let array=[];
-        // console.log(pro);
-        // console.log(templateList);
-        // pro.forEach((e)=>{
-        //     console.log(e);
-        //     templateList.forEach(e1=>{
-        //         console.log(e);
-        //         if(e._id==e1.parentProject){
-        //            console.log("***************")
-        //             // let obj={...e1,project:`${e.name}`};
-        //             // console.log(obj);
-        //             // array.push(obj);
-        //         }
-        //     })
-        // });
-        // console.log(array);
 
 
         const deletePopupHandler=(id)=>{
@@ -149,10 +93,18 @@ const ProcessTemplateList = (props) => {
         })
     }
  
+    // const createList = () => {
+    //     setCreateDetails(true)
+    //     setOnTrackModal(false)
+    //     setVotedModal(false)
+    //     setVotingStepModal(false)
+    //     setModal(false)
+    // }
     const processCreated = () => {
         setProcessModal(true);
         setOnTrackModal(false)
         setCreateDetails(false);
+        // setProcessList(false);
         setVotedModal(false)
         setVotingStepModal(false)
         setModal(false)
@@ -167,10 +119,7 @@ const ProcessTemplateList = (props) => {
         setProcessModal(false);
 
     }
-    const createList = (name,userId) => {
-
-        setProcessItemName(name);
-        setUserId(userId)
+    const createList = () => {
         setCreateDetails(true);
         setProcessModal(false);
         setOnTrackModal(false)
@@ -178,15 +127,13 @@ const ProcessTemplateList = (props) => {
         setVotingStepModal(false)
         setModal(false)
     }
-    const ontrackModal = (id) => {
+    const ontrackModal = () => {
         setOnTrackModal(true)
         setVotedModal(false)
         setVotingStepModal(false)
         setCreateDetails(false);
         setProcessModal(false);
         setModal(false)
-        setProcessListSelectedData(processListData.find(e => (e.id === id)))
-
     }
     const showVotedModal = () => {
         setOnTrackModal(false)
@@ -208,11 +155,6 @@ const ProcessTemplateList = (props) => {
     const closeModal = () => {
         setCreateDetails(false)
     }
-    const nextProcess=()=>{
-        console.log("hiiiiiiiii")
-        setCreateDetails(false);
-        setProcessModal(true);
-    }
     const closeVotingModal = () => {
         setVotedModal(false)
         setOnTrackModal(true)
@@ -224,17 +166,6 @@ const ProcessTemplateList = (props) => {
         setOnTrackModal(true)
 
     }
-    let arr=[];
-    pro.forEach(e=>{
-        processListData.forEach(e1=>{
-            if(e1.parentProject==e._id){
-                console.log(e1.userId);
-                let obj={...e1,project:`${e.name}`};
-                arr.push(obj);
-            }
-        })
-    })
-    console.log(arr);
 
 
     return (
@@ -256,7 +187,7 @@ const ProcessTemplateList = (props) => {
                 <script src="/tailwind.js"></script>
             </head>
         <MainLayout>
-        {!createDetails && !processModal ?
+        {!createDetails && !processModal && !modal && !onTrackModal && !votedModal && !votingStepModal?
 
 <div className="flex w-full flex-col">
 <div className="flex justify-between">
@@ -281,18 +212,18 @@ const ProcessTemplateList = (props) => {
         </h4>
     </div>
     <div className="flex bg-kelvinLight p-4 rounded-md w-full flex-wrap">
-        {arr.map(item=>{
+        {templateList.map(item=>{
             return(
                 <div
                 className="flex items-center w-full min-h-8 justify-between pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2 ">
-                <h6 className="mr-2 w-1/2">{item.name}</h6>
+                <h6 className="mr-2 w-1/2">{item.processTemplate}</h6>
                 <p className="text-sm opacity-50 mr-2 font-normal w-32" style={{ marginRight: '37%' }}>{item.project}</p>
                 <div className="flex items-center">
-                    <button onClick={()=>{createList(item.name,item.userId)}}
+                    <button onClick={createList}
                         className="text-white bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-6 text-left w-44 text-center items-center mr-2"
                         data-modal-toggle="large-modal">
                         <i className="fa-solid fa-play text-white mt-1 mr-1 text-xs"></i>
-                        Create Process</button>
+                        Create Processes</button>
                     <button onClick={()=>{console.log(item.id)}}
                         className="text-white bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-6 text-left w-20 text-center "
                         data-modal-toggle="large-modal">
@@ -308,6 +239,27 @@ const ProcessTemplateList = (props) => {
         })
         }
         
+
+        {/* <div
+            className="flex items-center w-full min-h-8 justify-between pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2">
+            <h6 className="mr-2 w-1/2">Submiting Designs</h6>
+            <p className="text-sm opacity-50 mr-2 font-normal w-32" style={{ marginRight: '37%' }}>R&D</p>
+            <div className="flex items-center">
+                <button onClick={createList}
+                    className="text-white bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-6 text-left w-44 text-center items-center mr-2"
+                    data-modal-toggle="large-modal">
+                    <i className="fa-solid fa-play text-white mt-1 mr-1 text-xs"></i>
+                    Create Processes
+                </button>
+                <button onClick={createList}
+                    className="text-white bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-6 text-left w-20 text-center "
+                    data-modal-toggle="large-modal">
+                    Edit</button>
+                <a href="#" className=" px-4 hover:bg-kelvinLight rounded-full">
+                    <i className="fa-solid fa-ellipsis-vertical mt-1 text-xl"></i>
+                </a>
+            </div>
+        </div> */}
     </div>
 </div>
 </div>
@@ -316,13 +268,12 @@ const ProcessTemplateList = (props) => {
                 }
 
 
-            {createDetails ? <CreateProcessList nextProcess={nextProcess} processItemName={processItemName} userId={userId}closeModal={closeModal} processCreated={processCreated} /> : null}
+            {createDetails ? <CreateProcessList closeModal={closeModal} processCreated={processCreated} /> : null}
                 {processModal ? <CreatedTemplateSuccess createdModal={createdModal} /> : null}
-                {/* {modal ? <ProcessListGroup ontrackModal={ontrackModal}   processListData={processListData}
-                    setProcessListData={setProcessListData} /> : null}
-                {onTrackModal ? <ViewProcess votedModal={showVotedModal} processListSelectedData={processListSelectedData} /> : null}
+                {modal ? <ProcessListGroup ontrackModal={ontrackModal} /> : null}
+                {onTrackModal ? <ViewProcess votedModal={showVotedModal} /> : null}
                 {votedModal ? <VotingDetails closeModal={closeVotingModal}  votingStepModal={showVotingStepModal} /> : null}
-                {votingStepModal ?<VotingSteps closeModal={closeVotingStepModal}  /> :null} */}
+                {votingStepModal ?<VotingSteps closeModal={closeVotingStepModal}  /> :null}
             </MainLayout>
         </>
     )

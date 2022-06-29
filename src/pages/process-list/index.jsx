@@ -92,14 +92,14 @@ const ProcessListGroup = (props) => {
 
     }
 
-    const GET_PROJECTS = gql`
+    const GET_PROCESS = gql`
         query processes($nameFilter: String!) {
             processes(input: {filter:{userId:{_neq:$nameFilter}}}) {
-              results {_id,name,dueDate}
+              results {_id,name,dueDate,parentProcessTemplate}
             }
         }
       `;
-        const { data2, error3, loading3 } = useQuery(GET_PROJECTS, {
+        const { data2, error3, loading3 } = useQuery(GET_PROCESS, {
             notifyOnNetworkStatusChange: true,
             variables: { nameFilter: "''"},
             onCompleted: (dataValue) => {
@@ -131,7 +131,7 @@ const ProcessListGroup = (props) => {
                 {!onTrackModal && !votedModal && !votingStepModal ?
                     <div className="flex w-full p-8 flex-col">
                         <div className="flex justify-between">
-                            <h1 className="text-3xl mb-8">Processes List</h1>
+                            <h1 className="text-3xl mb-8">Process List</h1>
                             <div className="flex">
                                 <input type="text" id="search-process-template"
                                     className="block p-2 px-5  h-8  w-44 text-gray-900 bg-white rounded-lg border border-gray-300 sm:text-sm focus:ring-blue-500 focus:border-blue-500 mr-2"
@@ -159,24 +159,27 @@ const ProcessListGroup = (props) => {
                             </div>
 
 
-                            <div className="flex bg-kelvinLight p-4 rounded-md w-full flex-wrap">
+                            <div className="flex bg-kelvinLight p-4 rounded-md w-full flex-wrap ">
                                 {processListData.map(item => {
                                     return (
                                         <>
                                             <div key={item.id}
                                                 className="flex items-center w-full min-h-8 justify-between pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2 ">
-                                                <h6 className="mr-2 "> {item.process || item.name}</h6>
-                                                <h6 className="mr-2 text-black/50">{item.processTemplate}</h6>
-                                                <p className="text-sm opacity-50 mr-2 font-normal">{item.dueDate}</p>
-                                                <p className="text-sm opacity-50 mr-2 font-normal">{item.assignees}</p>
+                                                <h6 className="mr-2 items-center"> {item.process || item.name}</h6>
+                                                <h6 className="mr-2 text-black/50 items-center">{item.parentProcessTemplate}</h6>
+                                                <p className="text-sm opacity-50 mr-2 font-normal items-center">{item.dueDate}</p>
+                                                <p className="text-sm opacity-50 mr-2 font-normal items-center">{item.assignees}</p>
                                                 <div className="flex flex-col">
-                                                    <div className="mb-1 text-xs text-black/50" style={{ textAlign: 'center' }}>{item.percent}</div>
-                                                    <div className="w-32 bg-gray-400 rounded-full h-1.5">
+                                                    <div className="mb-1 text-xs text-black/50 items-center" style={{ textAlign: 'center' }}>{item.percent}</div>
+                                                    <div className="w-32 bg-gray-400 rounded-full h-1.5 items-center">
                                                         <div className=" h-1.5 rounded-full " style={{ width: `${item.percent}`, background: "#6cef6c" }}></div>
                                                     </div>
                                                 </div>
                                                 <div className="flex">
-                                                    <Link href='/research-model'>
+                                                    <Link   href={{
+                                                                            pathname: "/research-model",
+                                                                            // dueDate: `${item.dueDate}`, // the data
+                                                                        }}>
                                                         <button
                                                             //onClick={()=>{ontrackModal(item.id)}}
 

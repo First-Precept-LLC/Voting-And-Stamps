@@ -7,7 +7,7 @@ const VotingSteps = (props) => {
 
             <div id="success-modal"
                 className=" overflow-y-auto overflow-x-hidden md:inset-0 "
-                style={{ zIndex: 1 }}
+                style={{ zIndex: 1,display: 'flex',justifyContent: 'center' }}
             >
                 <div className="relative p-4 w-full max-w-xl md:h-auto">
 
