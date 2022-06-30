@@ -8,12 +8,23 @@ import VotingDetails from '../../components/process-templates/voting-details';
 import VotingSteps from '../../components/process-templates/voting-steps';
 
 import { useRouter } from "next/router";
+import { template } from 'lodash';
+import { ObjectNodeDependencies } from 'mathjs';
 const ViewProcess=(props)=>{
            
 const [votedModal, setVotedModal] = useState(false)
 const [votingStepModal, setVotingStepModal] = useState(false)
 const [processListSelectedData, setProcessListSelectedData] = useState({});
 // const [onTrackModal, setOnTrackModal] = useState(false)
+const [templateList,setTemplateList]=useState([]);
+const [templateData,setTemplateData]=useState({description: "aaaaaaaaaaaaaaaaaaaa",
+estimatedDuration: "4days ,45hrs ,22mins ",
+name: "prooooooooo",
+parentProject: "62bb02c2711c0edd023f109b",
+userId: "1",
+__typename: "ProcessTemplate",
+_id: "62bd56f3a29c3446d228b4c2"});
+const [check,setCheck]=useState(false);
 
 const [processListData, setProcessListData] = useState([
     { process: 'Research of Model v1', processTemplate: 'Start research development', dueBy: 'Aug 22, 2022', assignees: 'Matt', votes: '24', id: '1', percent: '70%', deletePopup: false },
@@ -21,11 +32,40 @@ const [processListData, setProcessListData] = useState([
 
 ]);
 
-// const router = useRouter();
-// const {dueDate} = router.dueDate;
-// console.log(dueDate);
+const router = useRouter();
+const templateId = router.query.templateId;
+console.log(templateId);
 
-    
+const GET_PROCESS_TEMPLATES = gql`
+query processTemplates($nameFilter: String!) {
+    processTemplates(input: {filter:{name:{_neq:$nameFilter}}}) {
+      results {_id,name,
+        parentProject,userId,
+        estimatedDuration,description}
+    }
+}`;
+const { data1, error1, loading1 } = useQuery(GET_PROCESS_TEMPLATES, {
+    notifyOnNetworkStatusChange: true,
+    variables: { nameFilter: templateId },
+    onCompleted: (dataValue) => {
+        console.log(dataValue.processTemplates.results.find(e=>e._id===templateId));
+        
+        setTemplateData(dataValue.processTemplates.results.find(e=>e._id===templateId));
+      
+        
+    }
+});
+
+ 
+  console.log(templateData);
+ 
+
+   
+
+  
+//    console.log(obj);
+//    console.log(templateData.length)
+
          
      const deletePopupHandler=(id)=>{
         
@@ -125,17 +165,14 @@ const [processListData, setProcessListData] = useState([
 
                 <div className="flex flex-col mb-4">
                     <div className="flex mb-4">
-                        <p className="text-kelvinDark p-2 px-4 border-2 mr-4 text-sm border-gray-300 rounded">Due by {processListSelectedData.dueDate}
+                        <p className="text-kelvinDark p-2 px-4 border-2 mr-4 text-sm border-gray-300 rounded">Due by {templateData.estimatedDuration}
                             
                         </p>
                         <div className="text-kelvinDark p-2 px-4 border-2 text-sm border-gray-300 rounded">Assignee <span
                                 className="text-white bg-kelvinDark p-1 px-2 ml-2 rounded text-sm">{processListSelectedData.assignees}</span>
                         </div>
                     </div>
-                    <p className="text-kelvinBlack text-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime
-                        accusantium veritatis libero
-                        doloremque. Possimus ut laboriosam, odit consequuntur, animi laborum minus nulla maiores culpa
-                        totam quae, impedit quas enim reiciendis.</p>
+                    <p className="text-kelvinBlack text-sm">{templateData.description}</p>
                 </div>
             </div>
             <div className="flex flex-col">

@@ -63,7 +63,7 @@ const Login = () => {
           <div>
             <button onClick={handleSubmit} className={styles.button}>
               <FontAwesomeIcon icon={faSearch} style={{ color: "#fff" }} />{" "}
-              Connect with Near
+              Login
             </button>
             <p className={styles.donthave}>
               Don't have and account?{" "}

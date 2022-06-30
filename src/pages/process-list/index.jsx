@@ -15,6 +15,7 @@ const ProcessListGroup = (props) => {
     const [votingStepModal, setVotingStepModal] = useState(false)
     const [processListSelectedData, setProcessListSelectedData] = useState({});
     const [onTrackModal, setOnTrackModal] = useState(false)
+    const [templateList,setTemplateList]=useState([]);
 
     const [processListData, setProcessListData] = useState([
         { process: 'Research of Model v1', processTemplate: 'Start research development', dueBy: 'Aug 22, 2022', assignees: 'Matt', votes: '24', id: '1', percent: '70%', deletePopup: false },
@@ -23,6 +24,24 @@ const ProcessListGroup = (props) => {
     ]);
 
 
+    const GET_PROCESS_TEMPLATES = gql`
+        query processTemplates($nameFilter: String!) {
+            processTemplates(input: {filter:{name:{_neq:$nameFilter}}}) {
+              results {_id,name,
+                parentProject,userId,}
+            }
+        }`;
+        const { data1, error1, loading1 } = useQuery(GET_PROCESS_TEMPLATES, {
+            notifyOnNetworkStatusChange: true,
+            variables: { nameFilter: getUserId() },
+            onCompleted: (dataValue) => {
+                console.log(dataValue.processTemplates.results);
+                setTemplateList(dataValue.processTemplates.results)
+         
+            }
+        });
+
+    
     const deletePopupHandler = (id) => {
 
         let arr = [...processListData];
@@ -95,7 +114,7 @@ const ProcessListGroup = (props) => {
     const GET_PROCESS = gql`
         query processes($nameFilter: String!) {
             processes(input: {filter:{userId:{_neq:$nameFilter}}}) {
-              results {_id,name,dueDate,parentProcessTemplate}
+              results {_id,name,dueDate,parentProcessTemplate,progress}
             }
         }
       `;
@@ -108,6 +127,18 @@ const ProcessListGroup = (props) => {
                 
             }
         });
+
+        let arr=[];
+        processListData.forEach(e=>{
+            templateList.forEach(e1=>{
+                if(e.parentProcessTemplate==e1._id){
+                    console.log(e1.userId);
+                    let obj={...e,processTemplate:`${e1.name}`,processTemplateId:`${e1._id}`};
+                    arr.push(obj);
+                }
+            })
+        })
+        console.log(arr);
 
     return (
         <>
@@ -160,25 +191,26 @@ const ProcessListGroup = (props) => {
 
 
                             <div className="flex bg-kelvinLight p-4 rounded-md w-full flex-wrap ">
-                                {processListData.map(item => {
+                                {arr.map(item => {
                                     return (
                                         <>
                                             <div key={item.id}
                                                 className="flex items-center w-full min-h-8 justify-between pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2 ">
                                                 <h6 className="mr-2 items-center"> {item.process || item.name}</h6>
-                                                <h6 className="mr-2 text-black/50 items-center">{item.parentProcessTemplate}</h6>
+                                                <h6 className="mr-2 text-black/50 items-center">{item.processTemplate}</h6>
                                                 <p className="text-sm opacity-50 mr-2 font-normal items-center">{item.dueDate}</p>
                                                 <p className="text-sm opacity-50 mr-2 font-normal items-center">{item.assignees}</p>
                                                 <div className="flex flex-col">
-                                                    <div className="mb-1 text-xs text-black/50 items-center" style={{ textAlign: 'center' }}>{item.percent}</div>
+                                                    <div className="mb-1 text-xs text-black/50 items-center" style={{ textAlign: 'center' }}>{item.progress}</div>
                                                     <div className="w-32 bg-gray-400 rounded-full h-1.5 items-center">
-                                                        <div className=" h-1.5 rounded-full " style={{ width: `${item.percent}`, background: "#6cef6c" }}></div>
+                                                        <div className=" h-1.5 rounded-full " style={{ width: `${item.progress}`, background: "#6cef6c" }}></div>
                                                     </div>
                                                 </div>
                                                 <div className="flex">
+                                                    
                                                     <Link   href={{
                                                                             pathname: "/research-model",
-                                                                            // dueDate: `${item.dueDate}`, // the data
+                                                                            query: {templateId:`${item.processTemplateId}`}, // the data
                                                                         }}>
                                                         <button
                                                             //onClick={()=>{ontrackModal(item.id)}}

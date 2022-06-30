@@ -127,7 +127,7 @@ const ProcessTemplateList = (props) => {
     const [onTrackModal, setOnTrackModal] = useState(false)
     const [votedModal, setVotedModal] = useState(false)
     const [votingStepModal, setVotingStepModal] = useState(false)
-
+    
     const CreatePage = () => {
         setProcessList(false);
         setCreateDetails(false);
@@ -167,10 +167,9 @@ const ProcessTemplateList = (props) => {
         setProcessModal(false);
 
     }
-    const createList = (name,userId) => {
+    const createList = (item) => {
 
-        setProcessItemName(name);
-        setUserId(userId)
+        setProcessItemName(item);
         setCreateDetails(true);
         setProcessModal(false);
         setOnTrackModal(false)
@@ -288,7 +287,7 @@ const ProcessTemplateList = (props) => {
                 <h6 className="mr-2 w-1/2">{item.name}</h6>
                 <p className="text-sm opacity-50 mr-2 font-normal w-32" style={{ marginRight: '37%' }}>{item.project}</p>
                 <div className="flex items-center">
-                    <button onClick={()=>{createList(item.name,item.userId)}}
+                    <button onClick={()=>{createList(item)}}
                         className="text-white bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-6 text-left w-44 text-center items-center mr-2"
                         data-modal-toggle="large-modal">
                         <i className="fa-solid fa-play text-white mt-1 mr-1 text-xs"></i>
@@ -316,7 +315,7 @@ const ProcessTemplateList = (props) => {
                 }
 
 
-            {createDetails ? <CreateProcessList nextProcess={nextProcess} processItemName={processItemName} userId={userId}closeModal={closeModal} processCreated={processCreated} /> : null}
+            {createDetails ? <CreateProcessList nextProcess={nextProcess} processItem={processItemName} userId={userId}closeModal={closeModal} processCreated={processCreated} /> : null}
                 {processModal ? <CreatedTemplateSuccess createdModal={createdModal} /> : null}
                 {/* {modal ? <ProcessListGroup ontrackModal={ontrackModal}   processListData={processListData}
                     setProcessListData={setProcessListData} /> : null}
