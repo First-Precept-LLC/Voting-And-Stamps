@@ -3,10 +3,16 @@ import { useUser } from "~/components/account/hooks";
 import Layout from "~/components/account/layout";
 import Form from "~/components/account/form";
 import { apiRoutes } from "~/lib/api/apiRoutes";
+import styles from "../../styles/login.module.scss";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faSearch,
+  faAmbulance,
+  faAnchor,
+} from "@fortawesome/free-solid-svg-icons";
 
 const Login = () => {
-  useUser({ redirectTo: "/", redirectIfFound: true });
-
+  
   const [errorMsg, setErrorMsg] = useState("");
 
   async function handleSubmit(e) {
@@ -14,46 +20,63 @@ const Login = () => {
 
     if (errorMsg) setErrorMsg("");
 
-    const body = {
-      email: e.currentTarget.email.value,
-      password: e.currentTarget.password.value,
-    };
+    // const body = {
+    //   email: e.currentTarget.email.value,
+    //   password: e.currentTarget.password.value,
+    // };
 
-    try {
-      const res = await fetch(apiRoutes.account.login.href, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      if (res.status === 200) {
-        // @see https://github.com/vercel/next.js/discussions/19601
-        // This force SWR to update all queries subscribed to "user"
-        window.location.replace("/");
-        // Router.push("/");
-      } else {
-        throw new Error(await res.text());
-      }
-    } catch (error) {
-      console.error("An unexpected error occurred:", error);
-      setErrorMsg(error.message);
-    }
+    window.location.href = '/organizations'
   }
 
   return (
-    <Layout>
-      <div className="login">
-        <Form isLogin errorMessage={errorMsg} onSubmit={handleSubmit} />
+    <div className={styles.startingdiv}>
+      <div className={styles.dFlex}>
+        <div>
+          <div className={styles.check}>
+            <p className={styles.sigin}>Sign in</p>
+            <p className={styles.create}>
+              Create a new organization to start plan, track your progress with
+              your team
+            </p>
+          </div>
+
+          <div>
+            <p className={styles.email}>Email Address</p>
+            <input
+              className={styles.input}
+              type="email"
+              placeholder="Enter Email"
+            />
+
+            <p className={styles.email}>Password</p>
+            <input
+              className={styles.input}
+              type="password"
+              placeholder="Enter Password"
+            />
+          </div>
+
+          <div>
+            <p className={styles.or}>or</p>
+          </div>
+
+          <div>
+            <button onClick={handleSubmit} className={styles.button}>
+              <FontAwesomeIcon icon={faSearch} style={{ color: "#fff" }} />{" "}
+              Login
+            </button>
+            <p className={styles.donthave}>
+              Don't have and account?{" "}
+              <span className={styles.signup}>Signup here</span>
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <img className={styles.img} src="/img/process-success.svg" />
+        </div>
       </div>
-      <style jsx>{`
-        .login {
-          max-width: 21rem;
-          margin: 0 auto;
-          padding: 1rem;
-          border: 1px solid #ccc;
-          border-radius: 4px;
-        }
-      `}</style>
-    </Layout>
+    </div>
   );
 };
 

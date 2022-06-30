@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/** processtemplates*/
+.dynamic{
+    position: absolute; 
+    inset: auto auto 0px 0px; 
+    margin: 0px; 
+    transform: translate3d(352.5px, 19px, 0px);
+}
+.dynamic-estimation{
+    position: absolute; 
+    inset: auto auto 0px 0px; 
+    margin: 0px; 
+    transform: translate3d(949px, -198px, 0px);
+}
+.arrow {
+    position: absolute; 
+    left: 0px; 
+    transform: translate3d(63px, 0px, 0px);
+}

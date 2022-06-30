@@ -7,28 +7,20 @@ import { PageLayout } from "~/components/layout";
 import { Box } from "@mui/material";
 import { MDXRemote, MDXRemoteSerializeResult } from "next-mdx-remote";
 import { serialize } from "next-mdx-remote/serialize";
-
+import Router from 'next/router'
+import { useEffect } from "react";
 // inject both the custom components + default components like h1, p, etc.
 const components = { ...muiMdComponents };
 const HomePage = ({ source }: { source: MDXRemoteSerializeResult }) => {
   const readMeContent = <MDXRemote {...source} components={components} />;
+  useEffect(() => {
+    const {pathname} = Router
+    if(pathname == '/' ){
+        Router.push('/account/login')
+    }
+  });
   return (
-    <PageLayout>
-      <main>
-        <Home />
-        <Box
-          sx={{
-            borderLeft: "1px solid",
-            paddingLeft: "24px",
-            borderImageSource: "linear-gradient(10deg, #e1009855, #3f77fa55)",
-            borderImageSlice: 1,
-            borderColor: "#3f77fa",
-          }}
-        >
-          {readMeContent}
-        </Box>
-      </main>
-    </PageLayout>
+    <p>Please wait while application is loading ........</p>
   );
 };
 

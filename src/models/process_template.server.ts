@@ -11,9 +11,9 @@ import { Proj } from "./proj.server";
 export interface ProcessTemplateTypeServer extends VulcanDocument {
     name?: string;
     parentProject?: string;
-    estimatedDuration?: number;
+    estimatedDuration?: string;
     description?: string;
-  }
+   }
 
   
   export const schema: VulcanGraphqlSchemaServer = {
@@ -22,7 +22,7 @@ export interface ProcessTemplateTypeServer extends VulcanDocument {
       type: String,
       optional: true,
       canRead: ["guests"],
-      canCreate: ["members"]
+      canCreate: ["guests","members"]
     },
     // userId is the _id of the owner of the document
     // Here, it guarantees that the user belongs to group "owners" for his own data
@@ -30,7 +30,7 @@ export interface ProcessTemplateTypeServer extends VulcanDocument {
       type: String,
       optional: true,
       canRead: ["guests"],
-      canCreate: ["members"]
+      canCreate: ["guests","members"]
 
     },
 
@@ -38,7 +38,7 @@ export interface ProcessTemplateTypeServer extends VulcanDocument {
         type: String,
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"]
+        canCreate: ["guests","members"]
     },
 
 
@@ -63,22 +63,22 @@ export interface ProcessTemplateTypeServer extends VulcanDocument {
         },
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"]
+        canCreate: ["guests","members"]
   
     },
 
     estimatedDuration: {
-        type: Number,
+        type: String,
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"]
+        canCreate: ["guests","members"]
     },
 
     description: {
         type: String,
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"]
+        canCreate: ["guests","members"]
     },
   };
 
@@ -90,10 +90,10 @@ export interface ProcessTemplateTypeServer extends VulcanDocument {
     },
     schema,
     permissions: {
-      canCreate: ["members"], 
+      canCreate: ["guests","members","owners", "admins"], 
       canUpdate: ["owners", "admins"],
       canDelete: ["owners", "admins"],
-      canRead: ["members", "admins"],
+      canRead: ["guests","members", "admins"],
     },
   };
 

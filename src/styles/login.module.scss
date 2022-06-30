@@ -1,0 +1,59 @@
+.dFlex{
+    display: flex;
+  }
+  .sigin{
+//   margin-top: 35px;
+  margin-bottom: 0px;
+  font-weight: 600;
+  font-size: 25px;
+  }
+  .create{
+    margin-top: 5px;
+    margin-bottom: 40px;
+  }
+  .email{
+    margin-top: 30px;
+    font-weight: 600;
+    margin-bottom: 5px;
+    margin-top: 15px;
+  }
+  .input{
+    width: 100%;
+    border-radius: 5px;
+    height: 40px;
+    border: 1px solid;
+    border-color: #cccccc;
+    padding-left: 10px;
+  }
+  .or{
+      text-align: center;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      font-weight: 600;
+  }
+  .button{
+    border-radius: 5px;
+      height: 40px;
+      width: 100%;
+      background: #000000;
+      color: #ffffff;
+  }
+  .login-img{
+    display: flex;
+  }
+  .img{
+    height: 390px;
+  }
+  .startingdiv{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  .signup{
+    color: #210684;
+    font-weight: 600;
+  }
+  .donthave{
+      margin-top: 10px;
+  }

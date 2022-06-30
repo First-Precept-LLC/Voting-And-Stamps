@@ -11,7 +11,7 @@ import { ProcessTemplate } from "./process_template.server";
 export interface StepTypeServer extends VulcanDocument {
     name?: string;
     parentProcessTemplate?: string;
-    estimatedDuration?: number;
+    estimatedDuration?: string;
     description?: string;
   }
 
@@ -38,7 +38,7 @@ export interface StepTypeServer extends VulcanDocument {
         type: String,
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"]
+        canCreate: ["guests","members"]
     },
 
 
@@ -68,17 +68,17 @@ export interface StepTypeServer extends VulcanDocument {
     },
 
     estimatedDuration: {
-        type: Number,
+        type: String,
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"]
+        canCreate: ["guests","members"]
     },
 
     description: {
         type: String,
         optional: true,
         canRead: ["guests"],
-        canCreate: ["members"]
+        canCreate: ["guests","members"]
     },
   };
 
@@ -90,10 +90,10 @@ export interface StepTypeServer extends VulcanDocument {
     },
     schema,
     permissions: {
-      canCreate: ["members"], 
+      canCreate: ["guests","members","owners", "admins"], 
       canUpdate: ["owners", "admins"],
       canDelete: ["owners", "admins"],
-      canRead: ["members", "admins"],
+      canRead: ["guests","members", "admins"],
     },
   };
 

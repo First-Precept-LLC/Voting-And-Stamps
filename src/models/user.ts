@@ -133,7 +133,7 @@ export const modelDef: CreateGraphqlModelOptionsShared = {
     canCreate: ["guests"], // signup is enabled
     canUpdate: ["owners", "admins"],
     canDelete: ["owners", "admins"],
-    canRead: ["members", "admins"],
+    canRead: ["guests","members", "admins"],
   },
 };
 export const User = createGraphqlModel(modelDef);

@@ -23,6 +23,13 @@ const ProjExample = (props) => {
           result {name}
         }
     }`;
+
+    const GET_All_PROJ = gql`
+    query proj($nameFilter: String!) {
+      proj(input: {filter: {name: {_in: [$nameFilter]}}}) {
+        result {name}
+      }
+  }`;
   
 
   let example_filter = {nameFilter: "An Example"}
