@@ -11,7 +11,7 @@ import { useRouter } from "next/router";
 import { template } from 'lodash';
 import { ObjectNodeDependencies } from 'mathjs';
 const ViewProcess=(props)=>{
-           
+    const [stepLists,setStepLists] =useState([]) ;     
 const [votedModal, setVotedModal] = useState(false)
 const [votingStepModal, setVotingStepModal] = useState(false)
 const [processListSelectedData, setProcessListSelectedData] = useState({});
@@ -31,7 +31,15 @@ const [processListData, setProcessListData] = useState([
     { process: 'Submission of Model v2', processTemplate: 'Submitting Designs', dueBy: 'Aug 28, 2022', assignees: 'Saidutt', votes: '2', id: '2', percent: '33%', deletePopup: false }
 
 ]);
-
+const [stepData,setStepData]=useState([{
+    description: "ejgr ughr rhgjrh jehgr",
+    estimatedDuration: "3days ,6hrs ,8mins ",
+    name: "step3",
+    parentProcessTemplate: "62bebae0f231e687ac77a1d7",
+    __typename: "Step",
+    _id: "62bebae0f231e687ac77a1dd"}]);
+    const [stepDescription,setStepDescription]=useState('');
+    const [stepDuration,setStepDuration]=useState('');
 const router = useRouter();
 const templateId = router.query.templateId;
 console.log(templateId);
@@ -59,13 +67,39 @@ const { data1, error1, loading1 } = useQuery(GET_PROCESS_TEMPLATES, {
  
   console.log(templateData);
  
+  const GET_STEPS = gql`
+  query steps($nameFilter: String!) {
+    steps(input: {filter:{name:{_neq:$nameFilter}}}) {
+        results {_id,name,
+            parentProcessTemplate,
+            estimatedDuration,
+            description
+            
 
+        }
+      }
+  }`;
+  const { data2, error2, loading2 } = useQuery(GET_STEPS, {
+      notifyOnNetworkStatusChange: true,
+      variables: { nameFilter: templateId },
+      onCompleted: (dataValue) => {
+        
+        console.log(dataValue.steps.results.filter(e=>e.parentProcessTemplate===templateId));
+        
+       setStepData(dataValue.steps.results.filter(e=>e.parentProcessTemplate===templateId).map((e)=>({...e,isSelected:false})))
+        
+      // setStepData(stepData)
+          
+          
+        
+        
+          
+      }
+  });
    
-
+ console.log(stepData);
   
-//    console.log(obj);
-//    console.log(templateData.length)
-
+ 
          
      const deletePopupHandler=(id)=>{
         
@@ -135,6 +169,31 @@ const { data1, error1, loading1 } = useQuery(GET_PROCESS_TEMPLATES, {
         setProcessListSelectedData(processListData.find(e => (e.id === id)))
 
     }
+
+    const selectHandler=(item)=>{
+        setStepDescription(item.description);
+        setStepDuration(item.estimatedDuration)
+        console.log(stepDescription,stepDuration)
+    }
+    const checkHandler=(item)=>{
+      let arr=[...stepData];
+    //   arr.forEach(e=>{
+    //     // if(e._id==item._id){
+    //     //     if(e.isSelected==true){
+    //     //         e.isSelected=false
+    //     //     }
+    //     //     else{
+    //     //         if(e.isSelected==false){
+    //     //             e.isSelected=true
+    //     //         }
+                
+    //     //     }
+    //     // }
+       
+    //   })
+        
+    }
+    console.log(stepData)
     return (
         <>
                <head>
@@ -180,14 +239,19 @@ const { data1, error1, loading1 } = useQuery(GET_PROCESS_TEMPLATES, {
                 <div className="flex grid grid-cols-2 gap-4">
                     <div className="flex  bg-kelvinLight p-4">
                         <div className="flex flex-col w-full">
-                            <div
-                                className="flex items-center w-full min-h-8 justify-start pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2 flex-wrap border-2 border-gray-300">
-                                <input id="link-checkbox" type="checkbox" value=""
-                                    className="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 mr-2"/>
-
-                                <h6 className="">Reach $1Trillion revenue mark</h6>
-                            </div>
-                            <div
+                            {stepData.map(item=>{
+                                return(
+                                    <div onClick={()=>{selectHandler(item)}}
+                                    className="flex items-center w-full min-h-8 justify-start pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2 flex-wrap border-2 border-gray-300">
+                                    <input id="link-checkbox" type="checkbox" value="" checked={item.isSelected} onClick={()=>{checkHandler(item)}}
+                                        className="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 mr-2"/>
+    
+                                    <h6 className="">{item.name}</h6>
+                                </div>
+                                )
+                            })}
+                           
+                            {/* <div
                                 className="flex items-center w-full min-h-8 justify-start pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2 flex-wrap">
                                 <input id="link-checkbox" type="checkbox" value=""
                                     className="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 mr-2"/>
@@ -200,13 +264,13 @@ const { data1, error1, loading1 } = useQuery(GET_PROCESS_TEMPLATES, {
                                     className="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 mr-2"/>
 
                                 <h6 className="">Reach $3Trillion revenue mark</h6>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                     <div className="flex flex-col bg-kelvinLight p-8">
                         <h5 className="text-lg mb-4">Start Research</h5>
                         <div className="flex mb-4 flex-wrap">
-                            <p className="text-kelvinDark p-2 px-4 border-2 mr-4 text-sm border-gray-200 rounded">Due by {processListSelectedData.dueBy}
+                            <p className="text-kelvinDark p-2 px-4 border-2 mr-4 text-sm border-gray-200 rounded">Due by {stepDuration}
                                 
                             </p>
                             <div className="text-kelvinDark p-2 px-4 border-2 text-sm border-gray-200 rounded mr-2">Assignee
@@ -217,12 +281,7 @@ const { data1, error1, loading1 } = useQuery(GET_PROCESS_TEMPLATES, {
                                 <i className="fa-solid fa-check-to-slot mr-1 text-white"></i>Votes ({processListSelectedData.votes})
                             </button>
                         </div>
-                        <p className="text-black/75 text-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                            Maxime
-                            accusantium veritatis libero
-                            doloremque. Possimus ut laboriosam, odit consequuntur, animi laborum minus nulla maiores
-                            culpa
-                            totam quae, impedit quas enim reiciendis.</p>
+                        <p className="text-black/75 text-sm">{stepDescription}</p>
 
                     </div>
                 </div>

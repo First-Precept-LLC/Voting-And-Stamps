@@ -23,7 +23,7 @@ function ProcessTemplates() {
     const [selectedStep,setSelectedStep]=useState({});
     const [fields, setFields] = useState([{ step: '',duration:[],description:'', showPopup: false, id: `${id}` ,selected:true}]);
     // const [showPopupValue,setShowPopupValue]=useState(false)
-
+    const [templateId,setTemplateId]=useState('');
     const CREATE_PROCESS_TEMPLATE = gql`
     mutation createProcessTemplate($name: String!, $parentProject: String!, $estimatedDuration: String!, $description: String!, $userId: String!) {
       createProcessTemplate(input: {data: {name: $name, parentProject: $parentProject, estimatedDuration: $estimatedDuration, description: $description, userId: $userId}}) {
@@ -35,13 +35,15 @@ function ProcessTemplates() {
         CREATE_PROCESS_TEMPLATE, {
         onCompleted: (dataValue) => {
             console.log(dataValue)
+            setTemplateId(dataValue.createProcessTemplate.data._id)
             fields.forEach(item=>{
                 createStep({
                     variables: {
                         name:item.step,
                         estimatedDuration: item.duration.toString(),
                         description: item.description,
-                        userId: getUserId()
+                        userId: getUserId(),
+                        parentProcessTemplate:dataValue.createProcessTemplate.data._id
                         
                     }
                 })
@@ -59,8 +61,8 @@ function ProcessTemplates() {
     }
     );
     const CREATE_STEP = gql`
-      mutation createStep($name: String!,$estimatedDuration: String!, $description: String!) {
-        createStep(input: {data: {name: $name, estimatedDuration: $estimatedDuration, description: $description}}) {
+      mutation createStep($name: String!,$estimatedDuration: String!, $description: String!,$parentProcessTemplate:String!) {
+        createStep(input: {data: {name: $name, estimatedDuration: $estimatedDuration, description: $description,parentProcessTemplate:$parentProcessTemplate}}) {
           data {_id, name }
         }
       }`;
