@@ -6,8 +6,8 @@ const CreateUserPopup = (props) => {
     const {users,setUsers,addUser,setAddUser,setAddUserPopup}=props;
    
     const CREATE_PUSERS = gql`
-    mutation createProj($name: String!, $role: String!, $levelUp: String!, $department: String!) {
-      createPusers(input: {data: {name: $name, role: $role, levelUp: $levelUp, department: $department}}) {
+    mutation createProj($name: String!, $levelUp: String!, $department: String!) {
+      createPusers(input: {data: {name: $name, levelUp: $levelUp, department: $department}}) {
         data {_id, name,role }
       }
     }`;
@@ -16,7 +16,7 @@ const CreateUserPopup = (props) => {
           onCompleted: (data) => {
             props.addValue({
                 name:addUser.name,
-                role:addUser.role,
+                // role:addUser.role,
                 levelUp:addUser.levelUp,
                 department:addUser.department
               })
@@ -32,7 +32,7 @@ const CreateUserPopup = (props) => {
         arr.push(addUser);
         console.log(arr);
         setUsers([...arr]);
-        createPUsersData({variables:{'name':addUser.name,'role':addUser.role,'levelUp': addUser.levelUp,'department':addUser.department}});
+        createPUsersData({variables:{'name':addUser.name,'levelUp': addUser.levelUp,'department':addUser.department}});
         setAddUserPopup(false);
             }
   const userHandler=(obj)=>{
@@ -73,10 +73,10 @@ const CreateUserPopup = (props) => {
                                             <select id="countries" defaultValue={'DEFAULT'} onChange={(e)=>{userHandler({role:`${e.target.value}`})}}
                                                 className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                                                 <option value="DEFAULT">Select Role(s) of user</option>
-                                                <option value="US">HR</option>
-                                                <option value="CA">HR</option>
-                                                <option value="FR">HR</option>
-                                                <option value="DE">HR</option>
+                                                <option value="Role1">Role 1</option>
+                                                <option value="Role 2">Role 2</option>
+                                                <option value="Role 3">Role 3</option>
+                                                <option value="Role 4">Role 4</option>
                                             </select>
 
 
@@ -89,10 +89,10 @@ const CreateUserPopup = (props) => {
                                             <select id="countries" defaultValue={'DEFAULT'}  onChange={(e)=>{userHandler({levelUp:`${e.target.value}`})}}
                                                 className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                                                 <option value="DEFAULT">Select the manager for the user</option>
-                                                <option value="US">HR</option>
-                                                <option value="CA">HR</option>
-                                                <option value="FR">HR</option>
-                                                <option value="DE">HR</option>
+                                                <option value="Level Up 1">Level Up 1</option>
+                                                <option value="Level Up 2">Level Up 2</option>
+                                                <option value="Level Up 3">Level Up 3</option>
+                                                <option value="Level Up 4">Level Up 4</option>
                                             </select>
 
 
@@ -105,10 +105,10 @@ const CreateUserPopup = (props) => {
                                             <select id="countries" defaultValue={'DEFAULT'}  onChange={(e)=>{userHandler({department:`${e.target.value}`})}}
                                                 className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                                                 <option value="DEFAULT">Select the department user belongs to</option>
-                                                <option value="US">HR</option>
-                                                <option value="CA">HR</option>
-                                                <option value="FR">HR</option>
-                                                <option value="DE">HR</option>
+                                                <option value="Department1">Department1</option>
+                                                <option value="Department2">Department2</option>
+                                                <option value="Department3">Department3</option>
+                                                <option value="Department4">Department4</option>
                                             </select>
 
 

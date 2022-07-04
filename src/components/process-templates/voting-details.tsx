@@ -1,7 +1,14 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
+import { getUserId } from '../../services/user.service';
+
 
 const VotingDetails = (props) => {
-    const {closeModal,votingStepModal} = props
+    const {closeModal,votingStepModal,stepName,values} = props
+   
+
+
+
     return (
         <>
 
@@ -34,7 +41,7 @@ const VotingDetails = (props) => {
 
                         <div className="flex flex-col ">
         <div className="flex px-10 mt-10 mb-4 items-center">
-                        <h1 className="text-3xl font-medium">Voting for Step - Start Research<span className="hidden text-kelvinDark">Start
+                        <h1 className="text-3xl font-medium">Voting for Step - {stepName}<span className="hidden text-kelvinDark">Start
                     Research</span></h1>
         </div>
         {/* <!-- cards --> */}
@@ -42,35 +49,20 @@ const VotingDetails = (props) => {
             {/* <!-- card --> */}
             <div className="flex flex-col border-b border-kelvinMedium py-4 px-10 my-4">
                 <div className="flex flex-col mb-2">
-                    <h3 className="text-kelvinDark font-medium text-xl">Start Research</h3>
+                    <h3 className="text-kelvinDark font-medium text-xl">{stepName}</h3>
                     <p>Rates Highly in Power</p>
                 </div>
+                
                 <div className="flex flex-wrap px-4 py-6 bg-kelvinLight rounded-md justify-start mb-4">
-                    <div className="flex shadow shadow-md rounded-md py-2 px-4 mx-2 my-2 items-center">
+                    
+                {values.map((item)=>{
+                    return(
+                        <div className="flex shadow shadow-md rounded-md py-2 px-4 mx-2 my-2 items-center">
                         <i className="fa-solid text-kelvinDark mr-2 fa-circle"></i>
-                        <p className="">32</p>
+                        <p className="">{item.title}</p>
                     </div>
-                    <div className="flex shadow shadow-md rounded-md py-2 px-4 mx-2 my-2 items-center">
-                        <i className="fa-solid text-kelvinDark mr-2 fa-circle"></i>
-                        <p className="">32</p>
-                    </div>
-                    <div className="flex shadow shadow-md rounded-md py-2 px-4 mx-2 my-2 items-center">
-                        <i className="fa-solid text-kelvinDark mr-2 fa-circle"></i>
-                        <p className="">32</p>
-                    </div>
-                    <div className="flex shadow shadow-md rounded-md py-2 px-4 mx-2 my-2 items-center">
-                        <i className="fa-solid text-kelvinDark mr-2 fa-circle"></i>
-                        <p className="">32</p>
-                    </div>
-                    <div className="flex shadow shadow-md rounded-md py-2 px-4 mx-2 my-2 items-center">
-                        <i className="fa-solid text-kelvinDark mr-2 fa-circle"></i>
-                        <p className="">32</p>
-                    </div>
-                    <div className="flex shadow shadow-md rounded-md py-2 px-4 mx-2 my-2 items-center">
-                        <i className="fa-solid text-kelvinDark mr-2 fa-circle"></i>
-                        <p className="">32</p>
-                    </div>
-
+                    )    
+                })}
                 </div>
                 <div className="flex">
                     <button type="button"

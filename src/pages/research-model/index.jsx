@@ -6,15 +6,17 @@ import CreatedTemplateSuccess from '../../components/process-templates/created-t
 import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
 import VotingDetails from '../../components/process-templates/voting-details';
 import VotingSteps from '../../components/process-templates/voting-steps';
-
+import { getUserId } from '../../services/user.service';
 import { useRouter } from "next/router";
 import { template } from 'lodash';
-import { ObjectNodeDependencies } from 'mathjs';
+import { forEach, ObjectNodeDependencies } from 'mathjs';
+let count=0;
 const ViewProcess=(props)=>{
     const [stepLists,setStepLists] =useState([]) ;     
 const [votedModal, setVotedModal] = useState(false)
 const [votingStepModal, setVotingStepModal] = useState(false)
 const [processListSelectedData, setProcessListSelectedData] = useState({});
+const [values,setValues]=useState([])
 // const [onTrackModal, setOnTrackModal] = useState(false)
 const [templateList,setTemplateList]=useState([]);
 const [templateData,setTemplateData]=useState({description: "aaaaaaaaaaaaaaaaaaaa",
@@ -25,6 +27,7 @@ userId: "1",
 __typename: "ProcessTemplate",
 _id: "62bd56f3a29c3446d228b4c2"});
 const [check,setCheck]=useState(false);
+const [progress, setProgress]=useState('')
 
 const [processListData, setProcessListData] = useState([
     { process: 'Research of Model v1', processTemplate: 'Start research development', dueBy: 'Aug 22, 2022', assignees: 'Matt', votes: '24', id: '1', percent: '70%', deletePopup: false },
@@ -40,10 +43,15 @@ const [stepData,setStepData]=useState([{
     _id: "62bebae0f231e687ac77a1dd"}]);
     const [stepDescription,setStepDescription]=useState('');
     const [stepDuration,setStepDuration]=useState('');
+    const [stepName,setStepName]=useState('')
 const router = useRouter();
 const templateId = router.query.templateId;
-console.log(templateId);
+const processName=router.query.processName;
+const assignees=router.query.assignees;
 
+
+console.log(templateId);
+console.log(processName);
 const GET_PROCESS_TEMPLATES = gql`
 query processTemplates($nameFilter: String!) {
     processTemplates(input: {filter:{name:{_neq:$nameFilter}}}) {
@@ -63,6 +71,7 @@ const { data1, error1, loading1 } = useQuery(GET_PROCESS_TEMPLATES, {
         
     }
 });
+
 
  
   console.log(templateData);
@@ -96,6 +105,23 @@ const { data1, error1, loading1 } = useQuery(GET_PROCESS_TEMPLATES, {
           
       }
   });
+  
+  const GET_Value = gql`
+  query values($nameFilter: String!) {
+      values(input: {filter:{userId:{_neq:$nameFilter}}}) {
+        results {_id,title,description}
+      }
+  }`;
+const { data,error,loading } = useQuery(GET_Value, {
+    notifyOnNetworkStatusChange: true,
+    variables: { nameFilter: getUserId() },
+    onCompleted: (dataValue) => {
+        console.log(data,dataValue,"hiiiiiiii");
+        setValues(dataValue.values.results)
+        console.log(dataValue.values.results,".....................")
+    }
+});
+console.log(values,"h!!!!!11111111")
    
  console.log(stepData);
   
@@ -119,6 +145,8 @@ const { data1, error1, loading1 } = useQuery(GET_PROCESS_TEMPLATES, {
           });
           setProcessListData(arr);
 
+
+
      }
      
      const deleteHandler=(id)=>{
@@ -132,12 +160,9 @@ const { data1, error1, loading1 } = useQuery(GET_PROCESS_TEMPLATES, {
      }
      
      const showVotedModal = () => {
-        // setOnTrackModal(false)
         setVotedModal(true)
         setVotingStepModal(false)
-        // setCreateDetails(false);
-        // setProcessModal(false);
-        // setModal(false)
+    
     }
     const showVotingStepModal=()=>{
         // setOnTrackModal(false)
@@ -173,27 +198,40 @@ const { data1, error1, loading1 } = useQuery(GET_PROCESS_TEMPLATES, {
     const selectHandler=(item)=>{
         setStepDescription(item.description);
         setStepDuration(item.estimatedDuration)
+        setStepName(item.name)
+        console.log(stepName);
         console.log(stepDescription,stepDuration)
     }
     const checkHandler=(item)=>{
+        
       let arr=[...stepData];
-    //   arr.forEach(e=>{
-    //     // if(e._id==item._id){
-    //     //     if(e.isSelected==true){
-    //     //         e.isSelected=false
-    //     //     }
-    //     //     else{
-    //     //         if(e.isSelected==false){
-    //     //             e.isSelected=true
-    //     //         }
+      arr.forEach(e=>{
+        if(e._id==item._id){
+            if(e.isSelected==true){
+                e.isSelected=false
+                count=count-1;
+                console.log(e.isSelected)
+                setStepData([...arr])
+            }
+            else{
                 
-    //     //     }
-    //     // }
+                    e.isSelected=true
+                    console.log(e.isSelected)
+                    setStepData([...arr])
+                    count=count+1;
+                
+            }
+        }
        
-    //   })
+      })
+         
+         setProgress((count/stepData.length)*100)
+         
         
     }
     console.log(stepData)
+    console.log(progress)
+
     return (
         <>
                <head>
@@ -216,7 +254,7 @@ const { data1, error1, loading1 } = useQuery(GET_PROCESS_TEMPLATES, {
         {!votedModal && !votingStepModal?
             <div className="flex w-full p-8 flex-col">
             <div className="flex justify-between">
-                <h1 className="text-3xl mb-8">{processListSelectedData.process}</h1>
+                <h1 className="text-3xl mb-8">{processName}</h1>
             </div>
 
 
@@ -228,7 +266,7 @@ const { data1, error1, loading1 } = useQuery(GET_PROCESS_TEMPLATES, {
                             
                         </p>
                         <div className="text-kelvinDark p-2 px-4 border-2 text-sm border-gray-300 rounded">Assignee <span
-                                className="text-white bg-kelvinDark p-1 px-2 ml-2 rounded text-sm">{processListSelectedData.assignees}</span>
+                                className="text-white bg-kelvinDark p-1 px-2 ml-2 rounded text-sm">{assignees}</span>
                         </div>
                     </div>
                     <p className="text-kelvinBlack text-sm">{templateData.description}</p>
@@ -268,13 +306,13 @@ const { data1, error1, loading1 } = useQuery(GET_PROCESS_TEMPLATES, {
                         </div>
                     </div>
                     <div className="flex flex-col bg-kelvinLight p-8">
-                        <h5 className="text-lg mb-4">Start Research</h5>
+                        <h5 className="text-lg mb-4">{stepName}</h5>
                         <div className="flex mb-4 flex-wrap">
                             <p className="text-kelvinDark p-2 px-4 border-2 mr-4 text-sm border-gray-200 rounded">Due by {stepDuration}
                                 
                             </p>
                             <div className="text-kelvinDark p-2 px-4 border-2 text-sm border-gray-200 rounded mr-2">Assignee
-                                <span className="text-white bg-kelvinDark p-1 px-2 ml-2 rounded text-sm">{processListSelectedData.assignees}</span>
+                                <span className="text-white bg-kelvinDark p-1 px-2 ml-2 rounded text-sm">{assignees}</span>
                             </div>
                             <button onClick={showVotedModal} className="flex text-white bg-kelvinDark items-center px-2 rounded text-sm">
                                 {/* <!-- navigate to voting widget --> */}
@@ -290,8 +328,8 @@ const { data1, error1, loading1 } = useQuery(GET_PROCESS_TEMPLATES, {
              : null
             }
 
-            {votedModal ? <VotingDetails closeModal={closeVotingModal}  votingStepModal={showVotingStepModal} /> : null}
-            {votingStepModal ?<VotingSteps closeModal={closeVotingStepModal}  /> :null}
+            {votedModal ? <VotingDetails closeModal={closeVotingModal}  votingStepModal={showVotingStepModal}  stepName={stepName} values={values}/> : null}
+            {votingStepModal ?<VotingSteps closeModal={closeVotingStepModal}  stepName={stepName} values={values} /> :null}
         </MainLayout>
         </>
     )

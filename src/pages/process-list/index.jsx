@@ -114,7 +114,7 @@ const ProcessListGroup = (props) => {
     const GET_PROCESS = gql`
         query processes($nameFilter: String!) {
             processes(input: {filter:{userId:{_neq:$nameFilter}}}) {
-              results {_id,name,dueDate,parentProcessTemplate,progress}
+              results {_id,name,dueDate,parentProcessTemplate,progress,userId}
             }
         }
       `;
@@ -210,7 +210,7 @@ const ProcessListGroup = (props) => {
                                                     
                                                     <Link   href={{
                                                                             pathname: "/research-model",
-                                                                            query: {templateId:`${item.processTemplateId}`}, // the data
+                                                                            query: {templateId:`${item.processTemplateId}`,processName:`${item.name}`,assignees:`${item.userId}`}, // the data
                                                                         }}>
                                                         <button
                                                             //onClick={()=>{ontrackModal(item.id)}}

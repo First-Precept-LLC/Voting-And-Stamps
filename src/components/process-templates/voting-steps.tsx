@@ -1,7 +1,28 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
+import { getUserId } from '../../services/user.service';
+
 
 const VotingSteps = (props) => {
-    const { closeModal } = props
+    const { closeModal ,stepName,values} = props
+    const [votes,setVotes] = useState([])
+
+    const GET_Value = gql`
+    query values($nameFilter: String!) {
+        values(input: {filter:{userId:{_neq:$nameFilter}}}) {
+          results {_id,title}
+        }
+    }`;
+const { data,error,loading } = useQuery(GET_Value, {
+      notifyOnNetworkStatusChange: true,
+      variables: { nameFilter: getUserId() },
+      onCompleted: (dataValue) => {
+          console.log(data,dataValue,"hiiiiiiii");
+          setVotes(dataValue.values.results)
+          console.log(dataValue.values.results,".....................")
+      }
+  });
+console.log(stepName)
     return (
         <>
 
@@ -43,7 +64,7 @@ const VotingSteps = (props) => {
 
                         <div className="flex flex-col ">
                             <div className="flex px-10 mt-10 mb-4 items-center">
-                                <h1 className="text-3xl font-medium">Voting for Step - <span className="text-kelvinDark">Start Research</span></h1>
+                                <h1 className="text-3xl font-medium">Voting for Step - <span className="text-kelvinDark">{stepName}</span></h1>
                             </div>
                             <div className="px-10 my-4">
 
@@ -71,7 +92,7 @@ const VotingSteps = (props) => {
                             {/* <!-- cards --> */}
                             <div className="flex flex-col px-10">
                                 {/* <!-- card --> */}
-                                <div className="flex shadow shadow-md rounded-md py-4 px-6 my-2 items-center justify-between">
+                                {/* <div className="flex shadow shadow-md rounded-md py-4 px-6 my-2 items-center justify-between">
                                     <div className="flex">
                                         <div className="flex flex-col justify-start items-start mr-2">
                                             <i className="fa-solid text-kelvinDark mr-2 fa-circle text-xl"></i>
@@ -95,16 +116,17 @@ const VotingSteps = (props) => {
                                                     className="fa-solid text-white fa-thumbs-down"></i></button>
                                         </div>
                                     </div>
-                                </div>
+                                </div> */}
                                 {/* <!-- card --> */}
-                                <div className="flex shadow shadow-md rounded-md py-4 px-6 my-2 items-center justify-between">
+                                {values.map(item=>
+                                    <div className="flex shadow shadow-md rounded-md py-4 px-6 my-2 items-center justify-between">
                                     <div className="flex">
                                         <div className="flex flex-col justify-start items-start mr-2">
                                             <i className="fa-solid text-kelvinDark mr-2 fa-circle text-xl"></i>
                                         </div>
                                         <div className="mr-8">
-                                            <h6 className="leading-none mb-2 ">Passion</h6>
-                                            <p className="text-gray-400">Short description of value here accommodates two lines</p>
+                                            <h6 className="leading-none mb-2 ">{item.title}</h6>
+                                            <p className="text-gray-400">{item.description}</p>
                                         </div>
                                     </div>
                                     <div className="flex flex-col items-end">
@@ -122,8 +144,10 @@ const VotingSteps = (props) => {
                                         </div>
                                     </div>
                                 </div>
+                                )}
+                                
                                 {/* <!-- card --> */}
-                                <div className="flex shadow shadow-md rounded-md py-4 px-6 my-2 items-center justify-between">
+                                {/* <div className="flex shadow shadow-md rounded-md py-4 px-6 my-2 items-center justify-between">
                                     <div className="flex">
                                         <div className="flex flex-col justify-start items-start mr-2">
                                             <i className="fa-solid text-kelvinDark mr-2 fa-circle text-xl"></i>
@@ -147,9 +171,9 @@ const VotingSteps = (props) => {
                                                     className="fa-solid text-white fa-thumbs-down"></i></button>
                                         </div>
                                     </div>
-                                </div>
+                                </div> */}
                                 {/* <!-- card --> */}
-                                <div className="flex shadow shadow-md rounded-md py-4 px-6 my-2 items-center justify-between">
+                                {/* <div className="flex shadow shadow-md rounded-md py-4 px-6 my-2 items-center justify-between">
                                     <div className="flex">
                                         <div className="flex flex-col justify-start items-start mr-2">
                                             <i className="fa-solid text-kelvinDark mr-2 fa-circle text-xl"></i>
@@ -173,9 +197,9 @@ const VotingSteps = (props) => {
                                                     className="fa-solid text-white fa-thumbs-down"></i></button>
                                         </div>
                                     </div>
-                                </div>
+                                </div> */}
                                 {/* <!-- card --> */}
-                                <div className="flex shadow shadow-md rounded-md py-4 px-6 my-2 items-center justify-between">
+                                {/* <div className="flex shadow shadow-md rounded-md py-4 px-6 my-2 items-center justify-between">
                                     <div className="flex">
                                         <div className="flex flex-col justify-start items-start mr-2">
                                             <i className="fa-solid text-kelvinDark mr-2 fa-circle text-xl"></i>
@@ -199,7 +223,7 @@ const VotingSteps = (props) => {
                                                     className="fa-solid text-white fa-thumbs-down"></i></button>
                                         </div>
                                     </div>
-                                </div>
+                                </div> */}
                             </div>
                             <div className="flex px-10 mt-4">
                                 <button type="button"
