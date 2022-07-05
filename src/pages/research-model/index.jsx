@@ -44,6 +44,7 @@ const [stepData,setStepData]=useState([{
     const [stepDescription,setStepDescription]=useState('');
     const [stepDuration,setStepDuration]=useState('');
     const [stepName,setStepName]=useState('')
+    const [selectedValue,setSelectedValue]=useState('')
 const router = useRouter();
 const templateId = router.query.templateId;
 const processName=router.query.processName;
@@ -114,11 +115,12 @@ const { data1, error1, loading1 } = useQuery(GET_PROCESS_TEMPLATES, {
   }`;
 const { data,error,loading } = useQuery(GET_Value, {
     notifyOnNetworkStatusChange: true,
-    variables: { nameFilter: getUserId() },
+    variables: { nameFilter: "''" },
     onCompleted: (dataValue) => {
         console.log(data,dataValue,"hiiiiiiii");
-        setValues(dataValue.values.results)
+        setValues(dataValue.values.results.map(e=>{return {...e,count:0}}))
         console.log(dataValue.values.results,".....................")
+        
     }
 });
 console.log(values,"h!!!!!11111111")
@@ -164,7 +166,9 @@ console.log(values,"h!!!!!11111111")
         setVotingStepModal(false)
     
     }
-    const showVotingStepModal=()=>{
+    const showVotingStepModal=(valueTitle)=>{
+        setSelectedValue(valueTitle)
+
         // setOnTrackModal(false)
         setVotedModal(false)
         setVotingStepModal(true)
@@ -329,7 +333,7 @@ console.log(values,"h!!!!!11111111")
             }
 
             {votedModal ? <VotingDetails closeModal={closeVotingModal}  votingStepModal={showVotingStepModal}  stepName={stepName} values={values}/> : null}
-            {votingStepModal ?<VotingSteps closeModal={closeVotingStepModal}  stepName={stepName} values={values} /> :null}
+            {votingStepModal ?<VotingSteps closeModal={closeVotingStepModal}  stepName={stepName} values={values} setValues={setValues} selectedValue={selectedValue} setVotedModal={setVotedModal} setVotingStepModal={setVotingStepModal}/> :null}
         </MainLayout>
         </>
     )

@@ -57,7 +57,8 @@ const VotingDetails = (props) => {
                     
                 {values.map((item)=>{
                     return(
-                        <div className="flex shadow shadow-md rounded-md py-2 px-4 mx-2 my-2 items-center">
+                        <div onClick={()=>{votingStepModal(item.title)}}   
+                        className="flex shadow shadow-md rounded-md py-2 px-4 mx-2 my-2 items-center">
                         <i className="fa-solid text-kelvinDark mr-2 fa-circle"></i>
                         <p className="">{item.title}</p>
                     </div>
@@ -66,7 +67,7 @@ const VotingDetails = (props) => {
                 </div>
                 <div className="flex">
                     <button type="button"
-                    onClick={votingStepModal}                    
+                    onClick={()=>{votingStepModal()}}                    
                         className="text-white bg-gradient-to-r from-kelvinDark  to-kelvinBold hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2">Rate
                         this content</button>
                 </div>
