@@ -7,6 +7,7 @@ const VotingSteps = (props) => {
     const { closeModal ,stepName,values,setValues,selectedValue,setVotingStepModal,setVotedModal} = props
     const [search,setSearch]=useState('');
     const [searchedValues,setSearchedValues]=useState([...values])
+    console.log(selectedValue)
 //     const [votes,setVotes] = useState([])
 
 //     const GET_Value = gql`
@@ -27,18 +28,19 @@ const VotingSteps = (props) => {
 console.log(stepName)
 const incrementHandler=(item)=>{
    // console.log(item.count,item.title)
-   if(parseInt(item.count)<parseInt(selectedValue)){
+//    if(parseInt(item.count)<parseInt(selectedValue)){
     item.count=parseInt(item.count)+1;
-    setValues(values.map(e=>{if(e._id===item.id){return {...e,count:`${item.count}`}} else{return {...e}}}))
-   }
+    setValues(values.map(e=>{if(e._id===item._id){return {...e,count:`${item.count}`}} else{return {...e}}}))
+   
    
 }
 
-const decrementHandler=(id,count)=>{
-    if(parseInt(count)>0){
-        count=parseInt(count)-1;
-        setValues(values.map(e=>{if(e._id===id){return {...e,count:`${count}`}} else{return {...e}}}))
-    }
+const decrementHandler=(item)=>{
+    console.log(item.count)
+    // if(parseInt(count)>0){
+        item.count=parseInt(item.count)-1;
+        setValues(values.map(e=>{if(e._id===item._id){return {...e,count:`${item.count}`}} else{return {...e}}}))
+    
    
 }
  const searchInputHandler=(e)=>{
@@ -60,6 +62,15 @@ const decrementHandler=(id,count)=>{
 
 console.log(searchedValues);
 console.log(values);
+const closeHandler=()=>{
+    let arr=[...values];
+    const index = arr.findIndex(object => {
+        return object._id === selectedValue._id;
+      });
+      arr.splice(index,1);
+      setValues([...arr]);
+      closeModal();
+}
     return (
         <>
 
@@ -169,14 +180,14 @@ console.log(values);
                                     </div>
                                     <div className="flex flex-col items-end">
                                         <div className="flex">
-                                            <p className="text-kelvinDark bg-kelvinLight px-3 py-2  font-bold rounded">{parseInt(selectedValue)}</p>
+                                            <p className="text-kelvinDark bg-kelvinLight px-3 py-2  font-bold rounded">{selectedValue.title}</p>
                                         </div>
                                         <div className="flex my-4">
                                             <button onClick={()=>{incrementHandler(item)}}
                                                 className="focus:outline-none text-white bg-kelvinDark hover:bg-kelvinBold focus:ring-4 focus:ring-kelvinDark font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-kelvinDark dark:hover:bg-kelvinBold dark:focus:ring-kelvinDark"><i
                                                     className="fa-solid text-white fa-thumbs-up"></i></button>
                                             <label htmlFor="" className="p-2 mx-2 font-medium text-lg">{item.count}</label>
-                                            <button onClick={()=>{decrementHandler(item._id,item.count)}}
+                                            <button onClick={()=>{decrementHandler(item)}}
                                                 className="focus:outline-none text-white bg-kelvinDark hover:bg-kelvinBold focus:ring-4 focus:ring-kelvinDark font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-kelvinDark dark:hover:bg-kelvinBold dark:focus:ring-kelvinDark"><i
                                                     className="fa-solid text-white fa-thumbs-down"></i></button>
                                         </div>
@@ -265,7 +276,7 @@ console.log(values);
                             </div>
                             <div className="flex px-10 mt-4">
                                 <button type="button"
-                                    onClick={closeModal}
+                                    onClick={closeHandler}
                                     className="text-white bg-gradient-to-r from-kelvinDark  to-kelvinBold hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2 w-36">Save</button>
                             </div>
                         </div>

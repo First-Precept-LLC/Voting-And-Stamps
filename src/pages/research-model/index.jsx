@@ -44,7 +44,7 @@ const [stepData,setStepData]=useState([{
     const [stepDescription,setStepDescription]=useState('');
     const [stepDuration,setStepDuration]=useState('');
     const [stepName,setStepName]=useState('')
-    const [selectedValue,setSelectedValue]=useState('')
+    const [selectedValue,setSelectedValue]=useState({})
 const router = useRouter();
 const templateId = router.query.templateId;
 const processName=router.query.processName;
@@ -118,7 +118,7 @@ const { data,error,loading } = useQuery(GET_Value, {
     variables: { nameFilter: "''" },
     onCompleted: (dataValue) => {
         console.log(data,dataValue,"hiiiiiiii");
-        setValues(dataValue.values.results.map(e=>{return {...e,count:0}}))
+        setValues(dataValue.values.results.map(e=>{return {...e,count:5,selected:false}}))
         console.log(dataValue.values.results,".....................")
         
     }
@@ -166,15 +166,18 @@ console.log(values,"h!!!!!11111111")
         setVotingStepModal(false)
     
     }
-    const showVotingStepModal=(valueTitle)=>{
-        setSelectedValue(valueTitle)
-
-        // setOnTrackModal(false)
-        setVotedModal(false)
-        setVotingStepModal(true)
-        // setCreateDetails(false);
-        // setProcessModal(false);
-        // setModal(false)
+    const showVotingStepModal=()=>{
+       if(selectedValue.selected==true){
+         // setOnTrackModal(false)
+         setVotedModal(false)
+         setVotingStepModal(true)
+         // setCreateDetails(false);
+         // setProcessModal(false);
+         // setModal(false)
+       
+       }
+       
+        
     }
 
     const closeVotingModal = () => {
@@ -332,7 +335,7 @@ console.log(values,"h!!!!!11111111")
              : null
             }
 
-            {votedModal ? <VotingDetails closeModal={closeVotingModal}  votingStepModal={showVotingStepModal}  stepName={stepName} values={values}/> : null}
+            {votedModal ? <VotingDetails closeModal={closeVotingModal}  votingStepModal={showVotingStepModal}  stepName={stepName} values={values} setValues={setValues} selectedValue={selectedValue} setSelectedValue={setSelectedValue}/> : null}
             {votingStepModal ?<VotingSteps closeModal={closeVotingStepModal}  stepName={stepName} values={values} setValues={setValues} selectedValue={selectedValue} setVotedModal={setVotedModal} setVotingStepModal={setVotingStepModal}/> :null}
         </MainLayout>
         </>
