@@ -3,14 +3,26 @@ import MainLayout from '../../components/layout/MainLayout';
 import { gql, useMutation, useQuery as query, NetworkStatus, useQuery } from '@apollo/client'
 import { useState, useEffect } from 'react';
 import { getUserId } from '../../services/user.service';
+import { useRouter } from "next/router";
 let id = 1;
 function ProcessTemplates() {
+    const router = useRouter();
+    //const item= router.query;
+    const [item,setItem]=useState(router.query)
+    console.log(item);
+    
     const [department, setDepartment] = useState(['US', 'CA', 'FR', 'DE']);
     // const [fields, setFields] = useState([{ step: '', showPopup: false, id: `${id}` }]);
     const [project, setProject] = useState('')
-    const [proName, setProName] = useState('')
+    const [proName, setProName] = useState(item.name)
     const [estDuration, setestDuration] = useState([])
-    const [desc, setDesc] = useState('')
+    useEffect(()=>{
+        if(item && item.estimatedDuration){
+        let duration=item.estimatedDuration.split(",");
+        console.log(duration[0].split('days')[0]);
+        setestDuration([ duration[0].split('days')[0],duration[1].split('hrs')[0],duration[2].split('mins')[0]])}
+    },[item])
+    const [desc, setDesc] = useState(item.description)
     const [step, setStep] = useState('')
     const [stepDuration, setStepDuration] = useState('')
     const [descriptionText, setDescriptionText] = useState('')
@@ -23,24 +35,29 @@ function ProcessTemplates() {
     const [selectedStep,setSelectedStep]=useState({});
     const [fields, setFields] = useState([{ step: '',duration:[],description:'', showPopup: false, id: `${id}` ,selected:true}]);
     // const [showPopupValue,setShowPopupValue]=useState(false)
-
+    const [templateId,setTemplateId]=useState('');
+    console.log(estDuration)
     const CREATE_PROCESS_TEMPLATE = gql`
-    mutation createProcessTemplate($name: String!, $parentProject: String!, $estimatedDuration: String!, $description: String!) {
-      createProcessTemplate(input: {data: {name: $name, parentProject: $parentProject, estimatedDuration: $estimatedDuration, description: $description}}) {
+    mutation createProcessTemplate($name: String!, $parentProject: String!, $estimatedDuration: String!, $description: String!, $userId: String!) {
+      createProcessTemplate(input: {data: {name: $name, parentProject: $parentProject, estimatedDuration: $estimatedDuration, description: $description, userId: $userId}}) {
         data {_id, name }
       }
     }`;
-
+  
     let [createProcessTemplate, { dataValue, loadingValue, errorValue }] = useMutation(
         CREATE_PROCESS_TEMPLATE, {
         onCompleted: (dataValue) => {
             console.log(dataValue)
+            setTemplateId(dataValue.createProcessTemplate.data._id)
             fields.forEach(item=>{
                 createStep({
                     variables: {
                         name:item.step,
                         estimatedDuration: item.duration.toString(),
                         description: item.description,
+                        userId: getUserId(),
+                        parentProcessTemplate:dataValue.createProcessTemplate.data._id
+                        
                     }
                 })
             })
@@ -50,14 +67,15 @@ function ProcessTemplates() {
                 parentProject: project,
                 estimatedDuration: estDuration.toString(),
                 description: desc,
+                userId: getUserId()
             })
         },
         onError: (errorValue) => console.error("Error creating a post", error),
     }
     );
     const CREATE_STEP = gql`
-      mutation createStep($name: String!,$estimatedDuration: String!, $description: String!) {
-        createStep(input: {data: {name: $name, estimatedDuration: $estimatedDuration, description: $description}}) {
+      mutation createStep($name: String!,$estimatedDuration: String!, $description: String!,$parentProcessTemplate:String!) {
+        createStep(input: {data: {name: $name, estimatedDuration: $estimatedDuration, description: $description,parentProcessTemplate:$parentProcessTemplate}}) {
           data {_id, name }
         }
       }`;
@@ -88,6 +106,23 @@ function ProcessTemplates() {
             setDepartment(data.projs.results);
         }
     });
+
+console.log(department);
+    const GET_PROCESS = gql`
+    query procs($nameFilter: String!) {
+        procs(input: {filter:{userId:{_eq:$nameFilter}}}) {
+          results {_id,name,parent}
+        }
+    }
+  `;
+    const { data1, error1, loading1 } = useQuery(GET_PROCESS, {
+        notifyOnNetworkStatusChange: true,
+        variables: { nameFilter: getUserId()},
+        onCompleted: (dataValue) => {
+            console.log({ data1 })
+            setProName(data1.procs.results);
+        }
+    });
     console.log(data);
 
 
@@ -103,6 +138,29 @@ function ProcessTemplates() {
         })
 
     }
+    const GET_STEPS = gql`
+    query steps($nameFilter: String!) {
+      steps(input: {filter:{name:{_eq:$nameFilter}}}) {
+          results {_id,name,
+              parentProcessTemplate,
+              estimatedDuration,
+              description
+                        }
+        }
+    }`;
+    const { data2, error2, loading2 } = useQuery(GET_STEPS, {
+        notifyOnNetworkStatusChange: true,
+        variables: { nameFilter: ""},
+        onCompleted: (dataValue) => {
+          
+         console.log(dataValue.steps.results)
+            setFields( dataValue.steps.results.filter(e=>e.parentProcessTemplate===item._id))
+          
+          
+            
+        }
+    });
+    console.log(fields)
 
     const CREATE_PROCESS = gql`
     mutation  createProcess($userId:String!,$name: String!, $dueDate: Date!) {
@@ -147,6 +205,7 @@ function ProcessTemplates() {
                 parentProject: project,
                 estimatedDuration: estDuration.toString(),
                 description: desc,
+                userId: getUserId()
             }
         })
 
@@ -205,6 +264,17 @@ function ProcessTemplates() {
     const estimatedDate = () => {
         setProcessShowDate(!processShowDate)
     }
+    const handleBlur=()=>{
+        if(estDuration.length==3){
+            setProcessShowDate(false);
+        }
+       
+    }
+  const handleBlurOfstep=()=>{
+    if(selectedStep.duration.length>=3){
+        setShowDate(false);
+    }
+  }
     const selectedDecriptionHandler=(value)=>{
         let step = JSON.parse(JSON.stringify(selectedStep))
         step.description=value;
@@ -311,10 +381,10 @@ function ProcessTemplates() {
                 {!createModal ?
                     <div className="flex w-full p-8 flex-col">
                         <div className="flex justify-between">
-                            <h1 className="text-3xl mb-8">Create Process Template</h1>
+                            <h1 className="text-3xl mb-8">Update Process Template</h1>
                             <button type="button" onClick={CreatePage}
                                 className="text-white h-10 bg-gradient-to-r from-kelvinDark  to-kelvinBold hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2">
-                                Create
+                                Update
                             </button>
                         </div>
 
@@ -322,11 +392,11 @@ function ProcessTemplates() {
                             <div className="flex grid grid-cols-3 gap-4">
                                 <div className="flex flex-col mb-8">
                                     <label for="countries" className="text-xs font-bold mb-2">Project</label>
-                                    <select id="countries" onChange={(e) => setProject(e.target.value)}
+                                    <select value={item.project_id ? item.project:''} id="countries" onChange={(e) => setProject(e.target.value)}
                                         className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                                        <option selected="">Select Project</option>
+                                        <option value=''>Select Project</option>
                                         {department.map(value => {
-                                            return (<option value={value._id}>{value.name}</option>)
+                                            return (<option value={value.name}>{value.name}</option>)
                                         }
 
                                         )}
@@ -339,7 +409,7 @@ function ProcessTemplates() {
                                 </div>
                                 <div className="flex flex-col mb-8">
                                     <h4 className="text-xs font-bold mb-2">Process Name</h4>
-                                    <input type="text" id="processname" onChange={(e) => setProName(e.target.value)}
+                                    <input type="text" id="processname" onChange={(e) => setProName(e.target.value)} value={proName}
                                         className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                         placeholder="Enter process name" required />
                                 </div>
@@ -363,10 +433,10 @@ function ProcessTemplates() {
                                     </div>
                                 </div>
                                 {processShowDate ?
-                                    <div id="dropdownDivider"
+                                    <div id="dropdownDivider" onBlur={handleBlur}
                                         className="z-10 p-4 bg-kelvinLight divide-y divide-gray-100 rounded rounded-lg shadow w-80 "
                                         data-popper-reference-hidden="" data-popper-escaped="" data-popper-placement="top"
-                                        style={{ position: 'absolute', inset: 'auto auto 0px 0px', top:'250px', right:'1px',height:'200px', margin: '0px', transform: 'translate3d(352.5px, 19px, 0px)' }}>
+                                        style={{ position: 'absolute', inset: 'auto auto 0px 0px', top:'250px', right:'1px',height:'200px', margin: '0px', transform: 'translate3d(970.5px, 11px, 0px)' }}>
                                         <div className="py-1">
                                             <a href="#"
                                                 className="block px-4 py-2 text-xs text-center text-gray-700 hover:bg-gray-100">Dynamic
@@ -398,7 +468,7 @@ function ProcessTemplates() {
                             </div>
                             <div className="flex flex-col mb-4">
                                 <h4 className="text-xs font-bold mb-2">Description</h4>
-                                <textarea id="message" rows="4" onChange={(e) => setDesc(e.target.value)}
+                                <textarea id="message" rows="4" onChange={(e) => setDesc(e.target.value)} value={desc}
                                     className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-md border-2 border-gray-300 focus:ring-blue-500 focus:border-blue-500 "
                                     placeholder="Enter Description"></textarea>
 
@@ -460,10 +530,10 @@ function ProcessTemplates() {
                                     </div>
 
                                  {showDate ?
-                                    <div id="dropdownDivider"
+                                    <div id="dropdownDivider" onBlur={handleBlurOfstep}
                                         className="z-10 p-4 bg-kelvinLight divide-y divide-gray-100 rounded rounded-lg shadow w-80 "
                                         data-popper-reference-hidden="" data-popper-escaped="" data-popper-placement="top"
-                                        style={{ position: 'absolute', inset: 'auto auto 0px 0px', top:'250px', right:'1px',height:'200px', margin: '0px', transform: 'translate3d(352.5px, 19px, 0px)' }}>
+                                        style={{ position: 'absolute', inset: 'auto auto 0px 0px', top:'250px', right:'1px',height:'200px', margin: '0px', transform: 'translate3d(842.5px, 344px, 0px)' }}>
                                         <div className="py-1">
                                             <a href="#"
                                                 className="block px-4 py-2 text-xs text-center text-gray-700 hover:bg-gray-100">Dynamic

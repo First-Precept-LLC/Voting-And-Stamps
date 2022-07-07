@@ -4,7 +4,7 @@ import { getUserId } from '../../services/user.service';
 
 
 const VotingSteps = (props) => {
-    const { closeModal ,stepName,values,setValues,selectedValue,setVotingStepModal,setVotedModal} = props
+    const { closeModal ,stepName,values,setValues,selectedValue,setVotingStepModal,setVotedModal,setSelectedValue,setStepName} = props
     const [search,setSearch]=useState('');
     const [searchedValues,setSearchedValues]=useState([...values])
     console.log(selectedValue)
@@ -37,10 +37,10 @@ const incrementHandler=(item)=>{
 
 const decrementHandler=(item)=>{
     console.log(item.count)
-    // if(parseInt(count)>0){
+    if(parseInt(item.count)>0){
         item.count=parseInt(item.count)-1;
         setValues(values.map(e=>{if(e._id===item._id){return {...e,count:`${item.count}`}} else{return {...e}}}))
-    
+    }
    
 }
  const searchInputHandler=(e)=>{
@@ -64,11 +64,16 @@ console.log(searchedValues);
 console.log(values);
 const closeHandler=()=>{
     let arr=[...values];
+    arr.forEach(e=>{
+        e.count=5;
+    })
     const index = arr.findIndex(object => {
         return object._id === selectedValue._id;
       });
       arr.splice(index,1);
       setValues([...arr]);
+      setSelectedValue({});
+      setStepName('');
       closeModal();
 }
     return (

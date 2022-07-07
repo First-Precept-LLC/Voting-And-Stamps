@@ -194,6 +194,10 @@ const ProcessListGroup = (props) => {
                                 {arr.map(item => {
                                     return (
                                         <>
+                                         <Link   href={{
+                                                                            pathname: "/research-model",
+                                                                            query: {templateId:`${item.processTemplateId}`,processName:`${item.name}`,assignees:`${item.userId}`}, // the data
+                                                                        }}>
                                             <div key={item.id}
                                                 className="flex items-center w-full min-h-8 justify-between pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2 ">
                                                 <h6 className="mr-2 items-center"> {item.process || item.name}</h6>
@@ -208,17 +212,14 @@ const ProcessListGroup = (props) => {
                                                 </div>
                                                 <div className="flex">
                                                     
-                                                    <Link   href={{
-                                                                            pathname: "/research-model",
-                                                                            query: {templateId:`${item.processTemplateId}`,processName:`${item.name}`,assignees:`${item.userId}`}, // the data
-                                                                        }}>
+                                                   
                                                         <button
                                                             //onClick={()=>{ontrackModal(item.id)}}
 
                                                             className=" bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-2  h-6 text-left mr-2 w-24 text-center "
                                                             data-modal-toggle="large-modal">
                                                             On Track</button>
-                                                    </Link>
+                                                    
 
                                                     <p style={{ lineHeight: '10px', textAlign: 'center' }}><span style={{ fontSize: '20px' }} >{item.votes}</span><br /><span style={{ fontSize: '10px' }}>Votes</span></p>
                                                     <a href="#" className=" px-4 hover:bg-kelvinLight rounded-full" onClick={() => { deletePopupHandler(item.id) }}>
@@ -227,6 +228,7 @@ const ProcessListGroup = (props) => {
                                                     {item.deletePopup ? <button onClick={() => { deleteHandler(item.id) }}>delete</button> : null}
                                                 </div>
                                             </div>
+                                            </Link>
                                         </>
                                     )
                                 })}

@@ -181,6 +181,7 @@ console.log(values,"h!!!!!11111111")
     }
 
     const closeVotingModal = () => {
+        setStepName('')
         setVotedModal(false)
         // setOnTrackModal(true)
 
@@ -321,7 +322,7 @@ console.log(values,"h!!!!!11111111")
                             <div className="text-kelvinDark p-2 px-4 border-2 text-sm border-gray-200 rounded mr-2">Assignee
                                 <span className="text-white bg-kelvinDark p-1 px-2 ml-2 rounded text-sm">{assignees}</span>
                             </div>
-                            <button onClick={showVotedModal} className="flex text-white bg-kelvinDark items-center px-2 rounded text-sm">
+                            <button onClick={()=>{if(stepName){showVotedModal()}}} className="flex text-white bg-kelvinDark items-center px-2 rounded text-sm">
                                 {/* <!-- navigate to voting widget --> */}
                                 <i className="fa-solid fa-check-to-slot mr-1 text-white"></i>Votes ({processListSelectedData.votes})
                             </button>
@@ -336,7 +337,7 @@ console.log(values,"h!!!!!11111111")
             }
 
             {votedModal ? <VotingDetails closeModal={closeVotingModal}  votingStepModal={showVotingStepModal}  stepName={stepName} values={values} setValues={setValues} selectedValue={selectedValue} setSelectedValue={setSelectedValue}/> : null}
-            {votingStepModal ?<VotingSteps closeModal={closeVotingStepModal}  stepName={stepName} values={values} setValues={setValues} selectedValue={selectedValue} setVotedModal={setVotedModal} setVotingStepModal={setVotingStepModal}/> :null}
+            {votingStepModal ?<VotingSteps closeModal={closeVotingStepModal}  stepName={stepName} values={values} setValues={setValues} selectedValue={selectedValue} setSelectedValue={setSelectedValue} setVotedModal={setVotedModal} setVotingStepModal={setVotingStepModal} setStepName={setStepName}/> :null}
         </MainLayout>
         </>
     )
