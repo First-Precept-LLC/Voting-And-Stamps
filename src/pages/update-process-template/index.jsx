@@ -7,20 +7,22 @@ import { useRouter } from "next/router";
 let id = 1;
 function ProcessTemplates() {
     const router = useRouter();
-    //const item= router.query;
+    // const item= router.query;
     const [item,setItem]=useState(router.query)
     console.log(item);
-    
+    const [status,setStatus]=useState(false)
     const [department, setDepartment] = useState(['US', 'CA', 'FR', 'DE']);
     // const [fields, setFields] = useState([{ step: '', showPopup: false, id: `${id}` }]);
     const [project, setProject] = useState('')
     const [proName, setProName] = useState(item.name)
     const [estDuration, setestDuration] = useState([])
+    const [estStepDuration,setEstStepDuration]=useState([])
     useEffect(()=>{
         if(item && item.estimatedDuration){
         let duration=item.estimatedDuration.split(",");
         console.log(duration[0].split('days')[0]);
         setestDuration([ duration[0].split('days')[0],duration[1].split('hrs')[0],duration[2].split('mins')[0]])}
+      
     },[item])
     const [desc, setDesc] = useState(item.description)
     const [step, setStep] = useState('')
@@ -73,22 +75,22 @@ function ProcessTemplates() {
         onError: (errorValue) => console.error("Error creating a post", error),
     }
     );
-    const CREATE_STEP = gql`
-      mutation createStep($name: String!,$estimatedDuration: String!, $description: String!,$parentProcessTemplate:String!) {
-        createStep(input: {data: {name: $name, estimatedDuration: $estimatedDuration, description: $description,parentProcessTemplate:$parentProcessTemplate}}) {
-          data {_id, name }
-        }
-      }`;
-    let [createStep, { dataProcess, loadingProcess, errorProcess }] = useMutation(
-        CREATE_STEP, {
-        onCompleted: (dataProcess) => {
-            console.log(dataProcess)
-            setShowCreateModal(true);
+    // const CREATE_STEP = gql`
+    //   mutation createStep($name: String!,$estimatedDuration: String!, $description: String!,$parentProcessTemplate:String!) {
+    //     createStep(input: {data: {name: $name, estimatedDuration: $estimatedDuration, description: $description,parentProcessTemplate:$parentProcessTemplate}}) {
+    //       data {_id, name }
+    //     }
+    //   }`;
+    // let [createStep, { dataProcess, loadingProcess, errorProcess }] = useMutation(
+    //     CREATE_STEP, {
+    //     onCompleted: (dataProcess) => {
+    //         console.log(dataProcess)
+    //         setShowCreateModal(true);
 
-        },
-        onError: (errorProcess) => console.error("Error creating a post step", error),
-    }
-    );
+    //     },
+    //     onError: (errorProcess) => console.error("Error creating a post step", error),
+    // }
+    // );
 
 
     const GET_PROJECTS = gql`
@@ -103,7 +105,7 @@ function ProcessTemplates() {
         variables: { nameFilter: getUserId()},
         onCompleted: (dataValue) => {
             console.log({ data })
-            setDepartment(data.projs.results);
+            setDepartment(dataValue.projs.results);
         }
     });
 
@@ -140,7 +142,7 @@ console.log(department);
     }
     const GET_STEPS = gql`
     query steps($nameFilter: String!) {
-      steps(input: {filter:{name:{_eq:$nameFilter}}}) {
+      steps(input: {filter:{parentProcessTemplate:{_eq:$nameFilter}}}) {
           results {_id,name,
               parentProcessTemplate,
               estimatedDuration,
@@ -150,7 +152,7 @@ console.log(department);
     }`;
     const { data2, error2, loading2 } = useQuery(GET_STEPS, {
         notifyOnNetworkStatusChange: true,
-        variables: { nameFilter: ""},
+        variables: { nameFilter: item._id},
         onCompleted: (dataValue) => {
           
          console.log(dataValue.steps.results)
@@ -271,9 +273,9 @@ console.log(department);
        
     }
   const handleBlurOfstep=()=>{
-    if(selectedStep.duration.length>=3){
-        setShowDate(false);
-    }
+    // if(selectedStep.duration.length>=3){
+    //     setShowDate(false);
+    // }
   }
     const selectedDecriptionHandler=(value)=>{
         let step = JSON.parse(JSON.stringify(selectedStep))
@@ -288,35 +290,42 @@ console.log(department);
         })
          setFields([...arr])
     }
+   
     
-    const showDataHandler=(id)=>{
+    const showDataHandler=(item)=>{
 
         let array = [...fields];
         array.forEach(element => {
-            if (element.id == id) {
+            if (element._id == item._id) {
                 
                setSelectedStep(element);
-                return;
+               
+                
             }
 
         });
+      // console.log(selectedStep)
+       setStatus(true) 
         
     }
+    if(status){
+        let duration=selectedStep.estimatedDuration.split(",");
+             console.log(duration)
+             setEstStepDuration([ duration[0].split('days')[0],duration[1].split('hrs')[0],duration[2].split('mins')[0]])
+           setStatus(false)
+    }
+    console.log(estStepDuration)
     console.log(selectedStep);
     const selectedDurationHandler=(value)=>{
-        selectedStep.duration=value;
-        fields.forEach(e=>{
-            if(e.id===selectedStep.id){
-                e.duration=value;
-            }
-        });
+        setSelectedStep({...selectedStep,description:`${value}`});
+        setFields(fields.map(e=>{if(e._id==selectedStep._id){return {...selectedStep}}else{return {...e}}}))
         
     }
 
     const daysHandler=(value)=>{
         
         let step={...selectedStep}
-        step.duration[0]=`${value.days}days `
+        estStepDuration[0]=`${value.days}days `
         setSelectedStep({...step})
         
         
@@ -324,13 +333,13 @@ console.log(department);
     const hrsHandler=(value)=>{
        
         let step={...selectedStep}
-        step.duration[1]=`${value.hrs}hrs `
+        estStepDuration[1]=`${value.hrs}hrs `
         setSelectedStep({...step})
     }
     const minsHandler=(value)=>{
    
         let step={...selectedStep}
-        step.duration[2]=`${value.mins}mins `
+        estStepDuration[2]=`${value.mins}mins `
         setSelectedStep({...step})
     }
 
@@ -338,7 +347,7 @@ console.log(department);
         
         
         estDuration[0]=`${value.days}days `
-        setSelectedStep({...step})
+        
         
         
     }
@@ -346,17 +355,24 @@ console.log(department);
        
       
         estDuration[1]=`${value.hrs}hrs `
-        setSelectedStep({...step})
+        
     }
     const processMinsHandler=(value)=>{
    
        
         estDuration[2]=`${value.mins}mins `
-        setSelectedStep({...step})
+        
+    }
+    const stepNameHandler =(name)=>{
+      setSelectedStep({...selectedStep,name:`${name}`});
+      setFields(fields.map(e=>{if(e._id==selectedStep._id){return {...selectedStep}}else{return {...e}}}))
+
+
     }
 
-    console.log(selectedStep);
+    console.log(item);
     console.log(fields);
+    console.log(estDuration)
 
     return (
         <>
@@ -382,7 +398,7 @@ console.log(department);
                     <div className="flex w-full p-8 flex-col">
                         <div className="flex justify-between">
                             <h1 className="text-3xl mb-8">Update Process Template</h1>
-                            <button type="button" onClick={CreatePage}
+                            <button type="button" onClick={()=>{console.log(item)}}//CreatePage}
                                 className="text-white h-10 bg-gradient-to-r from-kelvinDark  to-kelvinBold hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2">
                                 Update
                             </button>
@@ -392,11 +408,11 @@ console.log(department);
                             <div className="flex grid grid-cols-3 gap-4">
                                 <div className="flex flex-col mb-8">
                                     <label for="countries" className="text-xs font-bold mb-2">Project</label>
-                                    <select value={item.project_id ? item.project:''} id="countries" onChange={(e) => setProject(e.target.value)}
+                                    <select value={item.project_id ? item.project:''} id="countries" onChange={(e) => setItem({...item,parentProject:`${e.target.value}`})}
                                         className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                                         <option value=''>Select Project</option>
                                         {department.map(value => {
-                                            return (<option value={value.name}>{value.name}</option>)
+                                            return (<option value={department.name}>{value.name}</option>)
                                         }
 
                                         )}
@@ -409,7 +425,7 @@ console.log(department);
                                 </div>
                                 <div className="flex flex-col mb-8">
                                     <h4 className="text-xs font-bold mb-2">Process Name</h4>
-                                    <input type="text" id="processname" onChange={(e) => setProName(e.target.value)} value={proName}
+                                    <input type="text" id="processname" onChange={(e) => setItem({...item,name:`${e.target.value}`})} value={item.name}
                                         className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                         placeholder="Enter process name" required />
                                 </div>
@@ -468,7 +484,7 @@ console.log(department);
                             </div>
                             <div className="flex flex-col mb-4">
                                 <h4 className="text-xs font-bold mb-2">Description</h4>
-                                <textarea id="message" rows="4" onChange={(e) => setDesc(e.target.value)} value={desc}
+                                <textarea id="message" rows="4" onChange={(e) => setItem({...item,description:`${e.target.value}`})} value={item.description}
                                     className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-md border-2 border-gray-300 focus:ring-blue-500 focus:border-blue-500 "
                                     placeholder="Enter Description"></textarea>
 
@@ -483,9 +499,9 @@ console.log(department);
                                         {
                                             fields.map((item, index) => {
                                                 return (
-                                                    <div onClick={e=>{showDataHandler(item.id)}}
+                                                    <div onClick={e=>{showDataHandler(item)}}
                                                     className="flex items-center w-full min-h-8 justify-between pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2 flex-wrap">
-                                                    <input key={item.id} style={{ border: 0 }} type='text' defaultValue={item.step} onChange={(e) => { item.step = e.target.value; }} />
+                                                    <input key={item.id} style={{ border: 0 }} type='text' defaultValue={item.name} onChange={(e) => { stepNameHandler(e.target.value) }} />
                                                     <button className="px-4" onClick={() => { showPopupHandler(item.id) }}>
                                                         <i className="fa-solid fa-ellipsis-vertical" ></i>
                                                     </button>
@@ -510,7 +526,7 @@ console.log(department);
                                     </div>
                                 </div>
                                 <div className="flex flex-col bg-kelvinLight p-4">
-                                    <h5 className="text-xl mb-4">{selectedStep.step}</h5>
+                                    <h5 className="text-xl mb-4">{selectedStep.name}</h5>
                                     <div className="flex flex-col mb-8">
                                         <h4 className="mb-2">Estimated Duration</h4>
                                         <div className="relative" onClick={stepEstimatedDate} >
@@ -525,7 +541,7 @@ console.log(department);
                                             <input id="dropdownDividerButton" data-dropdown-toggle="dropdownDivider" onChange={(e) => selectedDurationHandler(e.target.value)}
                                                 className="bg-white border-2 border-gray-300 text-gray-900 sm:text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  datepicker-input"
                                                 placeholder="Estimated Duration" disabled
-                                                value={selectedStep.duration} />
+                                                value={estStepDuration} />
                                         </div>
                                     </div>
 
@@ -543,17 +559,17 @@ console.log(department);
                                             aria-labelledby="dropdownDividerButton">
                                             <li className="">
                                                 <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-kelvinDark">Days</a>
-                                                <input type="number" name="" id="" value={parseInt(selectedStep.duration[0])}onChange={(e)=>{daysHandler({days:`${e.target.value}`})}}  
+                                                <input type="number" name="" id="" value={parseInt(estStepDuration[0])}onChange={(e)=>{daysHandler({days:`${e.target.value}`})}}  
                                                     className="w-20 bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
                                             </li>
                                             <li>
                                                 <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-kelvinDark  ">Hours</a>
-                                                <input type="number" name="" id="" value={parseInt(selectedStep.duration[1])} onChange={(e)=>{hrsHandler({hrs:`${e.target.value}`})}}
+                                                <input type="number" name="" id="" value={parseInt(estStepDuration[1])} onChange={(e)=>{hrsHandler({hrs:`${e.target.value}`})}}
                                                     className="w-20 bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
                                             </li>
                                             <li>
                                                 <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-kelvinDark  ">Minutes</a>
-                                                <input type="number" name="" id=""  value={parseInt(selectedStep.duration[2])} onChange={(e)=>{minsHandler({mins:`${e.target.value}`})}}
+                                                <input type="number" name="" id=""  value={parseInt(estStepDuration[2])} onChange={(e)=>{minsHandler({mins:`${e.target.value}`})}}
                                                     className="w-20 bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
                                             </li>
                                         </ul>

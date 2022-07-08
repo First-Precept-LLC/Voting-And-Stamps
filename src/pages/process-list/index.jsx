@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect ,useRef} from 'react';
 import MainLayout from '../../components/layout/MainLayout';
 import ViewProcess from '../../components/process-templates/view-process';
 import VotingDetails from '../../components/process-templates/voting-details';
@@ -10,18 +10,19 @@ import { getUserId } from '../../services/user.service';
 
 const ProcessListGroup = (props) => {
 
-
+    let arr=[];
     const [votedModal, setVotedModal] = useState(false)
     const [votingStepModal, setVotingStepModal] = useState(false)
     const [processListSelectedData, setProcessListSelectedData] = useState({});
     const [onTrackModal, setOnTrackModal] = useState(false)
     const [templateList,setTemplateList]=useState([]);
-
+    const [status,setStatus]=useState('false');
     const [processListData, setProcessListData] = useState([
         { process: 'Research of Model v1', processTemplate: 'Start research development', dueBy: 'Aug 22, 2022', assignees: 'Matt', votes: '24', id: '1', percent: '70%', deletePopup: false },
         { process: 'Submission of Model v2', processTemplate: 'Submitting Designs', dueBy: 'Aug 28, 2022', assignees: 'Saidutt', votes: '2', id: '2', percent: '33%', deletePopup: false }
 
     ]);
+    const [finalProcessList,setFinalProcessList]=useState([]);
 
 
     const GET_PROCESS_TEMPLATES = gql`
@@ -37,29 +38,43 @@ const ProcessListGroup = (props) => {
             onCompleted: (dataValue) => {
                 console.log(dataValue.processTemplates.results);
                 setTemplateList(dataValue.processTemplates.results)
-         
+                setStatus(true);
             }
         });
 
-    
-    const deletePopupHandler = (id) => {
-
-        let arr = [...processListData];
-        arr.forEach(element => {
-            if (element.id == id) {
-                if (element.deletePopup == true) {
-                    element.deletePopup = false;
-                } else {
-                    element.deletePopup = true;
-                }
+        const GET_PROCESS = gql`
+        query processes($nameFilter: String!) {
+            processes(input: {filter:{userId:{_neq:$nameFilter}}}) {
+              results {_id,name,dueDate,parentProcessTemplate,progress,userId}
             }
-            else {
-                element.deletePopup = false;
+        }
+      `;
+        const { data2, error3, loading3 } = useQuery(GET_PROCESS, {
+            notifyOnNetworkStatusChange: true,
+            variables: { nameFilter: "''"},
+            onCompleted: (dataValue) => {
+                console.log(dataValue.processes.results);
+                setProcessListData(dataValue.processes.results.map(e => { return { ...e, showPopup: false } }));
+               setStatus(true);
             }
-
         });
-        setProcessListData(arr);
+    const deletePopupHandler = (index) => {
 
+        let data = [...finalProcessList];
+        data.forEach((e,i)=>{
+            if(i==index){
+             if(e.showPopup==false){
+                 e.showPopup=true
+             }
+             else{
+                 e.showPopup=false
+             }
+            }
+            else{
+             e.showPopup=false
+            }
+         })
+        setFinalProcessList([...data])
     }
 
     const deleteHandler = (id) => {
@@ -111,24 +126,16 @@ const ProcessListGroup = (props) => {
 
     }
 
-    const GET_PROCESS = gql`
-        query processes($nameFilter: String!) {
-            processes(input: {filter:{userId:{_neq:$nameFilter}}}) {
-              results {_id,name,dueDate,parentProcessTemplate,progress,userId}
-            }
-        }
-      `;
-        const { data2, error3, loading3 } = useQuery(GET_PROCESS, {
-            notifyOnNetworkStatusChange: true,
-            variables: { nameFilter: "''"},
-            onCompleted: (dataValue) => {
-                console.log(dataValue.processes.results);
-                setProcessListData(dataValue.processes.results);
-                
-            }
-        });
+    
 
-        let arr=[];
+     
+        // useEffect(() => {
+     
+        //     setFinalProcessList([...arr])
+        // },[])
+        console.log(status.current)
+     if(status){
+        
         processListData.forEach(e=>{
             templateList.forEach(e1=>{
                 if(e.parentProcessTemplate==e1._id){
@@ -138,7 +145,12 @@ const ProcessListGroup = (props) => {
                 }
             })
         })
-        console.log(arr);
+        console.log('************')
+        setFinalProcessList([...arr])
+        setStatus(false);
+        
+     }
+     console.log(finalProcessList);
 
     return (
         <>
@@ -191,10 +203,10 @@ const ProcessListGroup = (props) => {
 
 
                             <div className="flex bg-kelvinLight p-4 rounded-md w-full flex-wrap ">
-                                {arr.map(item => {
+                                {finalProcessList.map((item) => {
                                     return (
                                         <>
-                                         <Link   href={{
+                                         <Link key={item._id}  href={{
                                                                             pathname: "/research-model",
                                                                             query: {templateId:`${item.processTemplateId}`,processName:`${item.name}`,assignees:`${item.userId}`}, // the data
                                                                         }}>
@@ -222,7 +234,7 @@ const ProcessListGroup = (props) => {
                                                     
 
                                                     <p style={{ lineHeight: '10px', textAlign: 'center' }}><span style={{ fontSize: '20px' }} >{item.votes}</span><br /><span style={{ fontSize: '10px' }}>Votes</span></p>
-                                                    <a href="#" className=" px-4 hover:bg-kelvinLight rounded-full" onClick={() => { deletePopupHandler(item.id) }}>
+                                                    <a href="#" className=" px-4 hover:bg-kelvinLight rounded-full" >
                                                         <i className="fa-solid fa-ellipsis-vertical text-xl"></i>
                                                     </a>
                                                     {item.deletePopup ? <button onClick={() => { deleteHandler(item.id) }}>delete</button> : null}

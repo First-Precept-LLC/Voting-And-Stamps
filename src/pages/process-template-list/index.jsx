@@ -12,6 +12,7 @@ const ProcessTemplateList = (props) => {
 
     const [processItemName, setProcessItemName] = useState('')
     const [userId, setUserId] = useState('');
+    const [status,setStatus]=useState(false);
     const [processListData, setProcessListData] = useState([
         { process: 'Research of Model v1', processTemplate: 'Start research development', project: 'R&D', dueBy: 'Aug 22, 2022', assignees: 'Matt', votes: '24', id: '1', percent: '70%', deletePopup: false },
         { process: 'Submission of Model v2', processTemplate: 'Submitting Designs', project: 'R&D', dueBy: 'Aug 28, 2022', assignees: 'Saidutt', votes: '2', id: '2', percent: '33%', deletePopup: false }
@@ -43,25 +44,9 @@ const ProcessTemplateList = (props) => {
         onCompleted: (dataValue) => {
             console.log(dataValue.processTemplates.results);
             setProcessListData(dataValue.processTemplates.results.map(e => { return { ...e, showPopup: false } }));
-
+            setStatus(true);
         }
     });
-
-    useEffect(() => {
-        let arr = [];
-        pro.forEach(e => {
-            processListData.forEach(o => {
-
-                if (e._id === o.parentProject) {
-                    o.project = e.name;
-                    o.project_id=e._id;
-                    arr.push(o)
-                }
-            })
-        })
-        console.log(arr, '*************')
-        setFinalList(arr)
-    }, [pro]);
 
     const { data2, error3, loading3 } = useQuery(GET_PROJECTS, {
         notifyOnNetworkStatusChange: true,
@@ -69,9 +54,40 @@ const ProcessTemplateList = (props) => {
         onCompleted: (dataValue) => {
             console.log(dataValue.projs.results);
             setPro(dataValue.projs.results);
+            console.log(status)
+            setStatus(true);
+            console.log(status)
         }
     });
+console.log(status)
 
+    let arr = [];
+    pro.forEach(e => {
+        processListData.forEach(o => {
+
+            if (e._id === o.parentProject) {
+                o.project = e.name;
+                o.project_id=e._id;
+                arr.push(o)
+            }
+        })})
+    // useEffect(() => {
+        
+        
+    //     })
+    //     console.log(arr, '*************')
+    //     setFinalList(arr)
+    // }, [pro]);
+
+    console.log(status)
+    if(status){
+        console.log(status)
+        setFinalList([...arr]);
+        setStatus(false);
+    }
+    console.log(status)
+
+  
 
 
 
@@ -82,22 +98,38 @@ const ProcessTemplateList = (props) => {
 
 
     const deletePopupHandler = (index) => {
-        console.log(finalList)
-        let data = (JSON.parse(JSON.stringify(finalList)));
-        console.log('**************',data)
-        data.splice(index,1);
-        console.log('*(&',data)
+        // console.log(finalList)
+        // let data = (JSON.parse(JSON.stringify(finalList)));
+        // console.log('**************',data)
+        // data.splice(index,1);
+        // console.log('*(&',data)
+        // setFinalList(data);
+
+        
+
+        let data=[...finalList]
+        data.forEach((e,i)=>{
+           if(i==index){
+            if(e.showPopup==false){
+                e.showPopup=true
+            }
+            else{
+                e.showPopup=false
+            }
+           }
+           else{
+            e.showPopup=false
+           }
+        })
+        //data[index].showPopup=true;
         setFinalList(data);
     }
 
-    const deleteHandler = (id) => {
-        let arr = []
-        let index = arr.findIndex(object => {
-            return object.id == id;
-        });
-        console.log(index);
-        arr.splice(index, 1);
-
+    const deleteHandler = (index) => {
+        
+       let data=[...finalList]
+        data.splice(index,1);
+        setFinalList(data);
     }
 
     const [createDetails, setCreateDetails] = useState(false)
@@ -251,7 +283,7 @@ const ProcessTemplateList = (props) => {
                             <div className="flex bg-kelvinLight p-4 rounded-md w-full flex-wrap">
                                 {finalList ? finalList.map((item,index) => {
                                     return (
-                                        <div
+                                        <div key={item._id}
                                             className="flex items-center w-full min-h-8 justify-between pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2 ">
                                             <h6 className="mr-2 w-1/2">{item.name}</h6>
                                             <p className="text-sm opacity-50 mr-2 font-normal w-32" style={{ marginRight: '37%' }}>{item.project}</p>
@@ -274,7 +306,7 @@ const ProcessTemplateList = (props) => {
                                                     <i className="fa-solid fa-ellipsis-vertical mt-1 text-xl"></i>
 
                                                 </a>
-                                                {item.showPopup ? <button onClick={() => { deleteHandler(item.id) }}>delete</button> : null}
+                                                {item.showPopup ? <button onClick={() => { deleteHandler(index) }}  className=" bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-2  h-6 text-left mr-2 w-24 text-center ">delete</button> : null}
                                             </div>
                                         </div>
                                     )
