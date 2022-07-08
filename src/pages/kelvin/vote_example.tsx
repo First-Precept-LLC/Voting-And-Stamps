@@ -10,7 +10,7 @@ const VoteExample = (props) => {
 
   const GET_VOTE = gql`
   query uservote($user: String!, $contentId: String!, $value: String!) {
-    uservote(input: {filter: {user: {_eq: $user}}, {target: {_eq: $contentId}}, {graph: {_eq: $value}}}) {
+    uservote(input: {filter:  {user: {_eq: $user}, target: {_eq: $contentId}, graph: {_eq: $value} } }) {
       result {_id} 
     }
   }`;
@@ -19,8 +19,8 @@ const VoteExample = (props) => {
 
   const GET_VOTES_BY_CONTENT = gql`
   query uservotes($contentId: String!, $value: String!) {
-    uservotes(input: {filter: {target: {_eq: $contentId}}, {graph: {_eq: $value}}}) {
-      result {_votecount}
+    uservotes(input: {filter: { target: {_eq: $contentId}, graph: {_eq: $value} } }) {
+      result {votecount}
     }
   }`;
 

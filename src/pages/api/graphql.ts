@@ -22,7 +22,7 @@ import user from "./account/user";
 const stampy_id = "stampy";
 const {Matrix, solve} = require('ml-matrix');
 
-const readline = require('readline');
+//const readline = require('readline');
 const f = require('fs');
 const cron = require('node-cron');
 
@@ -585,7 +585,7 @@ export class StampsModule {
       return stamps;
     }
 
-    load_votes_from_csv(collection, filename="stamps.csv") {
+    /*load_votes_from_csv(collection, filename="stamps.csv") {
         let rl = readline.createInterface({
             input : f.createReadStream(File),
             output : process.stdout,
@@ -605,7 +605,7 @@ export class StampsModule {
             }
         });
         this.calculate_stamps(collection);
-    }
+    }*/
 
     static user_is_admin(username) {
         for(let i = 0; i < admin_usernames.length; i++) {
