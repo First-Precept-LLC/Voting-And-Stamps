@@ -37,6 +37,7 @@ function ProcessTemplates() {
             console.log(dataValue)
             setTemplateId(dataValue.createProcessTemplate.data._id)
             fields.forEach(item=>{
+              if(item.step &&item.duration && item.description )  
                 createStep({
                     variables: {
                         name:item.step,
@@ -162,7 +163,7 @@ function ProcessTemplates() {
 
     const [modal, setModal] = useState(false)
     const CreatePage = () => {
-
+      if(proName && project && estDuration && desc && fields.length!==0){
         createProcessTemplate({
             variables: {
                 name: proName,
@@ -172,6 +173,9 @@ function ProcessTemplates() {
                 userId: getUserId()
             }
         })
+      }
+       
+       
 
         console.log({
             project: project,
@@ -182,6 +186,8 @@ function ProcessTemplates() {
 
         })
     }
+     
+    
 
     const closeModal = () => {
         setShowCreateModal(false)
@@ -388,7 +394,7 @@ function ProcessTemplates() {
                                                     clip-rule="evenodd"></path>
                                             </svg>
                                         </div>
-                                        <input id="dropdownDividerButton"
+                                        <input id="dropdownDividerButton" 
                                             onChange={(e) => setestDuration(e.target.value)}
                                             value={estDuration}
                                             data-dropdown-toggle="dropdownDivider"
@@ -410,17 +416,17 @@ function ProcessTemplates() {
                                             aria-labelledby="dropdownDividerButton">
                                             <li className="">
                                                 <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-kelvinDark">Days</a>
-                                                <input type="number" name="" id=""  value={parseInt(estDuration[0])} onChange={(e)=>{processDaysHandler({days:`${e.target.value}`})}}
+                                                <input type="number" name="" id="" required value={parseInt(estDuration[0])} onChange={(e)=>{processDaysHandler({days:`${e.target.value}`})}}
                                                     className="w-20 bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
                                             </li>
                                             <li>
                                                 <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-kelvinDark  ">Hours</a>
-                                                <input type="number" name="" id=""  value={parseInt(estDuration[1])} onChange={(e)=>{processHrsHandler({hrs:`${e.target.value}`})}}
+                                                <input type="number" name="" id="" required  value={parseInt(estDuration[1])} onChange={(e)=>{processHrsHandler({hrs:`${e.target.value}`})}}
                                                     className="w-20 bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
                                             </li>
                                             <li>
                                                 <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-kelvinDark  ">Minutes</a>
-                                                <input type="number" name="" id="" value={parseInt(estDuration[2])} onChange={(e)=>{processMinsHandler({mins:`${e.target.value}`})}}
+                                                <input type="number" name="" id="" required value={parseInt(estDuration[2])} onChange={(e)=>{processMinsHandler({mins:`${e.target.value}`})}}
                                                     className="w-20 bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
                                             </li>
                                         </ul>
@@ -449,7 +455,7 @@ function ProcessTemplates() {
                                                 return (
                                                     <div onClick={e=>{showDataHandler(item.id)}}
                                                     className="flex items-center w-full min-h-8 justify-between pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2 flex-wrap">
-                                                    <input key={item.id} style={{ border: 0 }} type='text' defaultValue={item.step} onChange={(e) => { item.step = e.target.value; }} />
+                                                    <input key={item.id} style={{ border: 0 }} type='text' required defaultValue={item.step} onChange={(e) => { item.step = e.target.value; }} />
                                                     <button className="px-4" onClick={() => { showPopupHandler(item.id) }}>
                                                         <i className="fa-solid fa-ellipsis-vertical" ></i>
                                                     </button>
@@ -507,17 +513,17 @@ function ProcessTemplates() {
                                             aria-labelledby="dropdownDividerButton">
                                             <li className="">
                                                 <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-kelvinDark">Days</a>
-                                                <input type="number" name="" id="" value={parseInt(selectedStep.duration[0])}onChange={(e)=>{daysHandler({days:`${e.target.value}`})}}  
+                                                <input type="number" name="" required id="" value={(selectedStep && selectedStep.duration && selectedStep.duration[0]&& selectedStep.name!==null)?parseInt(selectedStep.duration[0]):null}onChange={(e)=>{daysHandler({days:`${e.target.value}`})}}  
                                                     className="w-20 bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
                                             </li>
                                             <li>
                                                 <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-kelvinDark  ">Hours</a>
-                                                <input type="number" name="" id="" value={parseInt(selectedStep.duration[1])} onChange={(e)=>{hrsHandler({hrs:`${e.target.value}`})}}
+                                                <input type="number" name="" required id="" value={(selectedStep && selectedStep.duration && selectedStep.duration[1]&& selectedStep.name!==null)?parseInt(selectedStep.duration[1]):null} onChange={(e)=>{hrsHandler({hrs:`${e.target.value}`})}}
                                                     className="w-20 bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
                                             </li>
                                             <li>
                                                 <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-kelvinDark  ">Minutes</a>
-                                                <input type="number" name="" id=""  value={parseInt(selectedStep.duration[2])} onChange={(e)=>{minsHandler({mins:`${e.target.value}`})}}
+                                                <input type="number" name=""  required id=""  value={(selectedStep && selectedStep.duration && selectedStep.duration[2]&& selectedStep.name!==null)?parseInt(selectedStep.duration[2]):null} onChange={(e)=>{minsHandler({mins:`${e.target.value}`})}}
                                                     className="w-20 bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
                                             </li>
                                         </ul>
@@ -532,7 +538,7 @@ function ProcessTemplates() {
                                                     <textarea id="editor" rows="8"  onChange={(e) =>
                                                        { selectedDecriptionHandler(e.target.value)}}
                                                         className="block px-0 w-full text-sm text-gray-800 bg-white border-0  focus:ring-0" style={{ height: '50px' }}
-                                                        placeholder="Enter Description" required="" value={selectedStep.description} >{selectedStep.description}</textarea>
+                                                        placeholder="Enter Description" required value={selectedStep.description} >{selectedStep.description}</textarea>
                                                 </div>
 
                                                 <div className="flex flex-row float-right">

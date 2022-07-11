@@ -11,12 +11,15 @@ const CreateOrganization=(props)=>{
         props.setShowCreateModal(false);
     }
     const createOrg=()=>{
-      console.log(orgName,vision)
+      if(orgName && vision){
+        console.log(orgName,vision)
         props.createOrg({
             orgName,
             vision
         })
         setCreate(true);
+      }
+    
     }
     return (
         <>

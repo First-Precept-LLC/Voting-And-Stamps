@@ -56,14 +56,17 @@ const { data:data2, error:error2, loading:loading2 } = useQuery(GET_ORG_Value, {
     );
   
     const createOrg=()=>{
-      createValue({
-        variables:{
-          title:orgName,
-          description:vision,
-          icon:option,
-          userId: getUserId()
-        } 
-      })
+      if(orgName && vision && option){
+        createValue({
+          variables:{
+            title:orgName,
+            description:vision,
+            icon:option,
+            userId: getUserId()
+          } 
+        })
+      }
+     
       
     }
     
@@ -101,6 +104,7 @@ const { data:data2, error:error2, loading:loading2 } = useQuery(GET_ORG_Value, {
                       <input
                         type="text"
                         id="first_name"
+                        
                         value={orgName}
                         onChange={(e)=>setOrgName(e.target.value)}
                         className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"

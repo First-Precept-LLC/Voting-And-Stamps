@@ -46,8 +46,10 @@ const { data:data2, error:error2, loading:loading2 } = useQuery(GET_ORG_Project,
         }
       );
     const createOrg=()=>{
+      if(projName){
+        createProjectData({variables:{'name':projName,'parent':'62a76b7f75bb9b447ffb6b22',userId: getUserId()}});
+      }
       
-      createProjectData({variables:{'name':projName,'parent':'62a76b7f75bb9b447ffb6b22',userId: getUserId()}});
       
     }
 

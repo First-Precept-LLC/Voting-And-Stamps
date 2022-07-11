@@ -9,6 +9,7 @@ let id = 1;
 function ProcessTemplates() {
     const router = useRouter();
     // const item= router.query;
+    const [templateId,seyTemplateId]=useState(router.query._id)
     const [item,setItem]=useState(router.query)
     //console.log(item);
     const [status,setStatus]=useState(false)
@@ -38,44 +39,60 @@ function ProcessTemplates() {
     const [selectedStep,setSelectedStep]=useState({});
     const [fields, setFields] = useState([{ step: '',duration:[],description:'', showPopup: false, id: `${id}` ,selected:true}]);
     // const [showPopupValue,setShowPopupValue]=useState(false)
-    const [templateId,setTemplateId]=useState('');
+   // const [templateId,setTemplateId]=useState('');
    // console.log(estDuration)
-    const CREATE_PROCESS_TEMPLATE = gql`
-    mutation createProcessTemplate($name: String!, $parentProject: String!, $estimatedDuration: String!, $description: String!, $userId: String!) {
-      createProcessTemplate(input: {data: {name: $name, parentProject: $parentProject, estimatedDuration: $estimatedDuration, description: $description, userId: $userId}}) {
-        data {_id, name }
-      }
-    }`;
+   const GET_PROCESS_TEMPLATES = gql`
+   query processTemplates($nameFilter: String!) {
+       processTemplates(input: {filter:{name:{_neq:$nameFilter}}}) {
+         results {_id,name,
+           parentProject,userId,}
+       }
+   }`;
+   const { data3, error3, loading3 } = useQuery(GET_PROCESS_TEMPLATES, {
+       notifyOnNetworkStatusChange: true,
+       variables: { nameFilter: getUserId() },
+       onCompleted: (dataValue) => {
+        console.log({data3})
+           console.log(dataValue.processTemplates.results);
+         
+       }
+   });
+    // const CREATE_PROCESS_TEMPLATE = gql`
+    // mutation createProcessTemplate($name: String!, $parentProject: String!, $estimatedDuration: String!, $description: String!, $userId: String!) {
+    //   createProcessTemplate(input: {data: {name: $name, parentProject: $parentProject, estimatedDuration: $estimatedDuration, description: $description, userId: $userId}}) {
+    //     data {_id, name }
+    //   }
+    // }`;
   
-    let [createProcessTemplate, { dataValue, loadingValue, errorValue }] = useMutation(
-        CREATE_PROCESS_TEMPLATE, {
-        onCompleted: (dataValue) => {
-            //console.log(dataValue)
-            setTemplateId(dataValue.createProcessTemplate.data._id)
-            fields.forEach(item=>{
-                createStep({
-                    variables: {
-                        name:item.step,
-                        estimatedDuration: item.duration.toString(),
-                        description: item.description,
-                        userId: getUserId(),
-                        parentProcessTemplate:dataValue.createProcessTemplate.data._id
+    // let [createProcessTemplate, { dataValue, loadingValue, errorValue }] = useMutation(
+    //     CREATE_PROCESS_TEMPLATE, {
+    //     onCompleted: (dataValue) => {
+    //         //console.log(dataValue)
+    //         setTemplateId(dataValue.createProcessTemplate.data._id)
+    //         fields.forEach(item=>{
+    //             createStep({
+    //                 variables: {
+    //                     name:item.step,
+    //                     estimatedDuration: item.duration.toString(),
+    //                     description: item.description,
+    //                     userId: getUserId(),
+    //                     parentProcessTemplate:dataValue.createProcessTemplate.data._id
                         
-                    }
-                })
-            })
+    //                 }
+    //             })
+    //         })
             
-            props.addValue({
-                name: proName,
-                parentProject: project,
-                estimatedDuration: estDuration.toString(),
-                description: desc,
-                userId: getUserId()
-            })
-        },
-        onError: (errorValue) => console.error("Error creating a post", error),
-    }
-    );
+    //         props.addValue({
+    //             name: proName,
+    //             parentProject: project,
+    //             estimatedDuration: estDuration.toString(),
+    //             description: desc,
+    //             userId: getUserId()
+    //         })
+    //     },
+    //     onError: (errorValue) => console.error("Error creating a post", error),
+    // }
+    // );
     // const CREATE_STEP = gql`
     //   mutation createStep($name: String!,$estimatedDuration: String!, $description: String!,$parentProcessTemplate:String!) {
     //     createStep(input: {data: {name: $name, estimatedDuration: $estimatedDuration, description: $description,parentProcessTemplate:$parentProcessTemplate}}) {
@@ -111,21 +128,21 @@ function ProcessTemplates() {
     });
 
 //console.log(department);
-    const GET_PROCESS = gql`
-    query procs($nameFilter: String!) {
-        procs(input: {filter:{userId:{_eq:$nameFilter}}}) {
-          results {_id,name,parent}
-        }
-    }
-  `;
-    const { data1, error1, loading1 } = useQuery(GET_PROCESS, {
-        notifyOnNetworkStatusChange: true,
-        variables: { nameFilter: getUserId()},
-        onCompleted: (dataValue) => {
-            console.log({ data1 })
-            setProName(data1.procs.results);
-        }
-    });
+//     const GET_PROCESS = gql`
+//     query procs($nameFilter: String!) {
+//         procs(input: {filter:{userId:{_eq:$nameFilter}}}) {
+//           results {_id,name,parent}
+//         }
+//     }
+//   `;
+//     const { data1, error1, loading1 } = useQuery(GET_PROCESS, {
+//         notifyOnNetworkStatusChange: true,
+//         variables: { nameFilter: getUserId()},
+//         onCompleted: (dataValue) => {
+//             console.log({ data1 })
+//             setProName(data1.procs.results);
+//         }
+//     });
   //  console.log(data);
 
 
@@ -247,9 +264,14 @@ function ProcessTemplates() {
 
     }
     const handleAdd = () => {
-        id = id + 1
+        setEstStepDuration([])
         const values = [...fields];
-        values.push({ step: '', showPopup: false, id: `${id}`, description: '', duration: [] });
+        
+        values.push({ 
+            
+            description: "",
+        estimatedDuration: "",
+        name: "",showPopup:false });
         setFields(values);
     }
     const deleteHandler = (id, index) => {
@@ -294,68 +316,80 @@ function ProcessTemplates() {
     }
    
     
-    const showDataHandler=(item)=>{
-
+    const showDataHandler=(item,index)=>{
+       console.log(item)
+        setSelectedStep({...item,index:`${index}`});
        
-               setSelectedStep({...item});
+               
               
                
-                
-         
+              
       
        setStatus(true) 
         
     }
     if(status){
         console.log(selectedStep.estimatedDuration)
-        let duration=selectedStep.estimatedDuration.split(",");
-            console.log(duration)
-             setEstStepDuration([ duration[0].split('days')[0],duration[1].split('hrs')[0],duration[2].split('mins')[0]])
-           setStatus(false)
+          if(selectedStep.estimatedDuration.length>0){
+            let duration=selectedStep.estimatedDuration.split(",");
+                   console.log(duration)
+                    setEstStepDuration([ duration[0].split('days')[0],duration[1].split('hrs')[0],duration[2].split('mins')[0]])
+                  setStatus(false) 
+          }
+          else{
+            setStatus(false) 
+          }
+            
+        
+     
+               
+         
     }
   //  console.log(estStepDuration)
    // console.log(selectedStep);
-    const selectedDurationHandler=(value)=>{
-        setSelectedStep({...selectedStep,description:`${value}`});
-        setFields(fields.map(e=>{if(e._id==selectedStep._id){return {...selectedStep}}else{return {...e}}}))
+    // const selectedDurationHandler=(value)=>{
+    //     setSelectedStep({...selectedStep,description:`${value}`});
+    //     setFields(fields.map(e=>{if(e._id==selectedStep._id){return {...selectedStep}}else{return {...e}}}))
         
-    }
+    // }
 
     const daysHandler=(value)=>{
         let arr=[...estStepDuration]
         arr[0]=`${value.days}days`
+        console.log(arr)
         setEstStepDuration([...arr])
-        setSelectedStep({...selectedStep,estimatedDuration:`${estStepDuration.toString()}`})
-        setFields(fields.map(e=>{if(selectedStep._id===e._id){return {...selectedStep}}else{return{...e}}}))
-        // let step={...selectedStep}
-        // estStepDuration[0]=`${value.days}days `
-        // setSelectedStep({...step})
         console.log(estStepDuration)
-        Console.log(selectedStep)
+        setSelectedStep({...selectedStep,estimatedDuration:`${estStepDuration.toString()}`})
+        setFields(fields.map((e,index)=>{if(index===selectedStep.index){return {...e,estimatedDuration:`${arr.toString()}`}}else{return{...e}}}))
+       
+        console.log(estStepDuration)
+        console.log(selectedStep)
         
         
     }
     const hrsHandler=(value)=>{
         let arr=[...estStepDuration]
         arr[1]=`${value.hrs}hrs`
+        console.log(arr)
         setEstStepDuration([...arr])
-        setSelectedStep({...selectedStep,estimatedDuration:`${estStepDuration.toString()}`})
-        setFields(fields.map(e=>{if(selectedStep._id===e._id){return {...selectedStep}}else{return{...e}}}))
-        // let step={...selectedStep}
-        // estStepDuration[1]=`${value.hrs}hrs `
-        // setSelectedStep({...step})
         console.log(estStepDuration)
-        Console.log(selectedStep)
+        setSelectedStep({...selectedStep,estimatedDuration:`${estStepDuration.toString()}`})
+        setFields(fields.map(e=>{if(selectedStep._id===e._id){return {...e,estimatedDuration:`${arr.toString()}`}}else{return{...e}}}))
+       
+        console.log(estStepDuration)
+        console.log(selectedStep)
     }
     const minsHandler=(value)=>{
         let arr=[...estStepDuration]
         arr[2]=`${value.mins}mins`
+        console.log(arr)
         setEstStepDuration([...arr])
+        console.log(estStepDuration)
         setSelectedStep({...selectedStep,estimatedDuration:`${estStepDuration.toString()}`})
-        setFields(fields.map(e=>{if(selectedStep._id===e._id){return {...selectedStep}}else{return{...e}}}))
-        // let step={...selectedStep}
-        // estStepDuration[2]=`${value.mins}mins `
-        // setSelectedStep({...step})
+        setFields(fields.map(e=>{if(selectedStep._id===e._id){return {...e,estimatedDuration:`${arr.toString()}`}}else{return{...e}}}))
+       
+        console.log(estStepDuration)
+        console.log(selectedStep)
         
     }
 
@@ -397,7 +431,7 @@ function ProcessTemplates() {
     }
      console.log(selectedStep)
     // console.log(item);
-    // console.log(fields);
+    console.log(fields);
     // console.log(estDuration)
     console.log(estStepDuration)
 
@@ -526,7 +560,7 @@ function ProcessTemplates() {
                                         {
                                             fields.map((item, index) => {
                                                 return (
-                                                    <div onClick={e=>{showDataHandler(item)}}
+                                                    <div onClick={e=>{showDataHandler(item,index)}}
                                                     className="flex items-center w-full min-h-8 justify-between pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2 flex-wrap">
                                                     <input key={item.id} style={{ border: 0 }} type='text' defaultValue={item.name} onChange={(e) => { stepNameHandler(e.target.value,item) }} />
                                                     <button className="px-4" onClick={() => { showPopupHandler(item.id) }}>
@@ -534,7 +568,7 @@ function ProcessTemplates() {
                                                     </button>
                                                     {item.showPopup ?
                                                         <div style={{ height: "30px", width: '30px' }}>
-                                                            <button onClick={() => { deleteHandler(item.id, index) }}>delete</button>
+                                                            <button onClick={() => { deleteHandler(item.id, index) }} className=" bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-2  h-6 text-left mr-2 w-12 text-center ">delete</button>
 
                                                         </div>
                                                         : null
@@ -565,7 +599,7 @@ function ProcessTemplates() {
                                                         clip-rule="evenodd"></path>
                                                 </svg>
                                             </div>
-                                            <input id="dropdownDividerButton" data-dropdown-toggle="dropdownDivider" onChange={(e) => selectedDurationHandler(e.target.value)}
+                                            <input id="dropdownDividerButton" data-dropdown-toggle="dropdownDivider" //onChange={(e) => selectedDurationHandler(e.target.value)}
                                                 className="bg-white border-2 border-gray-300 text-gray-900 sm:text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  datepicker-input"
                                                 placeholder="Estimated Duration" disabled
                                                 value={estStepDuration} />
