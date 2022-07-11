@@ -122,7 +122,7 @@ const { data:data2, error:error2, loading:loading2 } = useQuery(GET_ORG_Value, {
                       <h4 className="text-lg mb-2">Description</h4>
                       <textarea
                         id="message"
-                        rows="4"
+                        rows={4}
                         value={vision}
                         onChange={(e)=>setVision(e.target.value)}
                         className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-md border-2 border-gray-300 focus:ring-blue-500 focus:border-blue-500 "

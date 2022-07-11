@@ -47,6 +47,10 @@ export const routes = {
     },
     stepexample: {
       href: "/routes/kelvin/step_example"
+    },
+
+    voteexample: {
+      href: "/routes/kelvin/vote_example"
     }
   }
 };

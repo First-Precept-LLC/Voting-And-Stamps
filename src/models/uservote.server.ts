@@ -76,21 +76,7 @@ import user from "~/pages/api/account/user";
 
     },
 
-    targetTransaction: {
-      type: String,
-      relation: {
-        fieldName: "content",
-        kind: "hasOne",
-        model: Content,
-        typeName: "Content",
-      },
-      optional: true,
-      canRead: ["guests"],
-      canCreate: ["members"]
-
-    },
-
-    targetProposal: {
+    target: {
       type: String,
       relation: {
         fieldName: "content",
