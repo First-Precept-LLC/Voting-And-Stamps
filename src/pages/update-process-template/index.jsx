@@ -4,12 +4,13 @@ import { gql, useMutation, useQuery as query, NetworkStatus, useQuery } from '@a
 import { useState, useEffect } from 'react';
 import { getUserId } from '../../services/user.service';
 import { useRouter } from "next/router";
+import { ConsoleReporter } from 'jasmine';
 let id = 1;
 function ProcessTemplates() {
     const router = useRouter();
     // const item= router.query;
     const [item,setItem]=useState(router.query)
-    console.log(item);
+    //console.log(item);
     const [status,setStatus]=useState(false)
     const [department, setDepartment] = useState(['US', 'CA', 'FR', 'DE']);
     // const [fields, setFields] = useState([{ step: '', showPopup: false, id: `${id}` }]);
@@ -20,7 +21,7 @@ function ProcessTemplates() {
     useEffect(()=>{
         if(item && item.estimatedDuration){
         let duration=item.estimatedDuration.split(",");
-        console.log(duration[0].split('days')[0]);
+       // console.log(duration[0].split('days')[0]);
         setestDuration([ duration[0].split('days')[0],duration[1].split('hrs')[0],duration[2].split('mins')[0]])}
       
     },[item])
@@ -38,7 +39,7 @@ function ProcessTemplates() {
     const [fields, setFields] = useState([{ step: '',duration:[],description:'', showPopup: false, id: `${id}` ,selected:true}]);
     // const [showPopupValue,setShowPopupValue]=useState(false)
     const [templateId,setTemplateId]=useState('');
-    console.log(estDuration)
+   // console.log(estDuration)
     const CREATE_PROCESS_TEMPLATE = gql`
     mutation createProcessTemplate($name: String!, $parentProject: String!, $estimatedDuration: String!, $description: String!, $userId: String!) {
       createProcessTemplate(input: {data: {name: $name, parentProject: $parentProject, estimatedDuration: $estimatedDuration, description: $description, userId: $userId}}) {
@@ -49,7 +50,7 @@ function ProcessTemplates() {
     let [createProcessTemplate, { dataValue, loadingValue, errorValue }] = useMutation(
         CREATE_PROCESS_TEMPLATE, {
         onCompleted: (dataValue) => {
-            console.log(dataValue)
+            //console.log(dataValue)
             setTemplateId(dataValue.createProcessTemplate.data._id)
             fields.forEach(item=>{
                 createStep({
@@ -109,7 +110,7 @@ function ProcessTemplates() {
         }
     });
 
-console.log(department);
+//console.log(department);
     const GET_PROCESS = gql`
     query procs($nameFilter: String!) {
         procs(input: {filter:{userId:{_eq:$nameFilter}}}) {
@@ -125,10 +126,10 @@ console.log(department);
             setProName(data1.procs.results);
         }
     });
-    console.log(data);
+  //  console.log(data);
 
 
-    console.log(department);
+    //console.log(department);
     // Calculates output
 
     const createOrg = () => {
@@ -155,14 +156,14 @@ console.log(department);
         variables: { nameFilter: item._id},
         onCompleted: (dataValue) => {
           
-         console.log(dataValue.steps.results)
+         //console.log(dataValue.steps.results)
             setFields( dataValue.steps.results.filter(e=>e.parentProcessTemplate===item._id))
           
           
             
         }
     });
-    console.log(fields)
+   // console.log(fields)
 
     const CREATE_PROCESS = gql`
     mutation  createProcess($userId:String!,$name: String!, $dueDate: Date!) {
@@ -278,44 +279,42 @@ console.log(department);
     // }
   }
     const selectedDecriptionHandler=(value)=>{
-        let step = JSON.parse(JSON.stringify(selectedStep))
-        step.description=value;
-        setSelectedStep(step);
-        let arr=[...fields];
-        arr.forEach(e=>{
-            if(e.id===selectedStep.id){
-                e.description=value;
-                return;
-            }
-        })
-         setFields([...arr])
+        // let step = JSON.parse(JSON.stringify(selectedStep))
+        // step.description=value;
+        // setSelectedStep(step);
+        // let arr=[...fields];
+        // arr.forEach(e=>{
+        //     if(e.id===selectedStep.id){
+        //         e.description=value;
+        //         return;
+        //     }
+        // })
+        setSelectedStep({...selectedStep,description:`${value}`})
+        setFields(fields.map(e=>{if(e._id==selectedStep._id){return {...selectedStep}}else{return {...e}}}))
     }
    
     
     const showDataHandler=(item)=>{
 
-        let array = [...fields];
-        array.forEach(element => {
-            if (element._id == item._id) {
-                
-               setSelectedStep(element);
+       
+               setSelectedStep({...item});
+              
                
                 
-            }
-
-        });
-      // console.log(selectedStep)
+         
+      
        setStatus(true) 
         
     }
     if(status){
+        console.log(selectedStep.estimatedDuration)
         let duration=selectedStep.estimatedDuration.split(",");
-             console.log(duration)
+            console.log(duration)
              setEstStepDuration([ duration[0].split('days')[0],duration[1].split('hrs')[0],duration[2].split('mins')[0]])
            setStatus(false)
     }
-    console.log(estStepDuration)
-    console.log(selectedStep);
+  //  console.log(estStepDuration)
+   // console.log(selectedStep);
     const selectedDurationHandler=(value)=>{
         setSelectedStep({...selectedStep,description:`${value}`});
         setFields(fields.map(e=>{if(e._id==selectedStep._id){return {...selectedStep}}else{return {...e}}}))
@@ -323,56 +322,84 @@ console.log(department);
     }
 
     const daysHandler=(value)=>{
-        
-        let step={...selectedStep}
-        estStepDuration[0]=`${value.days}days `
-        setSelectedStep({...step})
+        let arr=[...estStepDuration]
+        arr[0]=`${value.days}days`
+        setEstStepDuration([...arr])
+        setSelectedStep({...selectedStep,estimatedDuration:`${estStepDuration.toString()}`})
+        setFields(fields.map(e=>{if(selectedStep._id===e._id){return {...selectedStep}}else{return{...e}}}))
+        // let step={...selectedStep}
+        // estStepDuration[0]=`${value.days}days `
+        // setSelectedStep({...step})
+        console.log(estStepDuration)
+        Console.log(selectedStep)
         
         
     }
     const hrsHandler=(value)=>{
-       
-        let step={...selectedStep}
-        estStepDuration[1]=`${value.hrs}hrs `
-        setSelectedStep({...step})
+        let arr=[...estStepDuration]
+        arr[1]=`${value.hrs}hrs`
+        setEstStepDuration([...arr])
+        setSelectedStep({...selectedStep,estimatedDuration:`${estStepDuration.toString()}`})
+        setFields(fields.map(e=>{if(selectedStep._id===e._id){return {...selectedStep}}else{return{...e}}}))
+        // let step={...selectedStep}
+        // estStepDuration[1]=`${value.hrs}hrs `
+        // setSelectedStep({...step})
+        console.log(estStepDuration)
+        Console.log(selectedStep)
     }
     const minsHandler=(value)=>{
-   
-        let step={...selectedStep}
-        estStepDuration[2]=`${value.mins}mins `
-        setSelectedStep({...step})
+        let arr=[...estStepDuration]
+        arr[2]=`${value.mins}mins`
+        setEstStepDuration([...arr])
+        setSelectedStep({...selectedStep,estimatedDuration:`${estStepDuration.toString()}`})
+        setFields(fields.map(e=>{if(selectedStep._id===e._id){return {...selectedStep}}else{return{...e}}}))
+        // let step={...selectedStep}
+        // estStepDuration[2]=`${value.mins}mins `
+        // setSelectedStep({...step})
+        
     }
 
     const processDaysHandler=(value)=>{
         
+        let arr=[...estDuration]
+        arr[0]=`${value.days}days`
+        setestDuration([...arr])
         
-        estDuration[0]=`${value.days}days `
         
         
         
     }
     const processHrsHandler=(value)=>{
        
+        let arr=[...estDuration]
+        arr[1]=`${value.hrs}hrs`
+        setestDuration([...arr])
       
-        estDuration[1]=`${value.hrs}hrs `
         
     }
     const processMinsHandler=(value)=>{
-   
+        
+        let arr=[...estDuration]
+        arr[2]=`${value.mins}mins`
+        setestDuration([...arr])
+        //setItem({...item,estimatedDuration:`${estDuration.join()}`})
        
-        estDuration[2]=`${value.mins}mins `
+        
         
     }
-    const stepNameHandler =(name)=>{
-      setSelectedStep({...selectedStep,name:`${name}`});
-      setFields(fields.map(e=>{if(e._id==selectedStep._id){return {...selectedStep}}else{return {...e}}}))
+    const stepNameHandler =(value,item)=>{
+      
+     
+      setSelectedStep({...selectedStep,name:`${value}`});
+      setFields(fields.map(e=>{if(e._id==selectedStep._id){return {...selectedStep,name:`${value}`}}else{return {...e}}}))
 
 
     }
-
-    console.log(item);
-    console.log(fields);
-    console.log(estDuration)
+     console.log(selectedStep)
+    // console.log(item);
+    // console.log(fields);
+    // console.log(estDuration)
+    console.log(estStepDuration)
 
     return (
         <>
@@ -398,7 +425,7 @@ console.log(department);
                     <div className="flex w-full p-8 flex-col">
                         <div className="flex justify-between">
                             <h1 className="text-3xl mb-8">Update Process Template</h1>
-                            <button type="button" onClick={()=>{console.log(item)}}//CreatePage}
+                            <button type="button" onClick={()=>{setItem({...item,estimatedDuration:`${estDuration.join()}`});console.log(item)}}//CreatePage}
                                 className="text-white h-10 bg-gradient-to-r from-kelvinDark  to-kelvinBold hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2">
                                 Update
                             </button>
@@ -441,7 +468,7 @@ console.log(department);
                                             </svg>
                                         </div>
                                         <input id="dropdownDividerButton"
-                                            onChange={(e) => setestDuration(e.target.value)}
+                                            //onChange={(e) => setestDuration(e.target.value)}
                                             value={estDuration}
                                             data-dropdown-toggle="dropdownDivider"
                                             className="bg-white border-2 border-gray-300 text-gray-900 sm:text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5"
@@ -501,7 +528,7 @@ console.log(department);
                                                 return (
                                                     <div onClick={e=>{showDataHandler(item)}}
                                                     className="flex items-center w-full min-h-8 justify-between pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2 flex-wrap">
-                                                    <input key={item.id} style={{ border: 0 }} type='text' defaultValue={item.name} onChange={(e) => { stepNameHandler(e.target.value) }} />
+                                                    <input key={item.id} style={{ border: 0 }} type='text' defaultValue={item.name} onChange={(e) => { stepNameHandler(e.target.value,item) }} />
                                                     <button className="px-4" onClick={() => { showPopupHandler(item.id) }}>
                                                         <i className="fa-solid fa-ellipsis-vertical" ></i>
                                                     </button>
