@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { getUserId } from '../../services/user.service';
 import { useRouter } from "next/router";
 import { ConsoleReporter } from 'jasmine';
-let id = 1;
+let id = 0;
 function ProcessTemplates() {
     const router = useRouter();
     // const item= router.query;
@@ -248,7 +248,7 @@ function ProcessTemplates() {
         console.log(id);
         let array = [...fields];
         array.forEach(element => {
-            if (element.id == id) {
+            if (element.id == id ) {
                 if (element.showPopup == true) {
                     element.showPopup = false;
                 } else {
@@ -264,15 +264,12 @@ function ProcessTemplates() {
 
     }
     const handleAdd = () => {
-        setEstStepDuration([])
-        const values = [...fields];
+        let id=Math.random()
+        setEstStepDuration([]);
         
-        values.push({ 
-            
-            description: "",
-        estimatedDuration: "",
-        name: "",showPopup:false });
-        setFields(values);
+        
+     
+        setFields([...fields,{ id:`${id}`, description: "",estimatedDuration: "", name: "",showPopup:false}]);
     }
     const deleteHandler = (id, index) => {
         let arr = [...fields];
@@ -301,31 +298,40 @@ function ProcessTemplates() {
     // }
   }
     const selectedDecriptionHandler=(value)=>{
-        // let step = JSON.parse(JSON.stringify(selectedStep))
-        // step.description=value;
-        // setSelectedStep(step);
-        // let arr=[...fields];
-        // arr.forEach(e=>{
-        //     if(e.id===selectedStep.id){
-        //         e.description=value;
-        //         return;
-        //     }
-        // })
+     
         setSelectedStep({...selectedStep,description:`${value}`})
-        setFields(fields.map(e=>{if(e._id==selectedStep._id){return {...selectedStep}}else{return {...e}}}))
+        if(selectedStep._id){
+            setFields(fields.map(e=>{if(e._id==selectedStep._id){return {...selectedStep}}else{return {...e}}}))
+        }
+        if(selectedStep.id){
+            setFields(fields.map(e=>{if(e.id==selectedStep.id){return {...selectedStep}}else{return {...e}}}))
+        }
+       
     }
    
     
     const showDataHandler=(item,index)=>{
-       console.log(item)
-        setSelectedStep({...item,index:`${index}`});
+        if(item._id){
+            console.log(item)
+            setSelectedStep({...item,index:`${index}`});
+             setStatus(true) 
+        }
+        else{
+              if(estStepDuration.length==0){
+                setSelectedStep({...item,index:`${index}`})
+              }
+              else{
+                setSelectedStep({...item,index:`${index}`})
+                setStatus(true) 
+              }
+                
+            
+            
+            
+         
+
+        }
        
-               
-              
-               
-              
-      
-       setStatus(true) 
         
     }
     if(status){
@@ -360,7 +366,13 @@ function ProcessTemplates() {
         setEstStepDuration([...arr])
         console.log(estStepDuration)
         setSelectedStep({...selectedStep,estimatedDuration:`${estStepDuration.toString()}`})
-        setFields(fields.map((e,index)=>{if(index===selectedStep.index){return {...e,estimatedDuration:`${arr.toString()}`}}else{return{...e}}}))
+        if(selectedStep._id){
+            setFields(fields.map((e,index)=>{if(e._id===selectedStep._id){return {...e,estimatedDuration:`${arr.toString()}`}}else{return{...e}}}))
+        }
+        if(selectedStep.id){
+            setFields(fields.map((e,index)=>{if(e.id===selectedStep.id){return {...e,estimatedDuration:`${arr.toString()}`}}else{return{...e}}}))
+        }
+        
        
         console.log(estStepDuration)
         console.log(selectedStep)
@@ -374,10 +386,13 @@ function ProcessTemplates() {
         setEstStepDuration([...arr])
         console.log(estStepDuration)
         setSelectedStep({...selectedStep,estimatedDuration:`${estStepDuration.toString()}`})
-        setFields(fields.map(e=>{if(selectedStep._id===e._id){return {...e,estimatedDuration:`${arr.toString()}`}}else{return{...e}}}))
-       
-        console.log(estStepDuration)
-        console.log(selectedStep)
+        if(selectedStep._id){
+            setFields(fields.map((e,index)=>{if(e._id===selectedStep._id){return {...e,estimatedDuration:`${arr.toString()}`}}else{return{...e}}}))
+        }
+        if(selectedStep.id){
+            setFields(fields.map((e,index)=>{if(e.id===selectedStep.id){return {...e,estimatedDuration:`${arr.toString()}`}}else{return{...e}}}))
+        }
+        
     }
     const minsHandler=(value)=>{
         let arr=[...estStepDuration]
@@ -386,8 +401,12 @@ function ProcessTemplates() {
         setEstStepDuration([...arr])
         console.log(estStepDuration)
         setSelectedStep({...selectedStep,estimatedDuration:`${estStepDuration.toString()}`})
-        setFields(fields.map(e=>{if(selectedStep._id===e._id){return {...e,estimatedDuration:`${arr.toString()}`}}else{return{...e}}}))
-       
+        if(selectedStep._id){
+            setFields(fields.map((e,index)=>{if(e._id===selectedStep._id){return {...e,estimatedDuration:`${arr.toString()}`}}else{return{...e}}}))
+        }
+        if(selectedStep.id){
+            setFields(fields.map((e,index)=>{if(e.id===selectedStep.id){return {...e,estimatedDuration:`${arr.toString()}`}}else{return{...e}}}))
+        }
         console.log(estStepDuration)
         console.log(selectedStep)
         
@@ -425,7 +444,13 @@ function ProcessTemplates() {
       
      
       setSelectedStep({...selectedStep,name:`${value}`});
-      setFields(fields.map(e=>{if(e._id==selectedStep._id){return {...selectedStep,name:`${value}`}}else{return {...e}}}))
+      if(selectedStep._id){
+        setFields(fields.map(e=>{if(e._id==selectedStep._id){return {...selectedStep}}else{return {...e}}}))
+      }
+      if(selectedStep.id){
+        setFields(fields.map(e=>{if(e.id==selectedStep.id){return {...selectedStep}}else{return {...e}}}))
+      }
+      
 
 
     }
