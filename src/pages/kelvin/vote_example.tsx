@@ -1,10 +1,8 @@
 import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
 
-import { StampsModule } from '../api/graphql';
 
 const VoteExample = (props) => {
 
-  const stamps = new StampsModule();
 
    //TODO: what fields do we want out of these queries?
 
@@ -25,9 +23,15 @@ const VoteExample = (props) => {
   }`;
 
 
+  const UPDATE_VOTE = gql`query updateVote($stampType: String!, $fromId: String!, $fromName: String!, $toId: String!, $toTarget: String!, $targetType: String!, $collection: String!, $negative: Boolean! ) {
+    updateVote(stampType: $stampType, fromId: $fromId, fromName: $fromName, toId: $toId, toTarget: $toTarget, collection: $collection, negative: $negative) {}
+  }
+`
+
 
   let example_vars_singular = {user: "alice_id", contentId: "61e61d41b2fe0cc79b78ed0c", value: "Test"};
   let example_vars_plural = {contentId: "61e61d41b2fe0cc79b78ed0c", value: "Test"}
+  let example_vars_update = {stampType: "stamp", fromId: "alice_id", fromName: "alice", toId: "bob_id", to_target: "61e61d41b2fe0cc79b78ed0c", targetType: "test", collection: "time", negative: false}
   const {loading: singularLoading, data: singularData, error: singularError, refetch: singularRefetch} = useQuery(
     GET_VOTE,
     {
@@ -64,10 +68,24 @@ const VoteExample = (props) => {
   } else {
       return <div>
             <button onClick={() => {
-                stamps.update_vote("stamp", "61b7d95a8e7c07eb90d8a8ce", "danielblank@berkeley.edu", "bob_id", "61e61d41b2fe0cc79b78ed0c", "TestType", "test", false, false);
+                const {loading: pluralLoading, data: pluralData, error: pluralError, refetch: updateRefetch} = useQuery(
+                  UPDATE_VOTE,
+                  {
+                    notifyOnNetworkStatusChange: true,
+                    variables: example_vars_update
+                  }
+                );
               }}>Upvote a piece of test content!</button>
             <button onClick={() => {
-                stamps.update_vote("stamp", "61b7d95a8e7c07eb90d8a8ce", "danielblank@berkeley.edu", "bob_id", "61e61d41b2fe0cc79b78ed0c", "TestType", "test", true, false);
+                let downvote_vars = example_vars_update;
+                downvote_vars.negative = true;
+                const {loading: pluralLoading, data: pluralData, error: pluralError, refetch: updateRefetch} = useQuery(
+                  UPDATE_VOTE,
+                  {
+                    notifyOnNetworkStatusChange: true,
+                    variables: downvote_vars
+                  }
+                );
               }}>Downvote a piece of test content!</button>
             <button onClick={
               
