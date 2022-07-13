@@ -7,8 +7,8 @@ const VoteExample = (props) => {
    //TODO: what fields do we want out of these queries?
 
   const GET_VOTE = gql`
-  query uservote($user: String!, $contentId: String!, $value: String!) {
-    uservote(input: {filter:  {user: {_eq: $user}, target: {_eq: $contentId}, graph: {_eq: $value} } }) {
+  query userVote($user: String!, $contentId: String!, $value: String!) {
+    userVote(input: {filter:  {user: {_eq: $user}, target: {_eq: $contentId}, graph: {_eq: $value} } }) {
       result {_id} 
     }
   }`;
@@ -16,15 +16,15 @@ const VoteExample = (props) => {
  
 
   const GET_VOTES_BY_CONTENT = gql`
-  query uservotes($contentId: String!, $value: String!) {
-    uservotes(input: {filter: { target: {_eq: $contentId}, graph: {_eq: $value} } }) {
-      result {votecount}
+  query userVotes($contentId: String!, $value: String!) {
+    userVotes(input: {filter: { target: {_eq: $contentId}, graph: {_eq: $value} } }) {
+      results {voteCount}
     }
   }`;
 
 
   const UPDATE_VOTE = gql`query updateVote($stampType: String!, $fromId: String!, $fromName: String!, $toId: String!, $toTarget: String!, $targetType: String!, $collection: String!, $negative: Boolean! ) {
-    updateVote(stampType: $stampType, fromId: $fromId, fromName: $fromName, toId: $toId, toTarget: $toTarget, collection: $collection, negative: $negative) {}
+    updateVote(stampType: $stampType, fromId: $fromId, fromName: $fromName, toId: $toId, toTarget: $toTarget, collection: $collection, negative: $negative, targetType: $targetType) {success}
   }
 `
 
@@ -63,7 +63,7 @@ const VoteExample = (props) => {
   }
   if (singularError || pluralError) {
       return <div>
-          {singularError ? singularError.graphQLErrors[0].message : pluralError?.graphQLErrors[0].message}
+          {singularError ? singularError.networkError?.message : pluralError?.graphQLErrors[0].message}
       </div>
   } else {
       return <div>

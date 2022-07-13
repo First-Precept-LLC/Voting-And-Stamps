@@ -65,7 +65,7 @@ import user from "~/pages/api/account/user";
     votedFor: {
       type: String,
       relation: {
-        fieldName: "user",
+        fieldName: "targetUser",
         kind: "hasOne",
         model: User,
         typeName: "VulcanUser",
