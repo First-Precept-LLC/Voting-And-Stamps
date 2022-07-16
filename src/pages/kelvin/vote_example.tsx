@@ -24,14 +24,14 @@ const VoteExample = (props) => {
 
 
   const UPDATE_VOTE = gql`query updateVote($stampType: String!, $fromId: String!, $fromName: String!, $toId: String!, $toTarget: String!, $targetType: String!, $collection: String!, $negative: Boolean! ) {
-    updateVote(stampType: $stampType, fromId: $fromId, fromName: $fromName, toId: $toId, target: $toTarget, collection: $collection, negative: $negative, targetType: $targetType)
+    updateVote(stampType: $stampType, fromId: $fromId, fromName: $fromName, toId: $toId, toTarget: $toTarget, collection: $collection, negative: $negative, targetType: $targetType)
   }
 `
 
 
   let example_vars_singular = {user: "alice_id", contentId: "61e61d41b2fe0cc79b78ed0c", value: "Test"};
   let example_vars_plural = {contentId: "61e61d41b2fe0cc79b78ed0c", value: "Test"}
-  let example_vars_update = {stampType: "stamp", fromId: "alice_id", fromName: "alice", toId: "bob_id", to_target: "61e61d41b2fe0cc79b78ed0c", targetType: "test", collection: "time", negative: false}
+  let example_vars_update = {stampType: "stamp", fromId: "alice_id", fromName: "alice", toId: "bob_id", toTarget: "61e61d41b2fe0cc79b78ed0c", targetType: "test", collection: "time", negative: false}
   const {loading: singularLoading, data: singularData, error: singularError, refetch: singularRefetch} = useQuery(
     GET_VOTE,
     {
