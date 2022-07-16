@@ -447,7 +447,7 @@ export class StampsModule {
         }
 		
         this.total_votes[collection] += vote_strength;
-        await this.utils.update_vote(from_id, from_name, to_id, to_target, vote_strength, collection, target_type);
+        await this.utils.update_vote(from_id, from_name, to_id, to_target, target_type, vote_strength, collection);
         let allUsers = [] as any;
         for (let i = 0; i < this.graphs.length; i++) {
             let users = await this.utils.get_users(this.graphs[i]);
@@ -631,7 +631,6 @@ export class StampsModule {
   */
  const typeDefs = gql`
    type Query {
-     getUservotes(graph: String): [UserVote]
      getVotesByTarget(targets: [String], collection: String): [Int]
      updateVote(stampType: String, fromId: String, fromName: String, toId: String, toTarget: String, targetType: String, collection: String, negative: Boolean): Boolean
      updateVoteForTarget(stampType: String, fromId: String, fromName: String, toId: String, toTarget: String, collection: String, negative: Boolean): Boolean
@@ -646,17 +645,6 @@ export class StampsModule {
      scoreUserByTag(user: String, collection: String, tag: String): Float
      getContentPage(first: Int, after: String, contentType: String): ContentConnection
    }
- 
-   type UserVote {
-     _id: ID!
-     user: String
-     sourceName: String
-     votedFor: String
-     targetTransaction: String
-     voteCount: Int
-     targetProposal: String
-   }
-
 
    type ContentConnection {
      edges: [ContentEdge]
@@ -677,13 +665,6 @@ export class StampsModule {
     `;
  export const resolvers = {
    Query: {
-     getUservotes: async (obj, args, context, info) => {
-       const db = mongoose.connection;
-       const collection = db.collection("uservotes");
-        const filteredDocs = await collection.find({graph: args.graph}).toArray();
-       console.log(filteredDocs);
-       return filteredDocs;
-    },
      
      //Get votes for a particular piece of content
      getVotesByTarget: async (obj, args, context, info) => {

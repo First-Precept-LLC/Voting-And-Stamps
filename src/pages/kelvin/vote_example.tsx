@@ -18,13 +18,13 @@ const VoteExample = (props) => {
   const GET_VOTES_BY_CONTENT = gql`
   query userVotes($contentId: String!, $value: String!) {
     userVotes(input: {filter: { target: {_eq: $contentId}, graph: {_eq: $value} } }) {
-      results {voteCount}
+      results {votecount}
     }
   }`;
 
 
   const UPDATE_VOTE = gql`query updateVote($stampType: String!, $fromId: String!, $fromName: String!, $toId: String!, $toTarget: String!, $targetType: String!, $collection: String!, $negative: Boolean! ) {
-    updateVote(stampType: $stampType, fromId: $fromId, fromName: $fromName, toId: $toId, toTarget: $toTarget, collection: $collection, negative: $negative, targetType: $targetType) {success}
+    updateVote(stampType: $stampType, fromId: $fromId, fromName: $fromName, toId: $toId, target: $toTarget, collection: $collection, negative: $negative, targetType: $targetType)
   }
 `
 
@@ -48,6 +48,24 @@ const VoteExample = (props) => {
     }
   );
 
+  const {loading: updateLoading, data: updateData, error: updateError, refetch: updateRefetch} = useQuery(
+    UPDATE_VOTE,
+    {
+      notifyOnNetworkStatusChange: true,
+      variables: example_vars_update
+    }
+  );
+
+  let downvote_vars = example_vars_update;
+  downvote_vars.negative = true;
+  const {loading: downvoteLoading, data: downvoteData, error: downvoteError, refetch: downvoteRefetch} = useQuery(
+    UPDATE_VOTE,
+    {
+      notifyOnNetworkStatusChange: true,
+      variables: downvote_vars
+    }
+  );
+
   let getVoteTotal = function(votes) {
     let total = 0;
     for(let i = 0; i < votes.length; i++) {
@@ -55,6 +73,7 @@ const VoteExample = (props) => {
     }
     return total;
   }
+
 
   if(singularLoading || pluralLoading) {
     return <div>
@@ -68,24 +87,10 @@ const VoteExample = (props) => {
   } else {
       return <div>
             <button onClick={() => {
-                const {loading: pluralLoading, data: pluralData, error: pluralError, refetch: updateRefetch} = useQuery(
-                  UPDATE_VOTE,
-                  {
-                    notifyOnNetworkStatusChange: true,
-                    variables: example_vars_update
-                  }
-                );
+                updateRefetch();
               }}>Upvote a piece of test content!</button>
             <button onClick={() => {
-                let downvote_vars = example_vars_update;
-                downvote_vars.negative = true;
-                const {loading: pluralLoading, data: pluralData, error: pluralError, refetch: updateRefetch} = useQuery(
-                  UPDATE_VOTE,
-                  {
-                    notifyOnNetworkStatusChange: true,
-                    variables: downvote_vars
-                  }
-                );
+                
               }}>Downvote a piece of test content!</button>
             <button onClick={
               
@@ -96,7 +101,7 @@ const VoteExample = (props) => {
               }
             }> Get the test content's vote count!</button>
             Votecount: {
-              getVoteTotal(pluralData["uservotes"]["results"])
+              getVoteTotal(pluralData ? pluralData["userVotes"]["results"] : "")
             }
         </div>
   }
