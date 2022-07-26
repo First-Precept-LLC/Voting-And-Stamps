@@ -5,5 +5,5 @@ import { SampleModel } from "./sampleModel";
 import { User } from "./user";
 import {UserVote} from "./uservote.server";
 
-const models = [User, SampleModel, UserVote, Org];
+const models = [User, SampleModel, Org];
 export default models;

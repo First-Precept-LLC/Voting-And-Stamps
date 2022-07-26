@@ -7,14 +7,12 @@ import {
   import { createMongooseConnector } from "@vulcanjs/mongo";
 import { User } from "./user.server";
 import { Content } from "./content.server";
-import user from "~/pages/api/account/user";
-
 
   export interface UserVoteTypeServer extends VulcanDocument {
     user?: string;
     votedFor?: string;
-    toProposal?: string;
-    toTransaction?: string;
+    target?: string;
+    targetType?: string;
     votecount?: number;
     graph?: string;
   }
@@ -41,7 +39,7 @@ import user from "~/pages/api/account/user";
     createdAt: {
       type: Date,
       optional: true,
-      canRead: ["admins"],
+      canRead: ["guests"],
       onCreate: () => {
         return new Date();
       },
@@ -65,7 +63,7 @@ import user from "~/pages/api/account/user";
     votedFor: {
       type: String,
       relation: {
-        fieldName: "user",
+        fieldName: "targetUser",
         kind: "hasOne",
         model: User,
         typeName: "VulcanUser",
@@ -76,21 +74,7 @@ import user from "~/pages/api/account/user";
 
     },
 
-    targetTransaction: {
-      type: String,
-      relation: {
-        fieldName: "content",
-        kind: "hasOne",
-        model: Content,
-        typeName: "Content",
-      },
-      optional: true,
-      canRead: ["guests"],
-      canCreate: ["members"]
-
-    },
-
-    targetProposal: {
+    target: {
       type: String,
       relation: {
         fieldName: "content",
@@ -122,7 +106,7 @@ import user from "~/pages/api/account/user";
   };
 
   export const modelDef: CreateGraphqlModelOptionsServer = {
-    name: "userVote",
+    name: "UserVote",
     graphql: {
       typeName: "UserVote",
       multiTypeName: "UserVotes",
@@ -132,7 +116,7 @@ import user from "~/pages/api/account/user";
       canCreate: ["members"], // Users should be able to vote
       canUpdate: ["owners", "admins"],
       canDelete: ["owners", "admins"],
-      canRead: ["members", "admins"],
+      canRead: ["guests", "members", "admins"],
     },
   };
 

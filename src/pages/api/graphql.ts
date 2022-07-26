@@ -22,7 +22,7 @@ import user from "./account/user";
 const stampy_id = "stampy";
 const {Matrix, solve} = require('ml-matrix');
 
-const readline = require('readline');
+//const readline = require('readline');
 const f = require('fs');
 const cron = require('node-cron');
 
@@ -90,6 +90,13 @@ class Utilities {
     static async update_ids_list() {
         if (Utilities.users) {
           Utilities.ids = Utilities.users.sort();
+          let uniqueIds = [] as any;
+          for (let i = 0; i < Utilities.ids.length; i++) {
+            if (JSON.stringify(Utilities.ids[i]) != JSON.stringify(Utilities.ids[i-1])) {
+              uniqueIds.push(Utilities.ids[i]);
+            }
+          }
+          Utilities.ids = uniqueIds;
         }
 		    console.log(Utilities.ids);
         let graphs = await Utilities.get_graphs()
@@ -404,9 +411,11 @@ export class StampsModule {
     async init() {
       await this.utils.init();
       this.graphs = await this.utils.get_graphs();
+      console.log(this.graphs);
       this.total_votes = {}
       for (let i = 0; i < this.graphs.length; i++) {
           this.total_votes[this.graphs[i]] = await this.utils.get_total_votes(this.graphs[i]);
+          console.log(this.graphs[i]);
           await this.calculate_stamps(this.graphs[i]);
       }
     }
@@ -447,7 +456,7 @@ export class StampsModule {
         }
 		
         this.total_votes[collection] += vote_strength;
-        await this.utils.update_vote(from_id, from_name, to_id, to_target, vote_strength, collection, target_type);
+        await this.utils.update_vote(from_id, from_name, to_id, to_target, target_type, vote_strength, collection);
         let allUsers = [] as any;
         for (let i = 0; i < this.graphs.length; i++) {
             let users = await this.utils.get_users(this.graphs[i]);
@@ -472,13 +481,13 @@ export class StampsModule {
           allUsers = [...new Set([...allUsers, ...users])];
       }
 
-
 		  this.utils.users = allUsers;
       await this.utils.update_ids_list();
 		
 
       let targetIndex = this.utils.indices[collection];
       let user_count = Object.keys(targetIndex).length - 1;
+
 
 
 
@@ -495,22 +504,23 @@ export class StampsModule {
         let from_id_index = targetIndex[from_id];
         let toi = targetIndex[to_id];
         let total_votes_by_user = await this.utils.get_votes_by_user(from_id, collection);
+
         if (total_votes_by_user != 0) {
             let score = (this.user_karma * votes_for_user) / total_votes_by_user;
             users_matrix.set(toi, from_id_index, users_matrix.get(toi, from_id_index) + score); 
         }
 
 
-
       }
 
-      for (let i = 1; i < user_count; i++) {
+      for (let i = 0; i < user_count; i++) {
         users_matrix.set(i, i, -1.0);
       }
 
 
       let start_set = await this.utils.get_start_set(collection);
 
+      
       let start_indices = [] as any;
 
       if (start_set.length == 0) {
@@ -526,6 +536,8 @@ export class StampsModule {
         }
       }
 
+
+
       for (let i = 0; i < start_indices.length; i++) {
         users_matrix.set(start_indices[i], start_indices[i], 1.0);
       }
@@ -533,6 +545,8 @@ export class StampsModule {
 
 
       let user_count_matrix = Matrix.zeros(user_count, 1);
+      
+
       for (let i = 0; i < start_indices.length; i++) {
         user_count_matrix.set(start_indices[i], 0, 1.0); //TODO: Is this the right dimension to use?
       }
@@ -585,7 +599,7 @@ export class StampsModule {
       return stamps;
     }
 
-    load_votes_from_csv(collection, filename="stamps.csv") {
+    /*load_votes_from_csv(collection, filename="stamps.csv") {
         let rl = readline.createInterface({
             input : f.createReadStream(File),
             output : process.stdout,
@@ -605,7 +619,7 @@ export class StampsModule {
             }
         });
         this.calculate_stamps(collection);
-    }
+    }*/
 
     static user_is_admin(username) {
         for(let i = 0; i < admin_usernames.length; i++) {
@@ -631,7 +645,6 @@ export class StampsModule {
   */
  const typeDefs = gql`
    type Query {
-     getUservotes(graph: String): [UserVote]
      getVotesByTarget(targets: [String], collection: String): [Int]
      updateVote(stampType: String, fromId: String, fromName: String, toId: String, toTarget: String, targetType: String, collection: String, negative: Boolean): Boolean
      updateVoteForTarget(stampType: String, fromId: String, fromName: String, toId: String, toTarget: String, collection: String, negative: Boolean): Boolean
@@ -646,17 +659,6 @@ export class StampsModule {
      scoreUserByTag(user: String, collection: String, tag: String): Float
      getContentPage(first: Int, after: String, contentType: String): ContentConnection
    }
- 
-   type UserVote {
-     _id: ID!
-     user: String
-     sourceName: String
-     votedFor: String
-     targetTransaction: String
-     voteCount: Int
-     targetProposal: String
-   }
-
 
    type ContentConnection {
      edges: [ContentEdge]
@@ -677,13 +679,6 @@ export class StampsModule {
     `;
  export const resolvers = {
    Query: {
-     getUservotes: async (obj, args, context, info) => {
-       const db = mongoose.connection;
-       const collection = db.collection("uservotes");
-        const filteredDocs = await collection.find({graph: args.graph}).toArray();
-       console.log(filteredDocs);
-       return filteredDocs;
-    },
      
      //Get votes for a particular piece of content
      getVotesByTarget: async (obj, args, context, info) => {

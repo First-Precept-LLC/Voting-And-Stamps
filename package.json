@@ -7,7 +7,6 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-
     "re:build": "rescript",
     "re:start": "rescript build -w",
     "analyze:bundle:storybook": "cross-env ANALYZE=true yarn run build:storybook",
@@ -110,6 +109,7 @@
     "graphql": "15.4.0",
     "graphql-tag": "2.10.3",
     "gray-matter": "^4.0.2",
+    "http": "^0.0.1-security",
     "i18next": "^19.4.5",
     "i18next-browser-languagedetector": "^4.2.0",
     "i18next-http-backend": "^1.0.15",
