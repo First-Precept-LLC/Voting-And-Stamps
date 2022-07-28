@@ -4,6 +4,7 @@ import { getUserId } from "~/services/user.service";
 
 const CreateProject=(props)=>{
     const [projName,setProjName] = React.useState('');
+    const [errorMsg,setError] = React.useState(false);
 
 
     const GET_ORG_Project = gql`
@@ -46,8 +47,15 @@ const { data:data2, error:error2, loading:loading2 } = useQuery(GET_ORG_Project,
         }
       );
     const createOrg=()=>{
+      if(projName){
+        setError(false)
+        createProjectData({variables:{'name':projName,'parent':'62a76b7f75bb9b447ffb6b22',userId: getUserId()}});
+      }
+      else{
+        setError(true)
+      }
+
       
-      createProjectData({variables:{'name':projName,'parent':'62a76b7f75bb9b447ffb6b22',userId: getUserId()}});
       
     }
 
@@ -81,8 +89,13 @@ const { data:data2, error:error2, loading:loading2 } = useQuery(GET_ORG_Project,
                         required
                       />
                     </div>
+                    
+     {
+                  errorMsg? <p style={{color:'red'}}>Please complete the form to proceed</p> : null
+                }
                   </div>
                 </div>
+                
 
                 <div className="flex items-center p-6 space-x-2 rounded-b justify-center dark:border-gray-600" style={{paddingLeft:'250px'}}>
                   <button

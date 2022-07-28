@@ -1,7 +1,81 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
+import { getUserId } from '../../services/user.service';
+
 
 const VotingSteps = (props) => {
-    const { closeModal } = props
+    const { closeModal ,stepName,values,setValues,selectedValue,setVotingStepModal,setVotedModal,setSelectedValue,setStepName} = props
+    const [search,setSearch]=useState('');
+    const [searchedValues,setSearchedValues]=useState([...values])
+    console.log(selectedValue)
+//     const [votes,setVotes] = useState([])
+
+//     const GET_Value = gql`
+//     query values($nameFilter: String!) {
+//         values(input: {filter:{userId:{_neq:$nameFilter}}}) {
+//           results {_id,title}
+//         }
+//     }`;
+// const { data,error,loading } = useQuery(GET_Value, {
+//       notifyOnNetworkStatusChange: true,
+//       variables: { nameFilter: getUserId() },
+//       onCompleted: (dataValue) => {
+//           console.log(data,dataValue,"hiiiiiiii");
+//           setVotes(dataValue.values.results)
+//           console.log(dataValue.values.results,".....................")
+//       }
+//   });
+console.log(stepName)
+const incrementHandler=(item)=>{
+   // console.log(item.count,item.title)
+//    if(parseInt(item.count)<parseInt(selectedValue)){
+    item.count=parseInt(item.count)+1;
+    setValues(values.map(e=>{if(e._id===item._id){return {...e,count:`${item.count}`}} else{return {...e}}}))
+   
+   
+}
+
+const decrementHandler=(item)=>{
+    console.log(item.count)
+    if(parseInt(item.count)>0){
+        item.count=parseInt(item.count)-1;
+        setValues(values.map(e=>{if(e._id===item._id){return {...e,count:`${item.count}`}} else{return {...e}}}))
+    }
+   
+}
+ const searchInputHandler=(e)=>{
+    console.log(e.target.value);
+    e.preventDefault();
+        setSearch(e.target.value);
+     let value=e.target.value;
+        if(e.target.value){
+            setSearchedValues(values.filter(e=>e.title.includes(value)))
+          }
+          else{
+            setSearchedValues([...values])
+          }
+  
+  if(e.target.value===''){
+    setSearchedValues([...values])
+  }
+ }
+
+console.log(searchedValues);
+console.log(values);
+const closeHandler=()=>{
+    let arr=[...values];
+    arr.forEach(e=>{
+        e.count=5;
+    })
+    const index = arr.findIndex(object => {
+        return object._id === selectedValue._id;
+      });
+      arr.splice(index,1);
+      setValues([...arr]);
+      setSelectedValue({});
+      setStepName('');
+      closeModal();
+}
     return (
         <>
 
@@ -18,9 +92,9 @@ const VotingSteps = (props) => {
 
                             </h3>
                             <div className='flex justify-between'>
-                                <div>
+                                <div onClick={()=>{setVotingStepModal(false),setVotedModal(true)}}>
                                     <i
-                                        onClick={closeModal}
+                                        
                                         className="fa-solid text-kelvinDark mr-6 fa-chevron-left text-3xl"></i>
                                 </div>
                                 <div>
@@ -43,11 +117,11 @@ const VotingSteps = (props) => {
 
                         <div className="flex flex-col ">
                             <div className="flex px-10 mt-10 mb-4 items-center">
-                                <h1 className="text-3xl font-medium">Voting for Step - <span className="text-kelvinDark">Start Research</span></h1>
+                                <h1 className="text-3xl font-medium">Voting for Step - <span className="text-kelvinDark">{stepName}</span></h1>
                             </div>
                             <div className="px-10 my-4">
 
-                                <form>
+                                <form >
                                     <label
                                         htmlFor="default-search"
                                         className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-gray-300">Search</label>
@@ -59,11 +133,12 @@ const VotingSteps = (props) => {
                                                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                             </svg>
                                         </div>
-                                        <input type="search" id="default-search"
+                                        <input type="search" id="default-search" onChange={e=>{searchInputHandler(e)}}
                                             className="block p-4 pl-10 w-full text-sm text-gray-900 bg-kelvinLight rounded-lg border-2 border-gray-300 focus:ring-kelvinMedium focus:border-kelvinMedium dark:bg-kelvinLight dark:border-gray-300 dark:placeholder-gray-400 dark:text-white dark:focus:ring-kelvinMedium dark:focus:border-kelvinMedium"
-                                            placeholder="Search 1021 values" required />
-                                        <button type="submit"
-                                            className="text-white absolute right-2.5 bottom-2.5 bg-kelvinMedium hover:bg-kelvinDark focus:ring-4 focus:outline-none focus:ring-kelvinMedium font-medium rounded-lg text-sm px-4 py-2 dark:bg-kelvinMedium dark:hover:bg-kelvinDark dark:focus:ring-blue-800">Search</button>
+                                            placeholder= {`Search ${values.length} values` }required />
+                                        {/* <button type="submit"  style={{marginRight:'40px'}}
+                                           
+                                           className="text-white absolute right-2.5 bottom-2.5 bg-kelvinMedium hover:bg-kelvinDark focus:ring-4 focus:outline-none focus:ring-kelvinMedium font-medium rounded-lg text-sm px-4 py-2 dark:bg-kelvinMedium dark:hover:bg-kelvinDark dark:focus:ring-blue-800">Search</button> */}
                                     </div>
                                 </form>
 
@@ -71,7 +146,7 @@ const VotingSteps = (props) => {
                             {/* <!-- cards --> */}
                             <div className="flex flex-col px-10">
                                 {/* <!-- card --> */}
-                                <div className="flex shadow shadow-md rounded-md py-4 px-6 my-2 items-center justify-between">
+                                {/* <div className="flex shadow shadow-md rounded-md py-4 px-6 my-2 items-center justify-between">
                                     <div className="flex">
                                         <div className="flex flex-col justify-start items-start mr-2">
                                             <i className="fa-solid text-kelvinDark mr-2 fa-circle text-xl"></i>
@@ -95,35 +170,38 @@ const VotingSteps = (props) => {
                                                     className="fa-solid text-white fa-thumbs-down"></i></button>
                                         </div>
                                     </div>
-                                </div>
+                                </div> */}
                                 {/* <!-- card --> */}
-                                <div className="flex shadow shadow-md rounded-md py-4 px-6 my-2 items-center justify-between">
+                                {searchedValues.map(item=>
+                                    <div className="flex shadow shadow-md rounded-md py-4 px-6 my-2 items-center justify-between">
                                     <div className="flex">
                                         <div className="flex flex-col justify-start items-start mr-2">
                                             <i className="fa-solid text-kelvinDark mr-2 fa-circle text-xl"></i>
                                         </div>
                                         <div className="mr-8">
-                                            <h6 className="leading-none mb-2 ">Passion</h6>
-                                            <p className="text-gray-400">Short description of value here accommodates two lines</p>
+                                            <h6 className="leading-none mb-2 ">{item.title}</h6>
+                                            <p className="text-gray-400">{item.description}</p>
                                         </div>
                                     </div>
                                     <div className="flex flex-col items-end">
                                         <div className="flex">
-                                            <p className="text-kelvinDark bg-kelvinLight px-3 py-2  font-bold rounded">8</p>
+                                            <p className="text-kelvinDark bg-kelvinLight px-3 py-2  font-bold rounded">{selectedValue.title}</p>
                                         </div>
                                         <div className="flex my-4">
-                                            <button
+                                            <button onClick={()=>{incrementHandler(item)}}
                                                 className="focus:outline-none text-white bg-kelvinDark hover:bg-kelvinBold focus:ring-4 focus:ring-kelvinDark font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-kelvinDark dark:hover:bg-kelvinBold dark:focus:ring-kelvinDark"><i
                                                     className="fa-solid text-white fa-thumbs-up"></i></button>
-                                            <label htmlFor="" className="p-2 mx-2 font-medium text-lg">5</label>
-                                            <button
+                                            <label htmlFor="" className="p-2 mx-2 font-medium text-lg">{item.count}</label>
+                                            <button onClick={()=>{decrementHandler(item)}}
                                                 className="focus:outline-none text-white bg-kelvinDark hover:bg-kelvinBold focus:ring-4 focus:ring-kelvinDark font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-kelvinDark dark:hover:bg-kelvinBold dark:focus:ring-kelvinDark"><i
                                                     className="fa-solid text-white fa-thumbs-down"></i></button>
                                         </div>
                                     </div>
                                 </div>
+                                )}
+                                
                                 {/* <!-- card --> */}
-                                <div className="flex shadow shadow-md rounded-md py-4 px-6 my-2 items-center justify-between">
+                                {/* <div className="flex shadow shadow-md rounded-md py-4 px-6 my-2 items-center justify-between">
                                     <div className="flex">
                                         <div className="flex flex-col justify-start items-start mr-2">
                                             <i className="fa-solid text-kelvinDark mr-2 fa-circle text-xl"></i>
@@ -147,9 +225,9 @@ const VotingSteps = (props) => {
                                                     className="fa-solid text-white fa-thumbs-down"></i></button>
                                         </div>
                                     </div>
-                                </div>
+                                </div> */}
                                 {/* <!-- card --> */}
-                                <div className="flex shadow shadow-md rounded-md py-4 px-6 my-2 items-center justify-between">
+                                {/* <div className="flex shadow shadow-md rounded-md py-4 px-6 my-2 items-center justify-between">
                                     <div className="flex">
                                         <div className="flex flex-col justify-start items-start mr-2">
                                             <i className="fa-solid text-kelvinDark mr-2 fa-circle text-xl"></i>
@@ -173,9 +251,9 @@ const VotingSteps = (props) => {
                                                     className="fa-solid text-white fa-thumbs-down"></i></button>
                                         </div>
                                     </div>
-                                </div>
+                                </div> */}
                                 {/* <!-- card --> */}
-                                <div className="flex shadow shadow-md rounded-md py-4 px-6 my-2 items-center justify-between">
+                                {/* <div className="flex shadow shadow-md rounded-md py-4 px-6 my-2 items-center justify-between">
                                     <div className="flex">
                                         <div className="flex flex-col justify-start items-start mr-2">
                                             <i className="fa-solid text-kelvinDark mr-2 fa-circle text-xl"></i>
@@ -199,11 +277,11 @@ const VotingSteps = (props) => {
                                                     className="fa-solid text-white fa-thumbs-down"></i></button>
                                         </div>
                                     </div>
-                                </div>
+                                </div> */}
                             </div>
                             <div className="flex px-10 mt-4">
                                 <button type="button"
-                                    onClick={closeModal}
+                                    onClick={closeHandler}
                                     className="text-white bg-gradient-to-r from-kelvinDark  to-kelvinBold hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2 w-36">Save</button>
                             </div>
                         </div>

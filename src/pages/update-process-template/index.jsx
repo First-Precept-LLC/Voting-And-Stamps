@@ -3,14 +3,30 @@ import MainLayout from '../../components/layout/MainLayout';
 import { gql, useMutation, useQuery as query, NetworkStatus, useQuery } from '@apollo/client'
 import { useState, useEffect } from 'react';
 import { getUserId } from '../../services/user.service';
-let id = 1;
+import { useRouter } from "next/router";
+import { ConsoleReporter } from 'jasmine';
+let id = 0;
 function ProcessTemplates() {
+    const router = useRouter();
+    // const item= router.query;
+    const [templateId,seyTemplateId]=useState(router.query._id)
+    const [item,setItem]=useState(router.query)
+    //console.log(item);
+    const [status,setStatus]=useState(false)
     const [department, setDepartment] = useState(['US', 'CA', 'FR', 'DE']);
     // const [fields, setFields] = useState([{ step: '', showPopup: false, id: `${id}` }]);
     const [project, setProject] = useState('')
-    const [proName, setProName] = useState('')
+    const [proName, setProName] = useState(item.name)
     const [estDuration, setestDuration] = useState([])
-    const [desc, setDesc] = useState('')
+    const [estStepDuration,setEstStepDuration]=useState([])
+    useEffect(()=>{
+        if(item && item.estimatedDuration){
+        let duration=item.estimatedDuration.split(",");
+       // console.log(duration[0].split('days')[0]);
+        setestDuration([ duration[0].split('days')[0],duration[1].split('hrs')[0],duration[2].split('mins')[0]])}
+      
+    },[item])
+    const [desc, setDesc] = useState(item.description)
     const [step, setStep] = useState('')
     const [stepDuration, setStepDuration] = useState('')
     const [descriptionText, setDescriptionText] = useState('')
@@ -23,54 +39,76 @@ function ProcessTemplates() {
     const [selectedStep,setSelectedStep]=useState({});
     const [fields, setFields] = useState([{ step: '',duration:[],description:'', showPopup: false, id: `${id}` ,selected:true}]);
     // const [showPopupValue,setShowPopupValue]=useState(false)
-
-    const CREATE_PROCESS_TEMPLATE = gql`
-    mutation createProcessTemplate($name: String!, $parentProject: String!, $estimatedDuration: String!, $description: String!) {
-      createProcessTemplate(input: {data: {name: $name, parentProject: $parentProject, estimatedDuration: $estimatedDuration, description: $description}}) {
-        data {_id, name }
-      }
-    }`;
-
-    let [createProcessTemplate, { dataValue, loadingValue, errorValue }] = useMutation(
-        CREATE_PROCESS_TEMPLATE, {
-        onCompleted: (dataValue) => {
-            console.log(dataValue)
-            fields.forEach(item=>{
-                createStep({
-                    variables: {
-                        name:item.step,
-                        estimatedDuration: item.duration.toString(),
-                        description: item.description,
-                    }
-                })
-            })
+   // const [templateId,setTemplateId]=useState('');
+   // console.log(estDuration)
+   const GET_PROCESS_TEMPLATES = gql`
+   query processTemplates($nameFilter: String!) {
+       processTemplates(input: {filter:{name:{_neq:$nameFilter}}}) {
+         results {_id,name,
+           parentProject,userId,}
+       }
+   }`;
+   const { data3, error3, loading3 } = useQuery(GET_PROCESS_TEMPLATES, {
+       notifyOnNetworkStatusChange: true,
+       variables: { nameFilter: getUserId() },
+       onCompleted: (dataValue) => {
+        console.log({data3})
+           console.log(dataValue.processTemplates.results);
+         
+       }
+   });
+    // const CREATE_PROCESS_TEMPLATE = gql`
+    // mutation createProcessTemplate($name: String!, $parentProject: String!, $estimatedDuration: String!, $description: String!, $userId: String!) {
+    //   createProcessTemplate(input: {data: {name: $name, parentProject: $parentProject, estimatedDuration: $estimatedDuration, description: $description, userId: $userId}}) {
+    //     data {_id, name }
+    //   }
+    // }`;
+  
+    // let [createProcessTemplate, { dataValue, loadingValue, errorValue }] = useMutation(
+    //     CREATE_PROCESS_TEMPLATE, {
+    //     onCompleted: (dataValue) => {
+    //         //console.log(dataValue)
+    //         setTemplateId(dataValue.createProcessTemplate.data._id)
+    //         fields.forEach(item=>{
+    //             createStep({
+    //                 variables: {
+    //                     name:item.step,
+    //                     estimatedDuration: item.duration.toString(),
+    //                     description: item.description,
+    //                     userId: getUserId(),
+    //                     parentProcessTemplate:dataValue.createProcessTemplate.data._id
+                        
+    //                 }
+    //             })
+    //         })
             
-            props.addValue({
-                name: proName,
-                parentProject: project,
-                estimatedDuration: estDuration.toString(),
-                description: desc,
-            })
-        },
-        onError: (errorValue) => console.error("Error creating a post", error),
-    }
-    );
-    const CREATE_STEP = gql`
-      mutation createStep($name: String!,$estimatedDuration: String!, $description: String!) {
-        createStep(input: {data: {name: $name, estimatedDuration: $estimatedDuration, description: $description}}) {
-          data {_id, name }
-        }
-      }`;
-    let [createStep, { dataProcess, loadingProcess, errorProcess }] = useMutation(
-        CREATE_STEP, {
-        onCompleted: (dataProcess) => {
-            console.log(dataProcess)
-            setShowCreateModal(true);
+    //         props.addValue({
+    //             name: proName,
+    //             parentProject: project,
+    //             estimatedDuration: estDuration.toString(),
+    //             description: desc,
+    //             userId: getUserId()
+    //         })
+    //     },
+    //     onError: (errorValue) => console.error("Error creating a post", error),
+    // }
+    // );
+    // const CREATE_STEP = gql`
+    //   mutation createStep($name: String!,$estimatedDuration: String!, $description: String!,$parentProcessTemplate:String!) {
+    //     createStep(input: {data: {name: $name, estimatedDuration: $estimatedDuration, description: $description,parentProcessTemplate:$parentProcessTemplate}}) {
+    //       data {_id, name }
+    //     }
+    //   }`;
+    // let [createStep, { dataProcess, loadingProcess, errorProcess }] = useMutation(
+    //     CREATE_STEP, {
+    //     onCompleted: (dataProcess) => {
+    //         console.log(dataProcess)
+    //         setShowCreateModal(true);
 
-        },
-        onError: (errorProcess) => console.error("Error creating a post step", error),
-    }
-    );
+    //     },
+    //     onError: (errorProcess) => console.error("Error creating a post step", error),
+    // }
+    // );
 
 
     const GET_PROJECTS = gql`
@@ -85,13 +123,30 @@ function ProcessTemplates() {
         variables: { nameFilter: getUserId()},
         onCompleted: (dataValue) => {
             console.log({ data })
-            setDepartment(data.projs.results);
+            setDepartment(dataValue.projs.results);
         }
     });
-    console.log(data);
+
+//console.log(department);
+//     const GET_PROCESS = gql`
+//     query procs($nameFilter: String!) {
+//         procs(input: {filter:{userId:{_eq:$nameFilter}}}) {
+//           results {_id,name,parent}
+//         }
+//     }
+//   `;
+//     const { data1, error1, loading1 } = useQuery(GET_PROCESS, {
+//         notifyOnNetworkStatusChange: true,
+//         variables: { nameFilter: getUserId()},
+//         onCompleted: (dataValue) => {
+//             console.log({ data1 })
+//             setProName(data1.procs.results);
+//         }
+//     });
+  //  console.log(data);
 
 
-    console.log(department);
+    //console.log(department);
     // Calculates output
 
     const createOrg = () => {
@@ -103,6 +158,29 @@ function ProcessTemplates() {
         })
 
     }
+    const GET_STEPS = gql`
+    query steps($nameFilter: String!) {
+      steps(input: {filter:{parentProcessTemplate:{_eq:$nameFilter}}}) {
+          results {_id,name,
+              parentProcessTemplate,
+              estimatedDuration,
+              description
+                        }
+        }
+    }`;
+    const { data2, error2, loading2 } = useQuery(GET_STEPS, {
+        notifyOnNetworkStatusChange: true,
+        variables: { nameFilter: item._id},
+        onCompleted: (dataValue) => {
+          
+         //console.log(dataValue.steps.results)
+            setFields( dataValue.steps.results.filter(e=>e.parentProcessTemplate===item._id))
+          
+          
+            
+        }
+    });
+   // console.log(fields)
 
     const CREATE_PROCESS = gql`
     mutation  createProcess($userId:String!,$name: String!, $dueDate: Date!) {
@@ -147,6 +225,7 @@ function ProcessTemplates() {
                 parentProject: project,
                 estimatedDuration: estDuration.toString(),
                 description: desc,
+                userId: getUserId()
             }
         })
 
@@ -169,7 +248,7 @@ function ProcessTemplates() {
         console.log(id);
         let array = [...fields];
         array.forEach(element => {
-            if (element.id == id) {
+            if (element.id == id ) {
                 if (element.showPopup == true) {
                     element.showPopup = false;
                 } else {
@@ -185,10 +264,12 @@ function ProcessTemplates() {
 
     }
     const handleAdd = () => {
-        id = id + 1
-        const values = [...fields];
-        values.push({ step: '', showPopup: false, id: `${id}`, description: '', duration: [] });
-        setFields(values);
+        let id=Math.random()
+        setEstStepDuration([]);
+        
+        
+     
+        setFields([...fields,{ id:`${id}`, description: "",estimatedDuration: "", name: "",showPopup:false}]);
     }
     const deleteHandler = (id, index) => {
         let arr = [...fields];
@@ -205,88 +286,179 @@ function ProcessTemplates() {
     const estimatedDate = () => {
         setProcessShowDate(!processShowDate)
     }
+    const handleBlur=()=>{
+        if(estDuration.length==3){
+            setProcessShowDate(false);
+        }
+       
+    }
+  const handleBlurOfstep=()=>{
+    // if(selectedStep.duration.length>=3){
+    //     setShowDate(false);
+    // }
+  }
     const selectedDecriptionHandler=(value)=>{
-        let step = JSON.parse(JSON.stringify(selectedStep))
-        step.description=value;
-        setSelectedStep(step);
-        let arr=[...fields];
-        arr.forEach(e=>{
-            if(e.id===selectedStep.id){
-                e.description=value;
-                return;
-            }
-        })
-         setFields([...arr])
+     
+        setSelectedStep({...selectedStep,description:`${value}`})
+        if(selectedStep._id){
+            setFields(fields.map(e=>{if(e._id==selectedStep._id){return {...selectedStep}}else{return {...e}}}))
+        }
+        if(selectedStep.id){
+            setFields(fields.map(e=>{if(e.id==selectedStep.id){return {...selectedStep}}else{return {...e}}}))
+        }
+       
     }
+   
     
-    const showDataHandler=(id)=>{
-
-        let array = [...fields];
-        array.forEach(element => {
-            if (element.id == id) {
+    const showDataHandler=(item,index)=>{
+        if(item._id){
+            console.log(item)
+            setSelectedStep({...item,index:`${index}`});
+             setStatus(true) 
+        }
+        else{
+              if(estStepDuration.length==0){
+                setSelectedStep({...item,index:`${index}`})
+              }
+              else{
+                setSelectedStep({...item,index:`${index}`})
+                setStatus(true) 
+              }
                 
-               setSelectedStep(element);
-                return;
-            }
+            
+            
+            
+         
 
-        });
+        }
+       
         
     }
-    console.log(selectedStep);
-    const selectedDurationHandler=(value)=>{
-        selectedStep.duration=value;
-        fields.forEach(e=>{
-            if(e.id===selectedStep.id){
-                e.duration=value;
-            }
-        });
+    if(status){
+        console.log(selectedStep.estimatedDuration)
+          if(selectedStep.estimatedDuration.length>0){
+            let duration=selectedStep.estimatedDuration.split(",");
+                   console.log(duration)
+                    setEstStepDuration([ duration[0].split('days')[0],duration[1].split('hrs')[0],duration[2].split('mins')[0]])
+                  setStatus(false) 
+          }
+          else{
+            setStatus(false) 
+          }
+            
         
+     
+               
+         
     }
+  //  console.log(estStepDuration)
+   // console.log(selectedStep);
+    // const selectedDurationHandler=(value)=>{
+    //     setSelectedStep({...selectedStep,description:`${value}`});
+    //     setFields(fields.map(e=>{if(e._id==selectedStep._id){return {...selectedStep}}else{return {...e}}}))
+        
+    // }
 
     const daysHandler=(value)=>{
+        let arr=[...estStepDuration]
+        arr[0]=`${value.days}days`
+        console.log(arr)
+        setEstStepDuration([...arr])
+        console.log(estStepDuration)
+        setSelectedStep({...selectedStep,estimatedDuration:`${estStepDuration.toString()}`})
+        if(selectedStep._id){
+            setFields(fields.map((e,index)=>{if(e._id===selectedStep._id){return {...e,estimatedDuration:`${arr.toString()}`}}else{return{...e}}}))
+        }
+        if(selectedStep.id){
+            setFields(fields.map((e,index)=>{if(e.id===selectedStep.id){return {...e,estimatedDuration:`${arr.toString()}`}}else{return{...e}}}))
+        }
         
-        let step={...selectedStep}
-        step.duration[0]=`${value.days}days `
-        setSelectedStep({...step})
+       
+        console.log(estStepDuration)
+        console.log(selectedStep)
         
         
     }
     const hrsHandler=(value)=>{
-       
-        let step={...selectedStep}
-        step.duration[1]=`${value.hrs}hrs `
-        setSelectedStep({...step})
+        let arr=[...estStepDuration]
+        arr[1]=`${value.hrs}hrs`
+        console.log(arr)
+        setEstStepDuration([...arr])
+        console.log(estStepDuration)
+        setSelectedStep({...selectedStep,estimatedDuration:`${estStepDuration.toString()}`})
+        if(selectedStep._id){
+            setFields(fields.map((e,index)=>{if(e._id===selectedStep._id){return {...e,estimatedDuration:`${arr.toString()}`}}else{return{...e}}}))
+        }
+        if(selectedStep.id){
+            setFields(fields.map((e,index)=>{if(e.id===selectedStep.id){return {...e,estimatedDuration:`${arr.toString()}`}}else{return{...e}}}))
+        }
+        
     }
     const minsHandler=(value)=>{
-   
-        let step={...selectedStep}
-        step.duration[2]=`${value.mins}mins `
-        setSelectedStep({...step})
+        let arr=[...estStepDuration]
+        arr[2]=`${value.mins}mins`
+        console.log(arr)
+        setEstStepDuration([...arr])
+        console.log(estStepDuration)
+        setSelectedStep({...selectedStep,estimatedDuration:`${estStepDuration.toString()}`})
+        if(selectedStep._id){
+            setFields(fields.map((e,index)=>{if(e._id===selectedStep._id){return {...e,estimatedDuration:`${arr.toString()}`}}else{return{...e}}}))
+        }
+        if(selectedStep.id){
+            setFields(fields.map((e,index)=>{if(e.id===selectedStep.id){return {...e,estimatedDuration:`${arr.toString()}`}}else{return{...e}}}))
+        }
+        console.log(estStepDuration)
+        console.log(selectedStep)
+        
     }
 
     const processDaysHandler=(value)=>{
         
+        let arr=[...estDuration]
+        arr[0]=`${value.days}days`
+        setestDuration([...arr])
         
-        estDuration[0]=`${value.days}days `
-        setSelectedStep({...step})
+        
         
         
     }
     const processHrsHandler=(value)=>{
        
+        let arr=[...estDuration]
+        arr[1]=`${value.hrs}hrs`
+        setestDuration([...arr])
       
-        estDuration[1]=`${value.hrs}hrs `
-        setSelectedStep({...step})
+        
     }
     const processMinsHandler=(value)=>{
-   
+        
+        let arr=[...estDuration]
+        arr[2]=`${value.mins}mins`
+        setestDuration([...arr])
+        //setItem({...item,estimatedDuration:`${estDuration.join()}`})
        
-        estDuration[2]=`${value.mins}mins `
-        setSelectedStep({...step})
+        
+        
     }
+    const stepNameHandler =(value,item)=>{
+      
+     
+      setSelectedStep({...selectedStep,name:`${value}`});
+      if(selectedStep._id){
+        setFields(fields.map(e=>{if(e._id==selectedStep._id){return {...selectedStep}}else{return {...e}}}))
+      }
+      if(selectedStep.id){
+        setFields(fields.map(e=>{if(e.id==selectedStep.id){return {...selectedStep}}else{return {...e}}}))
+      }
+      
 
-    console.log(selectedStep);
+
+    }
+     console.log(selectedStep)
+    // console.log(item);
     console.log(fields);
+    // console.log(estDuration)
+    console.log(estStepDuration)
 
     return (
         <>
@@ -311,10 +483,10 @@ function ProcessTemplates() {
                 {!createModal ?
                     <div className="flex w-full p-8 flex-col">
                         <div className="flex justify-between">
-                            <h1 className="text-3xl mb-8">Create Process Template</h1>
-                            <button type="button" onClick={CreatePage}
+                            <h1 className="text-3xl mb-8">Update Process Template</h1>
+                            <button type="button" onClick={()=>{setItem({...item,estimatedDuration:`${estDuration.join()}`});console.log(item)}}//CreatePage}
                                 className="text-white h-10 bg-gradient-to-r from-kelvinDark  to-kelvinBold hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2">
-                                Create
+                                Update
                             </button>
                         </div>
 
@@ -322,11 +494,11 @@ function ProcessTemplates() {
                             <div className="flex grid grid-cols-3 gap-4">
                                 <div className="flex flex-col mb-8">
                                     <label for="countries" className="text-xs font-bold mb-2">Project</label>
-                                    <select id="countries" onChange={(e) => setProject(e.target.value)}
+                                    <select value={item.project_id ? item.project:''} id="countries" onChange={(e) => setItem({...item,parentProject:`${e.target.value}`})}
                                         className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                                        <option selected="">Select Project</option>
+                                        <option value=''>Select Project</option>
                                         {department.map(value => {
-                                            return (<option value={value._id}>{value.name}</option>)
+                                            return (<option value={department.name}>{value.name}</option>)
                                         }
 
                                         )}
@@ -339,7 +511,7 @@ function ProcessTemplates() {
                                 </div>
                                 <div className="flex flex-col mb-8">
                                     <h4 className="text-xs font-bold mb-2">Process Name</h4>
-                                    <input type="text" id="processname" onChange={(e) => setProName(e.target.value)}
+                                    <input type="text" id="processname" onChange={(e) => setItem({...item,name:`${e.target.value}`})} value={item.name}
                                         className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                         placeholder="Enter process name" required />
                                 </div>
@@ -355,7 +527,7 @@ function ProcessTemplates() {
                                             </svg>
                                         </div>
                                         <input id="dropdownDividerButton"
-                                            onChange={(e) => setestDuration(e.target.value)}
+                                            //onChange={(e) => setestDuration(e.target.value)}
                                             value={estDuration}
                                             data-dropdown-toggle="dropdownDivider"
                                             className="bg-white border-2 border-gray-300 text-gray-900 sm:text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5"
@@ -363,10 +535,10 @@ function ProcessTemplates() {
                                     </div>
                                 </div>
                                 {processShowDate ?
-                                    <div id="dropdownDivider"
+                                    <div id="dropdownDivider" onBlur={handleBlur}
                                         className="z-10 p-4 bg-kelvinLight divide-y divide-gray-100 rounded rounded-lg shadow w-80 "
                                         data-popper-reference-hidden="" data-popper-escaped="" data-popper-placement="top"
-                                        style={{ position: 'absolute', inset: 'auto auto 0px 0px', top:'250px', right:'1px',height:'200px', margin: '0px', transform: 'translate3d(352.5px, 19px, 0px)' }}>
+                                        style={{ position: 'absolute', inset: 'auto auto 0px 0px', top:'250px', right:'1px',height:'200px', margin: '0px', transform: 'translate3d(970.5px, 11px, 0px)' }}>
                                         <div className="py-1">
                                             <a href="#"
                                                 className="block px-4 py-2 text-xs text-center text-gray-700 hover:bg-gray-100">Dynamic
@@ -398,7 +570,7 @@ function ProcessTemplates() {
                             </div>
                             <div className="flex flex-col mb-4">
                                 <h4 className="text-xs font-bold mb-2">Description</h4>
-                                <textarea id="message" rows="4" onChange={(e) => setDesc(e.target.value)}
+                                <textarea id="message" rows="4" onChange={(e) => setItem({...item,description:`${e.target.value}`})} value={item.description}
                                     className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-md border-2 border-gray-300 focus:ring-blue-500 focus:border-blue-500 "
                                     placeholder="Enter Description"></textarea>
 
@@ -413,15 +585,15 @@ function ProcessTemplates() {
                                         {
                                             fields.map((item, index) => {
                                                 return (
-                                                    <div onClick={e=>{showDataHandler(item.id)}}
+                                                    <div onClick={e=>{showDataHandler(item,index)}}
                                                     className="flex items-center w-full min-h-8 justify-between pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2 flex-wrap">
-                                                    <input key={item.id} style={{ border: 0 }} type='text' defaultValue={item.step} onChange={(e) => { item.step = e.target.value; }} />
+                                                    <input key={item.id} style={{ border: 0 }} type='text' defaultValue={item.name} onChange={(e) => { stepNameHandler(e.target.value,item) }} />
                                                     <button className="px-4" onClick={() => { showPopupHandler(item.id) }}>
                                                         <i className="fa-solid fa-ellipsis-vertical" ></i>
                                                     </button>
                                                     {item.showPopup ?
                                                         <div style={{ height: "30px", width: '30px' }}>
-                                                            <button onClick={() => { deleteHandler(item.id, index) }}>delete</button>
+                                                            <button onClick={() => { deleteHandler(item.id, index) }} className=" bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-2  h-6 text-left mr-2 w-12 text-center ">delete</button>
 
                                                         </div>
                                                         : null
@@ -440,7 +612,7 @@ function ProcessTemplates() {
                                     </div>
                                 </div>
                                 <div className="flex flex-col bg-kelvinLight p-4">
-                                    <h5 className="text-xl mb-4">{selectedStep.step}</h5>
+                                    <h5 className="text-xl mb-4">{selectedStep.name}</h5>
                                     <div className="flex flex-col mb-8">
                                         <h4 className="mb-2">Estimated Duration</h4>
                                         <div className="relative" onClick={stepEstimatedDate} >
@@ -452,18 +624,18 @@ function ProcessTemplates() {
                                                         clip-rule="evenodd"></path>
                                                 </svg>
                                             </div>
-                                            <input id="dropdownDividerButton" data-dropdown-toggle="dropdownDivider" onChange={(e) => selectedDurationHandler(e.target.value)}
+                                            <input id="dropdownDividerButton" data-dropdown-toggle="dropdownDivider" //onChange={(e) => selectedDurationHandler(e.target.value)}
                                                 className="bg-white border-2 border-gray-300 text-gray-900 sm:text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  datepicker-input"
                                                 placeholder="Estimated Duration" disabled
-                                                value={selectedStep.duration} />
+                                                value={estStepDuration} />
                                         </div>
                                     </div>
 
                                  {showDate ?
-                                    <div id="dropdownDivider"
+                                    <div id="dropdownDivider" onBlur={handleBlurOfstep}
                                         className="z-10 p-4 bg-kelvinLight divide-y divide-gray-100 rounded rounded-lg shadow w-80 "
                                         data-popper-reference-hidden="" data-popper-escaped="" data-popper-placement="top"
-                                        style={{ position: 'absolute', inset: 'auto auto 0px 0px', top:'250px', right:'1px',height:'200px', margin: '0px', transform: 'translate3d(352.5px, 19px, 0px)' }}>
+                                        style={{ position: 'absolute', inset: 'auto auto 0px 0px', top:'250px', right:'1px',height:'200px', margin: '0px', transform: 'translate3d(842.5px, 344px, 0px)' }}>
                                         <div className="py-1">
                                             <a href="#"
                                                 className="block px-4 py-2 text-xs text-center text-gray-700 hover:bg-gray-100">Dynamic
@@ -473,17 +645,17 @@ function ProcessTemplates() {
                                             aria-labelledby="dropdownDividerButton">
                                             <li className="">
                                                 <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-kelvinDark">Days</a>
-                                                <input type="number" name="" id="" value={parseInt(selectedStep.duration[0])}onChange={(e)=>{daysHandler({days:`${e.target.value}`})}}  
+                                                <input type="number" name="" id="" value={parseInt(estStepDuration[0])}onChange={(e)=>{daysHandler({days:`${e.target.value}`})}}  
                                                     className="w-20 bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
                                             </li>
                                             <li>
                                                 <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-kelvinDark  ">Hours</a>
-                                                <input type="number" name="" id="" value={parseInt(selectedStep.duration[1])} onChange={(e)=>{hrsHandler({hrs:`${e.target.value}`})}}
+                                                <input type="number" name="" id="" value={parseInt(estStepDuration[1])} onChange={(e)=>{hrsHandler({hrs:`${e.target.value}`})}}
                                                     className="w-20 bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
                                             </li>
                                             <li>
                                                 <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-kelvinDark  ">Minutes</a>
-                                                <input type="number" name="" id=""  value={parseInt(selectedStep.duration[2])} onChange={(e)=>{minsHandler({mins:`${e.target.value}`})}}
+                                                <input type="number" name="" id=""  value={parseInt(estStepDuration[2])} onChange={(e)=>{minsHandler({mins:`${e.target.value}`})}}
                                                     className="w-20 bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
                                             </li>
                                         </ul>

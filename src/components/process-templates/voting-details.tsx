@@ -1,9 +1,42 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
+import { getUserId } from '../../services/user.service';
+
 
 const VotingDetails = (props) => {
-    const {closeModal,votingStepModal} = props
+    const {closeModal,votingStepModal,stepName,values,setValues,selectedValue,setSelectedValue} = props
+   const [displayValues,setDisplayValues]=useState([...values])
+  const [selected,setSelected]=useState(false);
+  const [title,setTitle]=useState('')
+  console.log(values);
+
+        const selectorHandler=(item)=>{
+            setTitle(item.title)
+           
+            if (item.selected == false) {
+                setValues(displayValues.map(e => { if (item._id === e._id) { return { ...e, selected: true } } else { return { ...e, selected: false } } }))
+                setSelectedValue({...item,selected:true});
+            }
+            if (item.selected == true) {
+                setValues(displayValues.map(e => {
+                    if (item._id === e._id) {
+                        return { ...e, selected: false }
+                    } else {
+                        return { ...e }
+                    }
+                }))
+                setSelectedValue({...item,selected:false});
+            }
+
+          
+
+
+         
+        }
+      //  console.log(displayValues);
+        console.log(selectedValue)
     return (
-        <>
+        <div>
 
             <div id="success-modal"
                 className=" overflow-y-auto overflow-x-hidden md:inset-0 "
@@ -34,7 +67,7 @@ const VotingDetails = (props) => {
 
                         <div className="flex flex-col ">
         <div className="flex px-10 mt-10 mb-4 items-center">
-                        <h1 className="text-3xl font-medium">Voting for Step - Start Research<span className="hidden text-kelvinDark">Start
+                        <h1 className="text-3xl font-medium">Voting for Step - {stepName}<span className="hidden text-kelvinDark">Start
                     Research</span></h1>
         </div>
         {/* <!-- cards --> */}
@@ -42,39 +75,32 @@ const VotingDetails = (props) => {
             {/* <!-- card --> */}
             <div className="flex flex-col border-b border-kelvinMedium py-4 px-10 my-4">
                 <div className="flex flex-col mb-2">
-                    <h3 className="text-kelvinDark font-medium text-xl">Start Research</h3>
+                    <h3 className="text-kelvinDark font-medium text-xl">{stepName}</h3>
                     <p>Rates Highly in Power</p>
                 </div>
+                
                 <div className="flex flex-wrap px-4 py-6 bg-kelvinLight rounded-md justify-start mb-4">
-                    <div className="flex shadow shadow-md rounded-md py-2 px-4 mx-2 my-2 items-center">
-                        <i className="fa-solid text-kelvinDark mr-2 fa-circle"></i>
-                        <p className="">32</p>
-                    </div>
-                    <div className="flex shadow shadow-md rounded-md py-2 px-4 mx-2 my-2 items-center">
-                        <i className="fa-solid text-kelvinDark mr-2 fa-circle"></i>
-                        <p className="">32</p>
-                    </div>
-                    <div className="flex shadow shadow-md rounded-md py-2 px-4 mx-2 my-2 items-center">
-                        <i className="fa-solid text-kelvinDark mr-2 fa-circle"></i>
-                        <p className="">32</p>
-                    </div>
-                    <div className="flex shadow shadow-md rounded-md py-2 px-4 mx-2 my-2 items-center">
-                        <i className="fa-solid text-kelvinDark mr-2 fa-circle"></i>
-                        <p className="">32</p>
-                    </div>
-                    <div className="flex shadow shadow-md rounded-md py-2 px-4 mx-2 my-2 items-center">
-                        <i className="fa-solid text-kelvinDark mr-2 fa-circle"></i>
-                        <p className="">32</p>
-                    </div>
-                    <div className="flex shadow shadow-md rounded-md py-2 px-4 mx-2 my-2 items-center">
-                        <i className="fa-solid text-kelvinDark mr-2 fa-circle"></i>
-                        <p className="">32</p>
-                    </div>
+                    
+                {values.map((item)=>{
+                    return(<div  key={item?._id} onClick={()=>{selectorHandler(item)}}>
+                        <div
+                        className="flex shadow shadow-md rounded-md py-2 px-4 mx-2 my-2 items-center">
+                           
 
+                            
+                       {item?.selected ?  <div>
+                       <i className="fa-solid text-kelvinDark mr-2 fa-circle"></i></div>:null} 
+                        
+                        <p className="">{item.title}</p> {item?.selected}
+                    </div>
+                        
+                         </div>
+                    )    
+                })}
                 </div>
                 <div className="flex">
-                    <button type="button"
-                    onClick={votingStepModal}                    
+                    <button type="button" onClick={()=>{votingStepModal()}}  
+                                   
                         className="text-white bg-gradient-to-r from-kelvinDark  to-kelvinBold hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2">Rate
                         this content</button>
                 </div>
@@ -85,7 +111,7 @@ const VotingDetails = (props) => {
                     </div>
                 </div>
             </div>
-        </>
+            </div>
     )
 }
 export default VotingDetails;

@@ -4,9 +4,8 @@ import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
 import { getUserId } from "~/services/user.service";
 
 
-
 const CreateValue=(props)=>{
-
+  const [errorMsg,setError] = React.useState(false);
     const [orgName, setOrgName] = React.useState('');
     const [vision, setVision] = React.useState('');
     const [option, setOption] = React.useState('');
@@ -56,14 +55,20 @@ const { data:data2, error:error2, loading:loading2 } = useQuery(GET_ORG_Value, {
     );
   
     const createOrg=()=>{
-      createValue({
-        variables:{
-          title:orgName,
-          description:vision,
-          icon:option,
-          userId: getUserId()
-        } 
-      })
+      if(orgName && vision && option){
+        setError(false)
+        createValue({
+          variables:{
+            title:orgName,
+            description:vision,
+            icon:option,
+            userId: getUserId()
+          } 
+        })
+      }else{
+        setError(true)
+      }
+     
       
     }
     
@@ -101,6 +106,7 @@ const { data:data2, error:error2, loading:loading2 } = useQuery(GET_ORG_Value, {
                       <input
                         type="text"
                         id="first_name"
+                        
                         value={orgName}
                         onChange={(e)=>setOrgName(e.target.value)}
                         className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
@@ -131,6 +137,10 @@ const { data:data2, error:error2, loading:loading2 } = useQuery(GET_ORG_Value, {
                     </div>
                   </div>
                 </div>
+                {
+                  errorMsg? <p style={{color:'red'}}>Please complete the form to proceed</p> : null
+                }
+                
 
                 <div className="flex items-center p-6 space-x-2 rounded-b justify-center dark:border-gray-600" style={{paddingLeft:'250px'}}>
                   <button

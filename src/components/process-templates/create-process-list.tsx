@@ -7,6 +7,7 @@ const CreateProcessList = (props) => {
     const [processName, setProcessName] = useState('')
     const [user, setUser] = useState(getUserId() || '')
     const [date, setDate] = useState('')
+    const [errorMsg,setErrorMsg] = React.useState(false);
 
 
     const {closeModal,processItem,userId}=props;
@@ -28,7 +29,10 @@ const CreateProcessList = (props) => {
 
 
     const processCreated = (parentProcessTemplate) => {
-        createProces({
+        if(processName && getUserId() && date && parentProcessTemplate)
+        {   
+            setErrorMsg(false);
+            createProces({
             variables: {
                 name: processName,
                 userId: getUserId(),
@@ -36,7 +40,9 @@ const CreateProcessList = (props) => {
                 parentProcessTemplate:parentProcessTemplate
 
             }
-        })
+        })}else{
+            setErrorMsg(true);
+        }
     }
     return (
         <>
@@ -99,7 +105,12 @@ const CreateProcessList = (props) => {
                                             Auto calculated if it has estimated duration
                                         </p>
                                     </div>
+                                    
+                                    {
+                  errorMsg? <p style={{color:'red', marginBottom:'25px'}}>Please complete the form to proceed</p> : null
+                }
                                 </div>
+                                
                             </div>
                             <div className="flex items-center space-x-2 rounded-b dark:border-gray-600" style={{ paddingLeft: '235px', marginTop: '-17px' }}>
 

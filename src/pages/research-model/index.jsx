@@ -6,15 +6,17 @@ import CreatedTemplateSuccess from '../../components/process-templates/created-t
 import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
 import VotingDetails from '../../components/process-templates/voting-details';
 import VotingSteps from '../../components/process-templates/voting-steps';
-
+import { getUserId } from '../../services/user.service';
 import { useRouter } from "next/router";
 import { template } from 'lodash';
-import { ObjectNodeDependencies } from 'mathjs';
+import { forEach, ObjectNodeDependencies } from 'mathjs';
+let count=0;
 const ViewProcess=(props)=>{
-           
+    const [stepLists,setStepLists] =useState([]) ;     
 const [votedModal, setVotedModal] = useState(false)
 const [votingStepModal, setVotingStepModal] = useState(false)
 const [processListSelectedData, setProcessListSelectedData] = useState({});
+const [values,setValues]=useState([])
 // const [onTrackModal, setOnTrackModal] = useState(false)
 const [templateList,setTemplateList]=useState([]);
 const [templateData,setTemplateData]=useState({description: "aaaaaaaaaaaaaaaaaaaa",
@@ -25,17 +27,32 @@ userId: "1",
 __typename: "ProcessTemplate",
 _id: "62bd56f3a29c3446d228b4c2"});
 const [check,setCheck]=useState(false);
+const [progress, setProgress]=useState('')
 
 const [processListData, setProcessListData] = useState([
     { process: 'Research of Model v1', processTemplate: 'Start research development', dueBy: 'Aug 22, 2022', assignees: 'Matt', votes: '24', id: '1', percent: '70%', deletePopup: false },
     { process: 'Submission of Model v2', processTemplate: 'Submitting Designs', dueBy: 'Aug 28, 2022', assignees: 'Saidutt', votes: '2', id: '2', percent: '33%', deletePopup: false }
 
 ]);
-
+const [stepData,setStepData]=useState([{
+    description: "ejgr ughr rhgjrh jehgr",
+    estimatedDuration: "3days ,6hrs ,8mins ",
+    name: "step3",
+    parentProcessTemplate: "62bebae0f231e687ac77a1d7",
+    __typename: "Step",
+    _id: "62bebae0f231e687ac77a1dd"}]);
+    const [stepDescription,setStepDescription]=useState('');
+    const [stepDuration,setStepDuration]=useState('');
+    const [stepName,setStepName]=useState('')
+    const [selectedValue,setSelectedValue]=useState({})
 const router = useRouter();
 const templateId = router.query.templateId;
-console.log(templateId);
+const processName=router.query.processName;
+const assignees=router.query.assignees;
 
+
+console.log(templateId);
+console.log(processName);
 const GET_PROCESS_TEMPLATES = gql`
 query processTemplates($nameFilter: String!) {
     processTemplates(input: {filter:{name:{_neq:$nameFilter}}}) {
@@ -56,16 +73,61 @@ const { data1, error1, loading1 } = useQuery(GET_PROCESS_TEMPLATES, {
     }
 });
 
+
  
   console.log(templateData);
  
+  const GET_STEPS = gql`
+  query steps($nameFilter: String!) {
+    steps(input: {filter:{name:{_neq:$nameFilter}}}) {
+        results {_id,name,
+            parentProcessTemplate,
+            estimatedDuration,
+            description
+            
 
-   
-
+        }
+      }
+  }`;
+  const { data2, error2, loading2 } = useQuery(GET_STEPS, {
+      notifyOnNetworkStatusChange: true,
+      variables: { nameFilter: templateId },
+      onCompleted: (dataValue) => {
+        
+        console.log(dataValue.steps.results.filter(e=>e.parentProcessTemplate===templateId));
+        
+       setStepData(dataValue.steps.results.filter(e=>e.parentProcessTemplate===templateId).map((e)=>({...e,isSelected:false})))
+        
+      // setStepData(stepData)
+          
+          
+        
+        
+          
+      }
+  });
   
-//    console.log(obj);
-//    console.log(templateData.length)
-
+  const GET_Value = gql`
+  query values($nameFilter: String!) {
+      values(input: {filter:{userId:{_neq:$nameFilter}}}) {
+        results {_id,title,description}
+      }
+  }`;
+const { data,error,loading } = useQuery(GET_Value, {
+    notifyOnNetworkStatusChange: true,
+    variables: { nameFilter: "''" },
+    onCompleted: (dataValue) => {
+        console.log(data,dataValue,"hiiiiiiii");
+        setValues(dataValue.values.results.map(e=>{return {...e,count:5,selected:false}}))
+        console.log(dataValue.values.results,".....................")
+        
+    }
+});
+console.log(values,"h!!!!!11111111")
+   
+ console.log(stepData);
+  
+ 
          
      const deletePopupHandler=(id)=>{
         
@@ -85,6 +147,8 @@ const { data1, error1, loading1 } = useQuery(GET_PROCESS_TEMPLATES, {
           });
           setProcessListData(arr);
 
+
+
      }
      
      const deleteHandler=(id)=>{
@@ -98,23 +162,26 @@ const { data1, error1, loading1 } = useQuery(GET_PROCESS_TEMPLATES, {
      }
      
      const showVotedModal = () => {
-        // setOnTrackModal(false)
         setVotedModal(true)
         setVotingStepModal(false)
-        // setCreateDetails(false);
-        // setProcessModal(false);
-        // setModal(false)
+    
     }
     const showVotingStepModal=()=>{
-        // setOnTrackModal(false)
-        setVotedModal(false)
-        setVotingStepModal(true)
-        // setCreateDetails(false);
-        // setProcessModal(false);
-        // setModal(false)
+       if(selectedValue.selected==true){
+         // setOnTrackModal(false)
+         setVotedModal(false)
+         setVotingStepModal(true)
+         // setCreateDetails(false);
+         // setProcessModal(false);
+         // setModal(false)
+       
+       }
+       
+        
     }
 
     const closeVotingModal = () => {
+        setStepName('')
         setVotedModal(false)
         // setOnTrackModal(true)
 
@@ -135,6 +202,44 @@ const { data1, error1, loading1 } = useQuery(GET_PROCESS_TEMPLATES, {
         setProcessListSelectedData(processListData.find(e => (e.id === id)))
 
     }
+
+    const selectHandler=(item)=>{
+        setStepDescription(item.description);
+        setStepDuration(item.estimatedDuration)
+        setStepName(item.name)
+        console.log(stepName);
+        console.log(stepDescription,stepDuration)
+    }
+    const checkHandler=(item)=>{
+        
+      let arr=[...stepData];
+      arr.forEach(e=>{
+        if(e._id==item._id){
+            if(e.isSelected==true){
+                e.isSelected=false
+                count=count-1;
+                console.log(e.isSelected)
+                setStepData([...arr])
+            }
+            else{
+                
+                    e.isSelected=true
+                    console.log(e.isSelected)
+                    setStepData([...arr])
+                    count=count+1;
+                
+            }
+        }
+       
+      })
+         
+         setProgress((count/stepData.length)*100)
+         
+        
+    }
+    console.log(stepData)
+    console.log(progress)
+
     return (
         <>
                <head>
@@ -157,7 +262,7 @@ const { data1, error1, loading1 } = useQuery(GET_PROCESS_TEMPLATES, {
         {!votedModal && !votingStepModal?
             <div className="flex w-full p-8 flex-col">
             <div className="flex justify-between">
-                <h1 className="text-3xl mb-8">{processListSelectedData.process}</h1>
+                <h1 className="text-3xl mb-8">{processName}</h1>
             </div>
 
 
@@ -169,7 +274,7 @@ const { data1, error1, loading1 } = useQuery(GET_PROCESS_TEMPLATES, {
                             
                         </p>
                         <div className="text-kelvinDark p-2 px-4 border-2 text-sm border-gray-300 rounded">Assignee <span
-                                className="text-white bg-kelvinDark p-1 px-2 ml-2 rounded text-sm">{processListSelectedData.assignees}</span>
+                                className="text-white bg-kelvinDark p-1 px-2 ml-2 rounded text-sm">{assignees}</span>
                         </div>
                     </div>
                     <p className="text-kelvinBlack text-sm">{templateData.description}</p>
@@ -180,14 +285,19 @@ const { data1, error1, loading1 } = useQuery(GET_PROCESS_TEMPLATES, {
                 <div className="flex grid grid-cols-2 gap-4">
                     <div className="flex  bg-kelvinLight p-4">
                         <div className="flex flex-col w-full">
-                            <div
-                                className="flex items-center w-full min-h-8 justify-start pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2 flex-wrap border-2 border-gray-300">
-                                <input id="link-checkbox" type="checkbox" value=""
-                                    className="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 mr-2"/>
-
-                                <h6 className="">Reach $1Trillion revenue mark</h6>
-                            </div>
-                            <div
+                            {stepData.map(item=>{
+                                return(
+                                    <div onClick={()=>{selectHandler(item)}}
+                                    className="flex items-center w-full min-h-8 justify-start pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2 flex-wrap border-2 border-gray-300">
+                                    <input id="link-checkbox" type="checkbox" value="" checked={item.isSelected} onClick={()=>{checkHandler(item)}}
+                                        className="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 mr-2"/>
+    
+                                    <h6 className="">{item.name}</h6>
+                                </div>
+                                )
+                            })}
+                           
+                            {/* <div
                                 className="flex items-center w-full min-h-8 justify-start pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2 flex-wrap">
                                 <input id="link-checkbox" type="checkbox" value=""
                                     className="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 mr-2"/>
@@ -200,29 +310,24 @@ const { data1, error1, loading1 } = useQuery(GET_PROCESS_TEMPLATES, {
                                     className="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 mr-2"/>
 
                                 <h6 className="">Reach $3Trillion revenue mark</h6>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                     <div className="flex flex-col bg-kelvinLight p-8">
-                        <h5 className="text-lg mb-4">Start Research</h5>
+                        <h5 className="text-lg mb-4">{stepName}</h5>
                         <div className="flex mb-4 flex-wrap">
-                            <p className="text-kelvinDark p-2 px-4 border-2 mr-4 text-sm border-gray-200 rounded">Due by {processListSelectedData.dueBy}
+                            <p className="text-kelvinDark p-2 px-4 border-2 mr-4 text-sm border-gray-200 rounded">Due by {stepDuration}
                                 
                             </p>
                             <div className="text-kelvinDark p-2 px-4 border-2 text-sm border-gray-200 rounded mr-2">Assignee
-                                <span className="text-white bg-kelvinDark p-1 px-2 ml-2 rounded text-sm">{processListSelectedData.assignees}</span>
+                                <span className="text-white bg-kelvinDark p-1 px-2 ml-2 rounded text-sm">{assignees}</span>
                             </div>
-                            <button onClick={showVotedModal} className="flex text-white bg-kelvinDark items-center px-2 rounded text-sm">
+                            <button onClick={()=>{if(stepName){showVotedModal()}}} className="flex text-white bg-kelvinDark items-center px-2 rounded text-sm">
                                 {/* <!-- navigate to voting widget --> */}
                                 <i className="fa-solid fa-check-to-slot mr-1 text-white"></i>Votes ({processListSelectedData.votes})
                             </button>
                         </div>
-                        <p className="text-black/75 text-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                            Maxime
-                            accusantium veritatis libero
-                            doloremque. Possimus ut laboriosam, odit consequuntur, animi laborum minus nulla maiores
-                            culpa
-                            totam quae, impedit quas enim reiciendis.</p>
+                        <p className="text-black/75 text-sm">{stepDescription}</p>
 
                     </div>
                 </div>
@@ -231,8 +336,8 @@ const { data1, error1, loading1 } = useQuery(GET_PROCESS_TEMPLATES, {
              : null
             }
 
-            {votedModal ? <VotingDetails closeModal={closeVotingModal}  votingStepModal={showVotingStepModal} /> : null}
-            {votingStepModal ?<VotingSteps closeModal={closeVotingStepModal}  /> :null}
+            {votedModal ? <VotingDetails closeModal={closeVotingModal}  votingStepModal={showVotingStepModal}  stepName={stepName} values={values} setValues={setValues} selectedValue={selectedValue} setSelectedValue={setSelectedValue}/> : null}
+            {votingStepModal ?<VotingSteps closeModal={closeVotingStepModal}  stepName={stepName} values={values} setValues={setValues} selectedValue={selectedValue} setSelectedValue={setSelectedValue} setVotedModal={setVotedModal} setVotingStepModal={setVotingStepModal} setStepName={setStepName}/> :null}
         </MainLayout>
         </>
     )

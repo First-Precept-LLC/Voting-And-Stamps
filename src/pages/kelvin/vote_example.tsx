@@ -4,7 +4,7 @@ import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
 const VoteExample = (props) => {
 
 
-   //TODO: what fields do we want out of these queries?
+  //TODO: what fields do we want out of these queries?
 
   const GET_VOTE = gql`
   query userVote($user: String!, $contentId: String!, $value: String!) {
@@ -12,8 +12,6 @@ const VoteExample = (props) => {
       result {_id} 
     }
   }`;
-
- 
 
   const GET_VOTES_BY_CONTENT = gql`
   query userVotes($contentId: String!, $value: String!) {
@@ -40,7 +38,7 @@ const VoteExample = (props) => {
     }
   );
 
-  const {loading: pluralLoading, data: pluralData, error: pluralError, refetch: pluralRefetch} = useQuery(
+  const { loading: pluralLoading, data: pluralData, error: pluralError, refetch: pluralRefetch } = useQuery(
     GET_VOTES_BY_CONTENT,
     {
       notifyOnNetworkStatusChange: true,
@@ -68,8 +66,8 @@ const VoteExample = (props) => {
 
   let getVoteTotal = function(votes) {
     let total = 0;
-    for(let i = 0; i < votes.length; i++) {
-        total += votes[i].votecount;
+    for (let i = 0; i < votes.length; i++) {
+      total += votes[i].votecount;
     }
     return total;
   }
