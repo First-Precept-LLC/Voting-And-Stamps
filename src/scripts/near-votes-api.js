@@ -4,7 +4,7 @@ const Contract = require('web3-eth-contract');
 // set provider for all later instances to use
 Contract.setProvider('wss://testnet.aurora.dev');
 
-const {StampsModule } = require("~/pages/api/graphql");
+const {StampsModule } = require("../pages/api/graphql.ts");
 
 const { gql, useMutation, useQuery, NetworkStatus } = require('@apollo/client');
 
@@ -46,8 +46,8 @@ const GET_USERS = gql`
     }
   )
 
-  let userIds = [] as any;
-  let stampCounts = [] as any;
+  let userIds = [];
+  let stampCounts = [];
 
   for(let user in queryData["users"]["results"]) {
       userIds.push(user);
