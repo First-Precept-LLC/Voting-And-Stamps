@@ -1,40 +1,27 @@
-import * as nearAPI from "near-api-js";
 
-import { StampsModule } from "~/pages/api/graphql";
+const Contract = require('web3-eth-contract');
 
-import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
+// set provider for all later instances to use
+Contract.setProvider('ws://localhost:8546');
+
+const {StampsModule } = require("~/pages/api/graphql");
+
+const { gql, useMutation, useQuery, NetworkStatus } = require('@apollo/client');
+
+const fs = require('fs');
 
 
-const {connect, keyStores} = nearAPI;
+let rawJson = fs.readFileSync("KelvinToken.json");
 
-const keyStore = new keyStores.BrowserLocalStorageKeyStore(); //TODO: get a different key storage?
+
+const jsonInterface = JSON.parse(rawJson); //TODO: read in massive JSON interface
+let address = 0x32eD5c890e0Cb37694fA9f06784b6371D7B8314d;
+
+let contract = new Contract(jsonInterface, address);
 
 
 let SAMPLE_VALUE = "Life" //TODO: change this
 
-const config = {
-    networkId: "testnet",
-    keyStore,
-    headers: {}, 
-    nodeUrl: "https://rpc.testnet.near.org",
-    walletUrl: "https://wallet.testnet.near.org",
-    helperUrl: "https://helper.testnet.near.org",
-    explorerUrl: "https://explorer.testnet.near.org",
-};
-
-const near = await connect(config);
-
-let account : nearAPI.Account = new nearAPI.Account(near.connection, "dblank.near"); //TODO: What account should we use here?
-
-const contract = new nearAPI.Contract(
-    account, // the account object that is connecting
-    "dblank.testnet",
-    {
-      // name of contract you're connecting to
-      viewMethods: ["getStamps"], // view methods do not change state but usually return a value
-      changeMethods: ["fullOverride"], // change methods modify state
-    }
-  );
 
 
 let stamps = new StampsModule();
@@ -68,4 +55,5 @@ const GET_USERS = gql`
 
   }
 
+  contract.methods.fullOverride(userIds, stampCounts);
 
