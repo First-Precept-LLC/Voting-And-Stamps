@@ -7,7 +7,6 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-
     "re:build": "rescript",
     "re:start": "rescript build -w",
     "analyze:bundle:storybook": "cross-env ANALYZE=true yarn run build:storybook",
@@ -125,6 +124,7 @@
     "mongoose": "6",
     "nanoid": "^3.1.25",
     "near-api-js": "^0.45.1",
+    "near-web3-provider": "^1.2.0",
     "next": "^12.1.6",
     "next-connect": "^0.9.1",
     "next-i18next": "^8.10.0",
@@ -150,7 +150,8 @@
     "sass": "^1.52.3",
     "styled-jsx-plugin-postcss": "^3.0.2",
     "stylis": "4.0.4",
-    "swr": "^0.4.0"
+    "swr": "^0.4.0",
+    "truffle": "^5.5.24"
   },
   "devDependencies": {
     "@babel/core": "^7.10.2",

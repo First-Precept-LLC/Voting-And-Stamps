@@ -2,7 +2,7 @@
 const Contract = require('web3-eth-contract');
 
 // set provider for all later instances to use
-Contract.setProvider('ws://localhost:8546');
+Contract.setProvider('wss://testnet.aurora.dev');
 
 const {StampsModule } = require("~/pages/api/graphql");
 
