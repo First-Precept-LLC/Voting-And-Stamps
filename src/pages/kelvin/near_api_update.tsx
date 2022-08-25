@@ -1,5 +1,6 @@
 
 var Contract = require('web3-eth-contract');
+var Eth = require('web3-eth');
 
 
 
@@ -60,7 +61,19 @@ const NearUpdate = (props) => {
 
 // set provider for all later instances to use
 useEffect( () => {
+   
+}, [queryData] );
+
+
+
+
+
+
+
+ return <button onClick={() =>
+	{
    Contract.setProvider('wss://testnet.aurora.dev');
+   let eth = new Eth(Eth.givenProvider || 'wss://testnet.aurora.dev');
    console.log("set!");
    const jsonInterface = [
 	{
@@ -591,18 +604,19 @@ useEffect( () => {
 
 		}
 
-    contract.methods.fullOverride(userIds, stampCounts);
+	console.log("Calling contract!");
+	window.ethereum.request({ method: 'eth_requestAccounts' }).then((accounts) => {
+		console.log(accounts);
+		let encodedABI = contract.methods.fullOverride(userIds, stampCounts).encodeABI();
+		eth.sendTransaction({from: accounts[0], to: "0x5fe76a1CA26e1812dBdBb487454d30d4bA560110", data: encodedABI});
+		//contract.methods.fullOverride(userIds, stampCounts).send({from: accounts[0]});
+    });
   }
   });
-}, [queryData] );
 
 
-
-
-
-
-
- return <div>Placeholder</div>;
+ }
+}>Call the contract!</button>;
 }
 
 export default NearUpdate;
