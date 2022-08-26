@@ -59,22 +59,6 @@ const NearUpdate = (props) => {
 	 }
    );
 
-// set provider for all later instances to use
-useEffect( () => {
-   
-}, [queryData] );
-
-
-
-
-
-
-
- return <button onClick={() =>
-	{
-   Contract.setProvider('wss://testnet.aurora.dev');
-   let eth = new Eth(Eth.givenProvider || 'wss://testnet.aurora.dev');
-   console.log("set!");
    const jsonInterface = [
 	{
 		"inputs": [],
@@ -567,6 +551,19 @@ useEffect( () => {
 		"stateMutability": "nonpayable",
 		"type": "function"
 	}];
+
+
+
+
+
+
+
+ return <div>
+	<button onClick={() =>
+	{
+   Contract.setProvider('wss://testnet.aurora.dev');
+   let eth = new Eth(Eth.givenProvider || 'wss://testnet.aurora.dev');
+   console.log("set!");
     let address = "0x32eD5c890e0Cb37694fA9f06784b6371D7B8314d";
 
     let contract = new Contract(jsonInterface, address);
@@ -616,7 +613,17 @@ useEffect( () => {
 
 
  }
-}>Call the contract!</button>;
+}>Call the contract!</button>
+<button onClick={() => {
+	Contract.setProvider('wss://testnet.aurora.dev');
+	let address = "0x32eD5c890e0Cb37694fA9f06784b6371D7B8314d";
+	let contract = new Contract(jsonInterface, address);
+	console.log(contract.methods.decimals().call());
+
+
+}}>Get some data!</button>
+</div>
+;
 }
 
 export default NearUpdate;
