@@ -470,6 +470,19 @@ const NearUpdate = (props) => {
 		"type": "function"
 	},
 	{
+		"inputs": [],
+		"name": "getTotalStamps",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "address",
@@ -564,7 +577,7 @@ const NearUpdate = (props) => {
    Contract.setProvider('wss://testnet.aurora.dev');
    let eth = new Eth(Eth.givenProvider || 'wss://testnet.aurora.dev');
    console.log("set!");
-    let address = "0x32eD5c890e0Cb37694fA9f06784b6371D7B8314d";
+    let address = "0xeBB484E55c8F7263cdD831E587487F2ED3791e68";
 
     let contract = new Contract(jsonInterface, address);
 
@@ -616,10 +629,9 @@ const NearUpdate = (props) => {
 }>Call the contract!</button>
 <button onClick={() => {
 	Contract.setProvider('wss://testnet.aurora.dev');
-	let address = "0x32eD5c890e0Cb37694fA9f06784b6371D7B8314d";
+	let address = "0xeBB484E55c8F7263cdD831E587487F2ED3791e68";
 	let contract = new Contract(jsonInterface, address);
-	console.log(contract.methods.decimals().call());
-
+	console.log(contract.methods.getTotalStamps().call());
 
 }}>Get some data!</button>
 </div>
