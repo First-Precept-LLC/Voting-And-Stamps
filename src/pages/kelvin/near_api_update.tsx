@@ -11,7 +11,7 @@ import { useEffect } from "react";
 
 
 const NearUpdate = (props) => {
-	let SAMPLE_VALUE = "Life"; //TODO: change this
+	let SAMPLE_VALUES = ["Truth", "Life", "Agency"]; //TODO: change this
 
 
 	const GET_STAMPS = gql`
@@ -46,7 +46,7 @@ const NearUpdate = (props) => {
    const {loading: stampsLoading, data: stampsData, error: stampsError, refetch: stampsRefetch} = useQuery(
 	 GET_STAMPS,
 	 {
-	   variables: {user: "61b7d95a8e7c07eb90d8a8ce", collection: SAMPLE_VALUE},
+	   variables: {user: "61b7d95a8e7c07eb90d8a8ce", collection: SAMPLE_VALUES[0]},
 	   notifyOnNetworkStatusChange: true
 	 }
    );
@@ -599,11 +599,15 @@ const NearUpdate = (props) => {
 				if (walletData && walletData["wallet"] && walletData["wallet"]["result"]) {
 				if(walletData["wallet"]["result"]["auroraWallet"] != "none") {
 					userIds.push(walletData["wallet"]["result"]["auroraWallet"]);
-					stampsRefetch({user: user._id, collection: SAMPLE_VALUE}).then(() => {
-						if(stampsData) {
-						stampCounts.push(stampsData["getUserStamps"])
-						}
-					});
+					let avgStamps = 0;
+					for(let j = 0; j < SAMPLE_VALUES.length; j++) {
+						stampsRefetch({user: user._id, collection: SAMPLE_VALUES[j]}).then(() => {
+							if(stampsData) {
+							   avgStamps += stampsData["getUserStamps"]/SAMPLE_VALUES.length;
+							}
+						});
+				    }
+					stampCounts.push(avgStamps);
 				}
 				}
 			})
