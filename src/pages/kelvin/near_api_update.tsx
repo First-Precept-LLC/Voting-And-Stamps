@@ -638,6 +638,22 @@ const NearUpdate = (props) => {
 	console.log(contract.methods.getTotalStamps().call());
 
 }}>Get some data!</button>
+<button onClick={() => {
+	Contract.setProvider('wss://testnet.aurora.dev');
+	let eth = new Eth(Eth.givenProvider || 'wss://testnet.aurora.dev');
+	let address = "0xeBB484E55c8F7263cdD831E587487F2ED3791e68";
+	let contract = new Contract(jsonInterface, address);
+
+	window.ethereum.request({ method: 'eth_requestAccounts' }).then((accounts) => {
+		console.log(accounts);
+		let encodedABI = contract.methods.buyTokens(1).encodeABI();
+		eth.sendTransaction({from: accounts[0], to: "0x5fe76a1CA26e1812dBdBb487454d30d4bA560110", data: encodedABI});
+		//contract.methods.fullOverride(userIds, stampCounts).send({from: accounts[0]});
+		console.log("mint?");
+    });
+
+}}>Mint some coins!</button>
+
 </div>
 ;
 }
