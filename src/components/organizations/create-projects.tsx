@@ -2,61 +2,65 @@ import React from "react";
 import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
 import { getUserId } from "~/services/user.service";
 
-const CreateProject=(props)=>{
-    const [projName,setProjName] = React.useState('');
+const CreateProject=({ onCloseModal, onCreateProject, organizations })=>{
+    const [projName, setProjName] = React.useState('');
     const [errorMsg,setError] = React.useState(false);
 
 
-    const GET_ORG_Project = gql`
-    query proj($nameFilter: String!) {
-      proj(input: {filter:{userId:{_eq:$nameFilter}}}) {
-          result {_id,proj}
-        }
-    }`;
-const { data:data2, error:error2, loading:loading2 } = useQuery(GET_ORG_Project, {
-      notifyOnNetworkStatusChange: true,
-      variables: { nameFilter: getUserId() },
-      onCompleted: (dataValue) => {
-          console.log(data2,dataValue,"hiiiiiiii");
-          // if(dataValue.value){
-          //   setOrgData(dataValue.org.result)
-          //   closeSuccessModal();
-          // }
-        //  setTemplateList(data.p);
-        //  console.log(templateList);
-      }
-  });
+    // const GET_ORG_Project = gql`
+    // query proj($nameFilter: String!) {
+    //   proj(input: {filter:{userId:{_eq:$nameFilter}}}) {
+    //       result {_id,proj}
+    //     }
+    // }`;
+// const { data:data2, error:error2, loading:loading2 } = useQuery(GET_ORG_Project, {
+//       notifyOnNetworkStatusChange: true,
+//       variables: { nameFilter: getUserId() },
+//       onCompleted: (dataValue) => {
+//           console.log(data2,dataValue,"hiiiiiiii");
+//           // if(dataValue.value){
+//           //   setOrgData(dataValue.org.result)
+//           //   closeSuccessModal();
+//           // }
+//         //  setTemplateList(data.p);
+//         //  console.log(templateList);
+//       }
+//   });
 
 
-    const CREATE_PROJ = gql`
-    mutation createProj($name: String!, $parent: String!, $userId: String!) {
-      createProj(input: {data: {name: $name, parent: $parent, userId: $userId}}) {
-        data {_id, name }
-      }
-    }`;
-    let [createProjectData, {loading, data, error}] = useMutation(
-        CREATE_PROJ,{
-          onCompleted: (data) => {
-            props.projValue({
-                title:projName,
-                userId: getUserId()
-              })
-            props.closeModal();
-          },
-          onError: (error) => console.error("Error creating a post", error),
-        }
-      );
-    const createOrg=()=>{
-      if(projName){
-        setError(false)
-        createProjectData({variables:{'name':projName,'parent':'62a76b7f75bb9b447ffb6b22',userId: getUserId()}});
-      }
-      else{
-        setError(true)
-      }
+    // const CREATE_PROJ = gql`
+    // mutation createProj($name: String!, $parent: String!, $userId: String!) {
+    //   createProj(input: {data: {name: $name, parent: $parent, userId: $userId}}) {
+    //     data {_id, name }
+    //   }
+    // }`;
+    // let [createProjectData, {loading, data, error}] = useMutation(
+    //     CREATE_PROJ,{
+    //       onCompleted: (data) => {
+    //         props.projValue({
+    //             title:projName,
+    //             userId: getUserId()
+    //           })
+    //         props.closeModal();
+    //       },
+    //       onError: (error) => console.error("Error creating a post", error),
+    //     }
+    //   );
 
-      
-      
+    const handleCreateProject = () => {
+      onCreateProject({
+        title: projName,
+        orgId: organizations?.id,
+        userId: getUserId()
+      })
+      onCloseModal();
+      // if(projName){
+      //   setError(false)
+      //   createProjectData({variables:{'name':projName,'parent':'62a76b7f75bb9b447ffb6b22',userId: getUserId()}});
+      // }
+      // else{
+      //   setError(true)
+      // } 
     }
 
     return (
@@ -100,7 +104,7 @@ const { data:data2, error:error2, loading:loading2 } = useQuery(GET_ORG_Project,
                 <div className="flex items-center p-6 space-x-2 rounded-b justify-center dark:border-gray-600" style={{paddingLeft:'250px'}}>
                   <button
                     type="button"
-                    onClick={props.closeModal}
+                    onClick={onCloseModal}
                     className="text-black from-kelvinDark  to-kelvinBold hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6"
                     data-modal-toggle="success-modal"
                   >
@@ -108,9 +112,10 @@ const { data:data2, error:error2, loading:loading2 } = useQuery(GET_ORG_Project,
                   </button>
                   <button
                     type="button"
-                    onClick={createOrg}
+                    onClick={handleCreateProject}
                     className="text-white bg-gradient-to-r from-kelvinDark  to-kelvinBold hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6"
                     data-modal-toggle="success-modal"
+                    disabled={!projName}
                   >
                     Create 
                   </button>

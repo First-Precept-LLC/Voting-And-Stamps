@@ -15,17 +15,22 @@ import { connectToDb } from "~/lib/api/mongoose/connection";
 const mongoConnectionMiddleware = (mongoUri: string) => {
   // init the first database connection on server startup
   const isLocalMongo = mongoUri.match(/localhost/);
-  connectToDb(mongoUri, {
-    serverSelectionTimeoutMS: isLocalMongo ? 3000 : undefined,
-  }).catch((err) => {
-    console.error(
-      `\nCould not connect to Mongo database on URI ${mongoUri} during route initialization.`
-    );
-    if (isLocalMongo) {
-      console.error("Did you forget to run 'yarn run start:mongo'?\n");
-    }
+  try {
+    connectToDb(mongoUri, {
+      serverSelectionTimeoutMS: isLocalMongo ? 3000 : undefined,
+    }).catch((err) => {
+      console.error(
+        `\nCould not connect to Mongo database on URI ${mongoUri} during route initialization.`
+      );
+      if (isLocalMongo) {
+        console.error("Did you forget to run 'yarn run start:mongo'?\n");
+      }
+      console.error(err);
+    });
+  } catch(err) {
     console.error(err);
-  });
+  }
+ 
   // mongoose.set("useFindAndModify", false);
 
   // then return a middleware that checks the connection on every call

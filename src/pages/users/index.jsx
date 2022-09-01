@@ -1,19 +1,51 @@
-import { useState } from "react";
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from 'react-redux';
+import { usersActions } from "../../store/actions/usersActions";
+import { organizationActions } from "../../store/actions/organizationsActions";
 import MainLayout from '../../components/layout/MainLayout';
 import  CreateUserPopup from '../../components/users/create-users-popup'
 
 
 function Users() {
-    const [users,setUsers]=useState([{name:'',role:'',levelUp:'',department:''}]);
-    const [addUserPopup,setAddUserPopup]=useState(false);
-    const [addUser,setAddUser]=useState({name:'',role:'',levelUp:'',department:''});
-    console.log(users);
+    const dispatch = useDispatch();
+    const [ addUserPopup , setAddUserPopup ] = useState(false);
+    const [ selectedUser, setSelectedUser ] = useState(null);
+
+    const {
+        organizations
+      } = useSelector(state => state.organizations);
+
+    const {
+        users
+      } = useSelector(state => state.users);
+
+    useEffect(() => {
+        if (organizations) {
+            dispatch(usersActions.getUsersRequest())
+        }
+    }, [organizations]);
+
+    useEffect(() => {
+        dispatch(organizationActions.getOrganizationRequest());
+      }, []);
+
+    
+
+    const handleCreateUsers = (usersData) => {
+        console.log(usersData, 'use');
+        dispatch(usersActions.saveUsersRequest(usersData));
+    }
+
+    const handleEditUsers = (usersData) => {
+        console.log(usersData, 'use');
+        dispatch(usersActions.editUsersRequest(usersData));
+    }
+
     return (
         <>
           <head>
           <meta charSet="UTF-8" />
-                <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+                <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                 <title>Project Kelvin Widget</title>
                 <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
@@ -28,38 +60,43 @@ function Users() {
                 <script src="/tailwind.js"></script>
             </head>
             <MainLayout>
-            <div class="flex w-full p-8 flex-col">
-            <div class="flex justify-between">
-                <h1 class="text-3xl mb-8">Users</h1>
+            <div className="flex w-full p-8 flex-col">
+            <div className="flex justify-between">
+                <h1 className="text-3xl mb-8">Users</h1>
                 <button type="button"
                    className="bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5  h-8 text-left mb-2 hover:bg-kelvinBold"
                    id="dropdownDefault" data-dropdown-toggle="dropdown">
-                    <i class="fa-solid fa-sort"></i>
+                    <i className="fa-solid fa-sort"></i>
                     Filters</button>
             </div>
             {/* <!-- Goals section --> */}
-            <div class="flex flex-col mb-8" >
-                <div class="flex bg-kelvinLight p-4 rounded-md w-full flex-wrap">
-                    {users.map(item=>{
+            <div className="flex flex-col mb-8" >
+                <div className="flex bg-kelvinLight p-4 rounded-md w-full flex-wrap">
+                    {users?.map(item=>{
                         return(
                             <div
-                            class="flex items-center w-full  justify-between p-4 bg-white shadow shadow-md rounded-md mb-2">
-                            <div class="flex flex-col">
-                                <h6 class="">{item.name}</h6>
-                                <p class="text-xs text-kelvinBlack opacity-50">@saidutt</p>
+                            key={item.id}
+                            className="flex items-center w-full  justify-between p-4 bg-white shadow shadow-md rounded-md mb-2">
+                            <div className="flex flex-col">
+                                <h6 className="">{item.name}</h6>
+                                {/* <p class="text-xs text-kelvinBlack opacity-50">@saidutt</p> */}
                             </div>
-                            <div class="flex">
-                                <h6 class="">{item.role}</h6>
+                            <div className="flex">
+                                <h6 className="">{item.role}</h6>
                             </div>
-                            <a href="#" class="text-kelvinDark text-sm hover:underline">
+                            <a href="#" className="text-kelvinDark text-sm hover:underline">
                             {item.levelUp}
                             </a>
-                            <a href="#" class="text-kelvinDark text-sm hover:underline">
+                            <a href="#" className="text-kelvinDark text-sm hover:underline">
                             {item.department} </a>
                             <button 
+                            onClick={() => {
+                                setAddUserPopup(true);
+                                setSelectedUser(item)
+                            }}
                             className="text-white bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-6 text-left w-20 text-center hover:bg-kelvinBold"
                             data-modal-toggle="large-modal">
-                                 <i class="fa-solid fa-pencil"></i>
+                                 <i className="fa-solid fa-pencil"></i>
                             Edit</button>
                                
                                 
@@ -69,21 +106,25 @@ function Users() {
                     })}
                  
                     <button type="button"
-                        class="text-white bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-8 text-left w-full mb-2 hover:bg-kelvinBold"
+                    disabled={!organizations}
+                        className="text-white bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-8 text-left w-full mb-2 hover:bg-kelvinBold"
                         data-modal-toggle="large-modal" onClick={()=>{setAddUserPopup(true)}}>
-                        <i class="fa-solid fa-plus"></i>
+                        <i className="fa-solid fa-plus"></i>
                         Add User</button>
                        
                 </div>
-                {addUserPopup?<CreateUserPopup setAddUserPopup={setAddUserPopup} users={users}setUsers={setUsers} addUser={addUser} setAddUser={setAddUser} />:null}
-                
-                
-                
+                { addUserPopup && 
+                    <CreateUserPopup 
+                        setAddUserPopup={setAddUserPopup}
+                        organizations={organizations}
+                        onCreateUsers={handleCreateUsers}
+                        isEditMode={!!selectedUser}
+                        selectedUser={selectedUser}
+                        onEditUsers={handleEditUsers}
+                    /> 
+                }
             </div>
            
-            <div class="flex">
-            
-            </div>
         </div>
         
         </MainLayout>

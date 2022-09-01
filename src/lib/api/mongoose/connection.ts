@@ -31,23 +31,27 @@ export const connectToDb = async (
   mongoUri: string,
   options?: ConnectOptions
 ) => {
-  if (mongooseCache?.connectPromise) {
-    debugMongo(
-      "Running connectToDb, already connected or connecting to Mongo, waiting for promise"
-    );
-
-    await mongooseCache.connectPromise;
-  }
-  if (![1, 2].includes(mongoose.connection.readyState)) {
-    debugMongo("Call mongoose connect");
-    (mongooseCache as MongooseCache).connectPromise = mongoose.connect(
-      mongoUri,
-      {
-        ...(options || {}),
-      }
-    );
-    // Wait for connection
-    await mongooseCache?.connectPromise;
+  try {
+    if (mongooseCache?.connectPromise) {
+      debugMongo(
+        "Running connectToDb, already connected or connecting to Mongo, waiting for promise"
+      );
+  
+      await mongooseCache.connectPromise;
+    }
+    if (![1, 2].includes(mongoose.connection.readyState)) {
+      debugMongo("Call mongoose connect");
+      (mongooseCache as MongooseCache).connectPromise = mongoose.connect(
+        mongoUri,
+        {
+          ...(options || {}),
+        }
+      );
+      // Wait for connection
+      await mongooseCache?.connectPromise;
+    }
+  } catch (err) {
+    console.log(err);
   }
 };
 

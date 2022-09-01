@@ -1,9 +1,10 @@
 import Header from "./Header";
 import Sidemenu from "./Sidemenu";
+import ErrorBoundary from "./ErrorBoundry";
 
-const MainLayout=(props)=>{
+const MainLayout = (props) => {
     return (
-        <>
+        <ErrorBoundary>
             <Header />
             <div className="flex min-h-screen ">
                 <Sidemenu />
@@ -11,9 +12,8 @@ const MainLayout=(props)=>{
                     {props.children}
                 </div>
             </div>
-        </>
+        </ErrorBoundary>
     )
-
 }
 
 export default MainLayout;

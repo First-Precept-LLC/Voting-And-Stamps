@@ -3,6 +3,7 @@ import { AppProps } from "next/app";
 import { ReactElement } from "react";
 // Comment if you don't need i18n
 import { appWithTranslation } from "next-i18next";
+import {Provider} from 'react-redux'
 
 // Comment if you don't need Material UI
 import { createEmotionCache } from "@vulcanjs/next-mui";
@@ -25,6 +26,7 @@ import { useApollo } from "@vulcanjs/next-apollo";
 import { CacheProvider, EmotionCache } from "@emotion/react";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import { config } from "@fortawesome/fontawesome-svg-core";
+import { store } from "~/store"
 config.autoAddCss = false;
 
 // import environment from '@vulcanjs/multi-env-demo';
@@ -101,9 +103,11 @@ function VNApp({
         {/** Provide MUI theme but also mui utilities like CSS baseline, StyledEngineProvider... */}
         <MuiThemeProvider>
           <ApolloProvider client={apolloClient}>
+            <Provider store={store}>
             {/* <AppLayout> */}
               <Component {...pageProps} />
             {/* </AppLayout> */}
+            </Provider>
           </ApolloProvider>
         </MuiThemeProvider>
       </VulcanComponentsProvider>

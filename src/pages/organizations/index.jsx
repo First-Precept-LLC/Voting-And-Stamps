@@ -1,5 +1,11 @@
 
-import { useState } from 'react';
+import React , { useState, useEffect } from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+// import { values } from 'lodash';
+import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client';
+import { organizationActions } from "../../store/actions/organizationsActions";
+import { valuesActions } from '../../store/actions/valuesActions';
+import { projectsActions } from "../../store/actions/projectsActions";
 import MainLayout from '../../components/layout/MainLayout';
 import CreateOrganization from '../../components/organizations/create-organization'
 import SuccessOrganization from '../../components/organizations/success-organization'
@@ -8,131 +14,104 @@ import CreateValue from '../../components/organizations/create-value'
 import CreateSkills from '../../components/organizations/create-skills'
 import CreateGoal from '../../components/organizations/create-goal'
 import CreateDepartment from '../../components/organizations/create-department'
-import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
-import { values } from 'lodash';
+import CreateNewOrganization from "../../components/organizations/create-new-organization"
+
 import CreateProject from "../../components/organizations/create-projects"
 import {getUserId} from '../../services/user.service';
 
 function Organization() {
+  const dispatch = useDispatch();
   const [showCreateModal,setShowCreateModal] = useState(false);
   const [showSuccessModal,setShowSuccessModal] = useState(false);
   const [showOrgDetail,setShowOrgDetail] = useState(false);
-  const [showValue,setShowValue] = useState(false);
+  const [showValue, setShowValue] = useState(false);
   const [showCreateValue,setShowCreateValue] = useState(false);
   const [showAddGoal,setShowAddGoal] = useState(false)
   const [showAddSkills,setShowAddSkills] = useState(false)
   const [showDepartment,setDepartment] = useState(false)
   const [showProject,setProject]=useState(false);
-  const [values,setValue] = useState([])
   const [goal,setGoal] = useState([])
   const [skill,setSkills] = useState([])
   const [departmentValue,setDepartmentValues] = useState([])
-  const [projectValues,setProjectValues]=useState([])
- 
-  const CREATE_ORG = gql`
-  mutation createOrg($name: String!, $vision: String!, $userId: String!) {
-    createOrg(input: {data: {name: $name, vision: $vision, userId: $userId}}) {
-      data {_id}
-    }
-  }`;
-  
+  const [projectValues,setProjectValues]=useState([]);
   const [orgData, setOrgData] = useState({});
+
+  const {
+    organizations,
+    // isSaveFailure,
+    isSaveOrgSuccess,
+    getOrganizationRequest
+  } = useSelector(state => state.organizations);
+
+  const {
+    values,
+    isSaveOrganizationValuesSuccess
+  } = useSelector(state => state.values);
+
+  const {
+    projects,
+    //  isSaveOrganizationValuesSuccess
+  } = useSelector(state => state.projects);
+
+
+
+ console.log(organizations, 'organizations', isSaveOrgSuccess, projects)
+
+
+  useEffect(() => {
+      if (isSaveOrgSuccess) {
+        setShowOrgDetail(true);
+      }
+  }, [isSaveOrgSuccess]);
+
+  useEffect(() => {
+    dispatch(organizationActions.getOrganizationRequest());
+  }, []);
+
+  useEffect(() => {
+    if (!getOrganizationRequest && organizations) {
+      setShowOrgDetail(true);
+      setOrgData(organizations);
+      dispatch(valuesActions.getValuesRequest());
+      dispatch(projectsActions.getProjectsRequest());
+    }
+  }, [getOrganizationRequest, organizations]);
   
-  const closeModal=(flag)=>{
-    setShowCreateModal(flag);
-  }
-  const closeSuccessModal=()=>{
+
+  const handleSuccessCloseModal = ()=>{
     setShowCreateModal(false);
     setShowSuccessModal(false);
     setShowOrgDetail(true);
+    dispatch(organizationActions.resetStatus());
   }
   
-  const GET_ORG = gql`
-        query org($nameFilter: String!) {
-            org(input: {filter:{userId:{_eq:$nameFilter}}}) {
-              result {_id,name,vision}
-            }
-        }`;
-    const { data1, error1, loading1 } = useQuery(GET_ORG, {
-          notifyOnNetworkStatusChange: true,
-          variables: { nameFilter: getUserId() },
-          onCompleted: (dataValue) => {
-              console.log(data1,dataValue.org.result,"!!!!!!!!!!!!!!!!!!");
-              if(dataValue.org){
-                setOrgData(dataValue.org.result)
-                closeSuccessModal();
-              }
-            //  setTemplateList(data.p);
-            //  console.log(templateList);
-          }
-      });
-
-      const GET_VALUES = gql`
-        query values($nameFilter: String!) {
-            values(input: {filter:{userId:{_eq:$nameFilter}}}) {
-              results {_id,title,description,icon}
-            }
-        }`;
-    const { dataValues, error2, loading2 } = useQuery(GET_VALUES, {
-          notifyOnNetworkStatusChange: true,
-          variables: { nameFilter: getUserId() },
-          onCompleted: (dataValue) => {
-              console.log(dataValue,dataValues,"!!!!!!!!!!!!!!!!!!");
-              if(dataValue.values){
-                setValue(dataValue.values.results)
-              }
-            //  setTemplateList(data.p);
-            //  console.log(templateList);
-          }
-      });
-
-
-      const GET_PROJS = gql`
-      query projs($nameFilter: String!) {
-          projs(input: {filter:{userId:{_eq:$nameFilter}}}) {
-            results {_id,name,parent}
-          }
-      }`;
-  const { data3, error3, loading3 } = useQuery(GET_PROJS, {
-        notifyOnNetworkStatusChange: true,
-        variables: { nameFilter: getUserId() },
-        onCompleted: (dataValue) => {
-            console.log(dataValue,dataValues,"!!!!!!!!!!!!!!!!!!");
-            if(dataValue.projs){
-              setProjectValues(dataValue.projs.results)
-            }
-          //  setTemplateList(data.p);
-          //  console.log(templateList);
-        }
-    });
-
-      
-
-      
-  let [createExample, {loading, data, error}] = useMutation(
-    CREATE_ORG,{
-      onCompleted: (data) => {
-        console.log(data.createOrg.data._id)
-        setOrgData({...orgData,_id:data.createOrg.data._id})
-          setShowCreateModal(false);
-          setShowSuccessModal(true);
-      },
-      onError: (error) => console.error("Error creating a post", error),
-    }
-  );
-
-  const createOrg=(data)=>{
-    console.log(data)
-    setOrgData(data)
-    createExample({variables: {name:data.orgName,vision:data.vision,userId: getUserId()}});
+  const handleCreateOrganization = (data) => {
+    console.log(data);
+    setOrgData(data);
+    setShowCreateModal(false);
+    dispatch(organizationActions.saveOrganizationsRequest(data));
+    // createExample({variables: {name:data.orgName,vision:data.vision,userId: getUserId()}});
   }
-  const showAdd=()=>{
+
+  const handleAddValue = () => {
     setShowCreateModal(false);
     setShowSuccessModal(false);
     setShowOrgDetail(false);
     setShowCreateValue(true);
   }
-  const closeValueModal=()=>{
+
+
+  const handleCloseValueModal = () => {
+    setShowOrgDetail(true);
+    setShowCreateValue(false);
+  }
+
+  const handleCloseProjectModal = () => {
+    setShowOrgDetail(true);
+    setProject(false);
+  }
+
+  const closeValueModal = ()=>{
     setShowCreateModal(false);
     setShowSuccessModal(false);
     setShowOrgDetail(true);
@@ -166,7 +145,7 @@ function Organization() {
     setShowAddSkills(false);
     setDepartment(true)
   }
-  const showProj=()=>{
+  const handleAddProject = () => {
     setShowCreateModal(false);
     setShowSuccessModal(false);
     setShowOrgDetail(false);
@@ -175,10 +154,7 @@ function Organization() {
     setShowAddSkills(false);
     setProject(true)
   }
-  const addValue = (data)=>{
-    setValue([...values,data])
-    console.log([...values,data,"hi11111"]);
-  }
+
   const createValue = (data)=>{
     setGoal([...goal,data])
     console.log([...goal,data])
@@ -191,11 +167,19 @@ function Organization() {
     setDepartmentValues([...departmentValue,data])
     console.log([...departmentValue,data])
   }
-  const projValue=(data)=>{
-    setProjectValues([...projectValues,data])
-    console.log([...projectValues,data,"hi22222222"]);
+  const handleCreateProject = (data) => {
+    // setProjectValues([...projectValues,data])
+    // console.log([...projectValues,data,"hi22222222"]);
+    console.log(data, 'project data')
+    dispatch(projectsActions.saveProjectsRequest(data));
 
   }
+  
+  const handleCreateValues = (valuesData) => {
+    console.log(valuesData, 'test');
+    dispatch(valuesActions.saveValuesRequest(valuesData));
+  }
+
   return (
     <>
       <head>
@@ -215,44 +199,49 @@ function Organization() {
         <script src="/tailwind.js"></script>
     </head>
       <MainLayout>
-        {(!showCreateModal && !showSuccessModal && !showOrgDetail && !showCreateValue && !showAddGoal && !showAddSkills && !showDepartment && !showProject)?(<div className="flex w-full items-center justify-center">
-          <div className="flex flex-col items-center">
-            <img src="/img/org-empty.svg" alt="" />
-            <h6 className="my-2 font-medium text-kelvinBlack">
-              Looks like you’re new here
-            </h6>
-            <p className="mb-4 w-2/3 text-center text-kelvinBlack">
-              Create a new organization to start plan, track your progress with
-              your team
-            </p>
-            <div className="flex">
-              <button
-                type="button"
-                onClick={()=>setShowCreateModal(true)}
-                className="text-white bg-gradient-to-r from-kelvinDark  to-kelvinBold hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
-                >
-                Create Organization
-              </button>
-            </div>
-          </div>
-        </div>):null}
-
-        {showCreateModal?<CreateOrganization showValue={showValue} createOrg={createOrg} setShowCreateModal={closeModal}/>:null}
-
-        {showSuccessModal?<SuccessOrganization closeModal={closeSuccessModal} orgData={orgData}/>:null}
-
-        {showOrgDetail?<OrganizationDetail values={values} goal={goal} skill={skill} departmentValue={departmentValue} projectValues={projectValues} showAdd={showAdd} showGoal={showGoal} showSkills={showSkills} showDep={showDep} showProj={showProj} orgData={orgData} showValue={showValue}/>:null}
+        { getOrganizationRequest ? <>Loading....</> :
+          <>
+            
+            {
+              !organizations && 
+              !showCreateModal && 
+              !showSuccessModal && 
+              !showOrgDetail && 
+                <CreateNewOrganization onClick={() => setShowCreateModal(true) }/> 
+            }
+            { showCreateModal && <CreateOrganization onCreateOrganization={handleCreateOrganization} onCloseModal={() => setShowCreateModal(false)}/> }
+            { showSuccessModal && <SuccessOrganization onCloseModal={handleSuccessCloseModal} orgData={orgData}/>}
+            { showOrgDetail && organizations && 
+              <OrganizationDetail 
+                  values={values} 
+                  goal={goal} 
+                  skill={skill} 
+                  departmentValue={departmentValue} 
+                  projects={projects} 
+                  onAddValue={handleAddValue} 
+                  showGoal={showGoal} 
+                  showSkills={showSkills} 
+                  showDep={showDep} 
+                  onAddProject={handleAddProject} 
+                  orgData={orgData} 
+                  showValue={showValue}
+              /> 
+            }
+            {showCreateValue && <CreateValue organizations={organizations} onCreateValue={handleCreateValues} onCloseModal={handleCloseValueModal}/>}
         
-        {showCreateValue? <CreateValue addValue={addValue} closeModal={closeValueModal}/>:null}
-        
-        
-        {showAddGoal?<CreateGoal createValue={createValue} closeModal={closeValueModal}/>:null}
+            {showAddGoal && <CreateGoal createValue={createValue} closeModal={closeValueModal}/>}
 
-        {showAddSkills?<CreateSkills skills={skills} closeModal={closeValueModal}/>:null}
+            {showAddSkills && <CreateSkills skills={skills} closeModal={closeValueModal}/>}
 
-        {showDepartment?<CreateDepartment depValue={depValue} closeModal={closeValueModal}/>:null}
-        {showProject?<CreateProject projValue={projValue} closeModal={closeValueModal}/>:null}
+            {showDepartment && <CreateDepartment depValue={depValue} closeModal={closeValueModal}/>}
+
+            {showProject && <CreateProject organizations={organizations} onCreateProject={handleCreateProject} onCloseModal={handleCloseProjectModal}/>}
+          </>
+
+        }
         
+       
+ 
 
         {/* CreateOrganization */}
         {/* <CreateValue/>

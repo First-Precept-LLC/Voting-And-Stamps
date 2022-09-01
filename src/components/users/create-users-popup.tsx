@@ -1,43 +1,95 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
 
 
 const CreateUserPopup = (props) => {
-    const {users,setUsers,addUser,setAddUser,setAddUserPopup}=props;
-   
-    const CREATE_PUSERS = gql`
-    mutation createProj($name: String!, $levelUp: String!, $department: String!) {
-      createPusers(input: {data: {name: $name, levelUp: $levelUp, department: $department}}) {
-        data {_id, name,role }
-      }
-    }`;
-    let [createPUsersData, {loading, data, error}] = useMutation(
-        CREATE_PUSERS,{
-          onCompleted: (data) => {
-            props.addValue({
-                name:addUser.name,
-                // role:addUser.role,
-                levelUp:addUser.levelUp,
-                department:addUser.department
-              })
-            props.closeModal();
-          },
-          onError: (error) => console.error("Error creating a post", error),
+    const [ state, setState ] = useState({
+        name: '',
+        levelUp: '',
+        role: '',
+        department: ''
+    });
+
+    const { 
+        users, 
+        setUsers, 
+        addUser, 
+        setAddUser, 
+        setAddUserPopup, 
+        organizations, 
+        onCreateUsers,
+        isEditMode,
+        selectedUser,
+        onEditUsers
+    } = props;
+
+    useEffect(() => {
+        if (isEditMode && selectedUser) {
+            setState(selectedUser);
         }
-      );
+    }, [isEditMode, selectedUser])
+   
+    // const CREATE_PUSERS = gql`
+    // mutation createProj($name: String!, $levelUp: String!, $department: String!) {
+    //   createPusers(input: {data: {name: $name, levelUp: $levelUp, department: $department}}) {
+    //     data {_id, name,role }
+    //   }
+    // }`;
+    // let [createPUsersData, {loading, data, error}] = useMutation(
+    //     CREATE_PUSERS,{
+    //       onCompleted: (data) => {
+    //         props.addValue({
+    //             name:addUser.name,
+    //             // role:addUser.role,
+    //             levelUp:addUser.levelUp,
+    //             department:addUser.department
+    //           })
+    //         props.closeModal();
+    //       },
+    //       onError: (error) => console.error("Error creating a post", error),
+    //     }
+    //   );
 
 
-    const createHandler=()=>{
-        let arr=[...users]
-        arr.push(addUser);
-        console.log(arr);
-        setUsers([...arr]);
-        createPUsersData({variables:{'name':addUser.name,'levelUp': addUser.levelUp,'department':addUser.department}});
+    // const createHandler=()=>{
+    //     let arr=[...users]
+    //     arr.push(addUser);
+    //     console.log(arr);
+    //     setUsers([...arr]);
+    //     createPUsersData({variables:{'name':addUser.name,'levelUp': addUser.levelUp,'department':addUser.department}});
+    //     setAddUserPopup(false);
+    // }
+
+    const handleCreateUsers = () => {
+        console.log(state, 'ff', organizations)
+        if (organizations && !isEditMode) {
+            onCreateUsers({
+                ...state,
+                orgId: organizations.id
+            });
+        } else if (isEditMode) {
+            onEditUsers({
+                ...state
+            });
+        }
         setAddUserPopup(false);
-            }
-  const userHandler=(obj)=>{
-    setAddUser({...addUser,...obj});
-  }
+    }
+
+    const handleInputChange = (event) => {
+        const { name, value } = event.target;
+        setState(copyState => ({
+            ...copyState,
+            [name]: value
+        }))
+    }
+
+    const {
+        role,
+        name,
+        department,
+        levelUp
+    } = state;
+
     return (
         <>
             <div id="user-modal" tabIndex={-1}
@@ -63,17 +115,17 @@ const CreateUserPopup = (props) => {
                                         </div>
                                         <div className="flex flex-col mb-8">
                                             <h4 className="text-xs font-bold mb-2">Name</h4>
-                                            <input type="text" id="fullname" onChange={(e)=>{userHandler({name:`${e.target.value}`})}}
+                                            <input type="text" id="fullname" name="name" onChange={handleInputChange}
                                                 className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                                 style={{width:'21rem'}}
-                                                placeholder="Enter full name" required />
+                                                placeholder="Enter full name" value={name} required />
                                         </div>
                                         <div className="flex flex-col mb-8">
                                             <label htmlFor="countries" className="text-xs font-bold mb-2" >Role </label>
-                                            <select id="countries" defaultValue={'DEFAULT'} onChange={(e)=>{userHandler({role:`${e.target.value}`})}}
+                                            <select value={role} id="countries" name="role" defaultValue={'DEFAULT'} onChange={handleInputChange}
                                                 className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                                                 <option value="DEFAULT">Select Role(s) of user</option>
-                                                <option value="Role1">Role 1</option>
+                                                <option value="Role 1">Role 1</option>
                                                 <option value="Role 2">Role 2</option>
                                                 <option value="Role 3">Role 3</option>
                                                 <option value="Role 4">Role 4</option>
@@ -86,7 +138,7 @@ const CreateUserPopup = (props) => {
                                         </div>
                                         <div className="flex flex-col mb-8">
                                             <label htmlFor="countries" className="text-xs font-bold mb-2" >1 Level Up </label>
-                                            <select id="countries" defaultValue={'DEFAULT'}  onChange={(e)=>{userHandler({levelUp:`${e.target.value}`})}}
+                                            <select value={levelUp} id="countries" defaultValue={'DEFAULT'} name="levelUp"  onChange={handleInputChange}
                                                 className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                                                 <option value="DEFAULT">Select the manager for the user</option>
                                                 <option value="Level Up 1">Level Up 1</option>
@@ -102,7 +154,7 @@ const CreateUserPopup = (props) => {
                                         </div>
                                         <div className="flex flex-col mb-8">
                                             <label htmlFor="countries" className="text-xs font-bold mb-2" >Department </label>
-                                            <select id="countries" defaultValue={'DEFAULT'}  onChange={(e)=>{userHandler({department:`${e.target.value}`})}}
+                                            <select value={department} id="countries" defaultValue={'DEFAULT'} name="department"  onChange={handleInputChange}
                                                 className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                                                 <option value="DEFAULT">Select the department user belongs to</option>
                                                 <option value="Department1">Department1</option>
@@ -135,12 +187,16 @@ const CreateUserPopup = (props) => {
                                 </div>
                                 {/* <!-- Modal footer --> */}
                                 <div className="flex items-center p-6 space-x-2 rounded-b justify-end  dark:border-gray-600">
-                                    <button type="submit"
+                                    <button type="button"
                                         className="text-kelvinBlack  hover:bg-kelvinLight focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6"
                                         data-modal-toggle="success-modal"  onClick={()=>{setAddUserPopup(false)}}>Cancel</button>
-                                     <button type="submit"
+                                     <button 
+                                        type="button"
                                         className="text-white bg-gradient-to-r from-kelvinDark to-kelvinBold hover:bg-gradient-to-br focus:ring-4  focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6"
-                                        data-modal-toggle="success-modal" onClick={createHandler}>Create</button>
+                                        data-modal-toggle="success-modal" 
+                                        onClick={handleCreateUsers}
+                                        disabled={!name || !role || !department || !levelUp}
+                                    >Create</button>
                                 </div>
                             </form>
                         </div>

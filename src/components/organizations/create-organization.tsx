@@ -1,29 +1,32 @@
-import React from "react";
-import CreateValue from "./create-value";
+import React, { useState } from "react";
+import { getUserId } from "~/services/user.service";
 
-const CreateOrganization=(props)=>{
+const CreateOrganization=({ onCreateOrganization, onCloseModal }) => {
+    const [state, setState] = useState({
+      orgName: '',
+      vision: ''
+    })
+  
+    const handleCreateOrg = () => onCreateOrganization({
+      ...state,
+      userId: getUserId()
+    });
 
-    const [orgName, setOrgName] = React.useState('');
-    const [vision, setVision] = React.useState('');
-    const [create,setCreate] = React.useState(false);
-    const closeModal=()=>{
-        console.log(1)
-        props.setShowCreateModal(false);
+    const handleInputChange = (event) => {
+      const { name, value } = event.target;
+      setState(copyState => ({
+        ...copyState,
+        [name]: value
+      }))
     }
-    const createOrg=()=>{
-      if(orgName && vision){
-        console.log(orgName,vision)
-        props.createOrg({
-            orgName,
-            vision
-        })
-        setCreate(true);
-      }
-    
-    }
+
+    const {
+      orgName,
+      vision
+    } = state;
+
     return (
         <>
-     
         <div
           id="large-modal"
           className=" overflow-y-auto overflow-x-hidden w-full"
@@ -35,7 +38,7 @@ const CreateOrganization=(props)=>{
                 <h3 className="text-xl font-medium text-gray-900 "></h3>
                 <button
                   type="button"
-                  onClick={closeModal}
+                  onClick={onCloseModal}
                   className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
                   data-modal-toggle="large-modal"
                 >
@@ -68,8 +71,9 @@ const CreateOrganization=(props)=>{
                       <h4 className="text-lg mb-2">Organization Name</h4>
                       <input
                         type="text"
-                        id="first_name"
-                        onChange={e=>setOrgName(e.target.value)}
+                        id="orgName"
+                        name="orgName"
+                        onChange={handleInputChange}
                         className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                         placeholder="John"
                         required
@@ -83,7 +87,8 @@ const CreateOrganization=(props)=>{
                       <textarea
                         id="message"
                         rows={4}
-                        onChange={e=>setVision(e.target.value)}
+                        name="vision"
+                        onChange={handleInputChange}
                         className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-md border-2 border-gray-300 focus:ring-blue-500 focus:border-blue-500 "
                         placeholder="Your vision..."
                       ></textarea>
@@ -100,9 +105,10 @@ const CreateOrganization=(props)=>{
                 <div className="flex items-center p-6 space-x-2 rounded-b justify-center  dark:border-gray-600">
                   <button
                     type="button"
-                    onClick={createOrg}
+                    onClick={handleCreateOrg}
                     className="text-white bg-gradient-to-r from-kelvinDark  to-kelvinBold hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6"
                     data-modal-toggle="success-modal"
+                    disabled={!orgName || !vision}
                   >
                     Create Organization
                   </button>

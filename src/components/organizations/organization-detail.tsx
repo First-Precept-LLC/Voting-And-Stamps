@@ -5,7 +5,7 @@ import CreateProject from "./create-projects";
 
 const OrganizationDetail = (props) => {
     // console.log(props)
-    const { orgData, projectValues, sendDataToParent, showValue, values, goal, skill, departmentValue,showProj } = props;
+    const { orgData, projects, values, onAddProject, onAddValue } = props;
     const [value, setValue] = React.useState(false)
     // const showValueModal=()=>{
     //     setShowValue(!showValue);
@@ -30,7 +30,7 @@ const OrganizationDetail = (props) => {
                 </div>
                 <div
                     className="flex bg-kelvinLight p-4 rounded-md w-full flex-wrap grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5  items-end">
-                    {values.map(item => (<div className="flex  p-2 ">
+                    {values?.map(item => (<div className="flex  p-2 ">
                         <div className="flex tems-center w-full p-4 bg-white shadow shadow-md rounded-md">
                             <i className={"fa-solid " + item.icon + " text-2xl justify-center rounded-full p-4 bg-kelvinMedium text-white mr-2"}></i>
                             <div className="flex flex-col items-center">
@@ -44,7 +44,7 @@ const OrganizationDetail = (props) => {
                     <button type="button"
                         className="text-white  bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py-2 h-8 text-center mr-2 mb-2 hover:bg-kelvinBold"
                         data-modal-toggle="large-modal"
-                        onClick={() => props.showAdd()} >
+                        onClick={onAddValue} >
                         <i className="fa-solid fa-plus"></i>
                         Add Value </button>
                 </div>
@@ -98,7 +98,7 @@ const OrganizationDetail = (props) => {
                 </div>
                 <div
                     className="flex bg-kelvinLight p-4 rounded-md w-full flex-wrap grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5  items-end">
-                    {projectValues.map(item => (<div className="flex  p-2">
+                    {projects?.map(item => (<div className="flex  p-2">
                         <div
                             className="flex items-center w-full py-6 justify-center p-4 bg-white shadow shadow-md rounded-md">
                             <h4>{item.title || item.name}</h4>
@@ -108,7 +108,7 @@ const OrganizationDetail = (props) => {
                     <button type="button"
                         className="text-white  bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-pur w-full py-6ple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py-2 h-8 text-center mr-2 mb-2 hover:bg-kelvinBold"
                         data-modal-toggle="large-modal"
-                        onClick={() => props.showProj()} >
+                        onClick={onAddProject} >
                         <i className="fa-solid fa-plus"></i>
                         Add project</button>
                 </div>

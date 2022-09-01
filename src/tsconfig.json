@@ -1,4 +1,4 @@
 {
   "extends": "../tsconfig.common.json",
-  "include": ["./**/*.tsx", "./**/*.ts", "pages/api/spec/support/getterQueryTest.spec", "pages/api/spec/support/getterQueryTest.ts.spec"],
+  "include": ["./**/*.tsx", "./**/*.ts", "pages/api/spec/support/getterQueryTest.spec", "pages/api/spec/support/getterQueryTest.ts.spec", "store/index.js"],
 }

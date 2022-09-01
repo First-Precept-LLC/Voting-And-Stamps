@@ -1,86 +1,111 @@
-import React from "react";
+import React, { useState } from "react";
 import Select from 'react-select'
 import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
 import { getUserId } from "~/services/user.service";
 
 
-const CreateValue=(props)=>{
+const CreateValue=({ onCloseModal, onCreateValue, organizations } )=>{
   const [errorMsg,setError] = React.useState(false);
-    const [orgName, setOrgName] = React.useState('');
-    const [vision, setVision] = React.useState('');
-    const [option, setOption] = React.useState('');
+    const [state, setState ] = useState({
+      title: '',
+      icon: '',
+      description: ''
+    })
 
-    const GET_ORG_Value = gql`
-    query values($nameFilter: String!) {
-        values(input: {filter:{userId:{_eq:$nameFilter}}}) {
-          results {_id,values}
-        }
-    }`;
-const { data:data2, error:error2, loading:loading2 } = useQuery(GET_ORG_Value, {
-      notifyOnNetworkStatusChange: true,
-      variables: { nameFilter: getUserId() },
-      onCompleted: (dataValue) => {
-          console.log(data2,dataValue,"hiiiiiiii");
-          // if(dataValue.value){
-          //   setOrgData(dataValue.org.result)
-          //   closeSuccessModal();
-          // }
-        //  setTemplateList(data.p);
-        //  console.log(templateList);
-      }
-  });
+    // const GET_ORG_Value = gql`
+    // query values($nameFilter: String!) {
+    //     values(input: {filter:{userId:{_eq:$nameFilter}}}) {
+    //       results {_id,values}
+    //     }
+    // }`;
+  // const { data:data2, error:error2, loading:loading2 } = useQuery(GET_ORG_Value, {
+  //       notifyOnNetworkStatusChange: true,
+  //       variables: { nameFilter: getUserId() },
+  //       onCompleted: (dataValue) => {
+  //           console.log(data2,dataValue,"hiiiiiiii");
+  //           // if(dataValue.value){
+  //           //   setOrgData(dataValue.org.result)
+  //           //   closeSuccessModal();
+  //           // }
+  //         //  setTemplateList(data.p);
+  //         //  console.log(templateList);
+  //       }
+  //   });
 
 
     
-    const CREATE_VALUE = gql`
-    mutation createValue($title: String!, $description: String!,$icon: String!, $userId: String!) {
-      createValue(input: {data: {title: $title, description: $description, icon: $icon, userId: $userId}}) {
-        data {_id }
-      }
-    }`;
-    let [createValue, {loading, data, error}] = useMutation(
-      CREATE_VALUE,{
-        onCompleted: (data) => {
-          props.addValue({
-            title:orgName,
-            description:vision,
-            icon:option,
-            userId: getUserId()
+    // const CREATE_VALUE = gql`
+    // mutation createValue($title: String!, $description: String!,$icon: String!, $userId: String!) {
+    //   createValue(input: {data: {title: $title, description: $description, icon: $icon, userId: $userId}}) {
+    //     data {_id }
+    //   }
+    // }`;
+    
+    // let [createValue, {loading, data, error}] = useMutation(
+    //   CREATE_VALUE,{
+    //     onCompleted: (data) => {
+    //       props.addValue({
+    //         title:orgName,
+    //         description:vision,
+    //         icon:option,
+    //         userId: getUserId()
 
-          })
-          props.closeModal();
-        },
-        onError: (error) => console.error("Error creating a post", error),
-      }
-    );
+    //       })
+    //       props. onCloseModal();
+    //     },
+    //     onError: (error) => console.error("Error creating a post", error),
+    //   }
+    // );
   
-    const createOrg=()=>{
-      if(orgName && vision && option){
-        setError(false)
-        createValue({
-          variables:{
-            title:orgName,
-            description:vision,
-            icon:option,
-            userId: getUserId()
-          } 
-        })
-      }else{
-        setError(true)
-      }
-     
-      
+    const  handleCreateValue = () => {
+      onCloseModal();
+      onCreateValue({
+        ...state,
+        orgId: organizations?.id,
+        userId: getUserId()
+      });
     }
     
-    const options = [
-    { value: 'chocolate', label: 'Chocolate' },
-    { value: 'strawberry', label: 'Strawberry' },
-    { value: 'vanilla', label: 'Vanilla' }
-  ]
-  const handleChange=(e)=>{
-    const value=e.value
-    setOption(value)
+  //   const options = [
+  //   { value: 'chocolate', label: 'Chocolate' },
+  //   { value: 'strawberry', label: 'Strawberry' },
+  //   { value: 'vanilla', label: 'Vanilla' }
+  // ]
+
+  const handleInputChange = (event) => {
+    const { name, value} = event.target;
+    setState(copyState => ({
+      ...copyState,
+      [name]: value
+    }))
   }
+
+  const handleFileChange = (event) => {
+    try {
+      const file = event.target.files[0]
+      const reader = new FileReader();
+      reader.onload = (fileEvent: any) => {
+        setState(copyState => ({
+          ...copyState,
+          icon:fileEvent.target.result.split('base64,')[1]
+        }))
+      }
+      reader.onerror = () => {
+        setState(copyState => ({
+          ...copyState,
+          icon: ""
+        }))
+      }
+      reader.readAsDataURL(file)
+    } catch (err) {
+      setState(copyState => ({
+        ...copyState,
+        icon: ""
+      }))
+    }
+  }
+
+  const { title, icon, description } = state;
 
     return (
         <>
@@ -105,10 +130,10 @@ const { data:data2, error:error2, loading:loading2 } = useQuery(GET_ORG_Value, {
                       <h4 className="text-lg mb-2">Value Title</h4>
                       <input
                         type="text"
-                        id="first_name"
-                        
-                        value={orgName}
-                        onChange={(e)=>setOrgName(e.target.value)}
+                        id="title"
+                        name="title"
+                        value={title}
+                        onChange={handleInputChange}
                         className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                         placeholder="John"
                         required
@@ -116,9 +141,15 @@ const { data:data2, error:error2, loading:loading2 } = useQuery(GET_ORG_Value, {
                     </div>
                     <div className="flex flex-col mb-8">
                       <h4 className="text-lg mb-2">Value Icon</h4>
-                      <Select options={options} 
+                      {/* <Select options={options} 
+                      name="icon"
                       // value={option}
-                       onChange={handleChange} 
+                       onChange={handleInputChange} 
+                      /> */}
+                      <input
+                        className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-kelvinBold dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                        aria-describedby="user_avatar_help" id="user_avatar" type="file"
+                        onChange={handleFileChange}
                       />
                       <p className="text-xs opacity-50 mt-2">
                        Select the approriate icon for the value you want to add
@@ -127,10 +158,11 @@ const { data:data2, error:error2, loading:loading2 } = useQuery(GET_ORG_Value, {
                     <div className="flex flex-col">
                       <h4 className="text-lg mb-2">Description</h4>
                       <textarea
-                        id="message"
+                        id="description"
                         rows={4}
-                        value={vision}
-                        onChange={(e)=>setVision(e.target.value)}
+                        name="description"
+                        value={description}
+                        onChange={handleInputChange}
                         className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-md border-2 border-gray-300 focus:ring-blue-500 focus:border-blue-500 "
                         placeholder="Description"
                       ></textarea>
@@ -145,7 +177,7 @@ const { data:data2, error:error2, loading:loading2 } = useQuery(GET_ORG_Value, {
                 <div className="flex items-center p-6 space-x-2 rounded-b justify-center dark:border-gray-600" style={{paddingLeft:'250px'}}>
                   <button
                     type="button"
-                    onClick={props.closeModal}
+                    onClick={onCloseModal}
                     className="text-black from-kelvinDark  to-kelvinBold hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6"
                     data-modal-toggle="success-modal"
                   >
@@ -153,7 +185,8 @@ const { data:data2, error:error2, loading:loading2 } = useQuery(GET_ORG_Value, {
                   </button>
                   <button
                     type="button"
-                    onClick={createOrg}
+                    onClick={ handleCreateValue}
+                    disabled={!title || !icon || !description}
                     className="text-white bg-gradient-to-r from-kelvinDark  to-kelvinBold hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6"
                     data-modal-toggle="success-modal"
                   >
