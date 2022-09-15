@@ -1,18 +1,20 @@
-import React from 'react';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import Link from 'next/link';
 import MainLayout from '../../components/layout/MainLayout';
 import CreateProcessList from '../../components/process-templates/create-process-list';
 import CreatedTemplateSuccess from '../../components/process-templates/created-template-success';
-import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
-import { getUserId } from '../../services/user.service';
-import Link from 'next/link';
+import { processTemplateActions } from "../../store/actions/processTemplateActions";
+import { processActions } from "../../store/actions/processActions";
+
+import { usersActions } from '../../store/actions/usersActions';
+
 
 const ProcessTemplateList = (props) => {
 
-
-    const [processItemName, setProcessItemName] = useState('')
+    const [processItem, setProcessItem] = useState({})
     const [userId, setUserId] = useState('');
-    const [status,setStatus]=useState(false);
+    const [status, setStatus] = useState(false);
     const [processListData, setProcessListData] = useState([
         { process: 'Research of Model v1', processTemplate: 'Start research development', project: 'R&D', dueBy: 'Aug 22, 2022', assignees: 'Matt', votes: '24', id: '1', percent: '70%', deletePopup: false },
         { process: 'Submission of Model v2', processTemplate: 'Submitting Designs', project: 'R&D', dueBy: 'Aug 28, 2022', assignees: 'Saidutt', votes: '2', id: '2', percent: '33%', deletePopup: false }
@@ -20,116 +22,49 @@ const ProcessTemplateList = (props) => {
     ]);
     const [pro, setPro] = useState([]);
     const [finalList, setFinalList] = useState([]);
+    const [selectedItemId, setSelectedItemId] = useState('');
 
-    const GET_PROCESS_TEMPLATES = gql`
-        query processTemplates($nameFilter: String!) {
-            processTemplates(input: {filter:{name:{_neq:$nameFilter}}}) {
-              results {_id,name,
-                parentProject,userId,estimatedDuration,
-                description}
-            }
-        }`;
-    const GET_PROJECTS = gql`
-        query projs($nameFilter: String!) {
-            projs(input: {filter:{userId:{_eq:$nameFilter}}}) {
-              results {_id,name,userId,
-                
-                }
-            }
+    const dispatch = useDispatch();
+    const {
+        processTemplates
+    } = useSelector(state => state.processTemplate);
+
+    const {
+        users
+    } = useSelector((state) => state.users);
+
+    const {
+        saveProcessRequest,
+        isSaveProcessSuccess
+    } = useSelector(state => state.process);
+
+    useEffect(() => {
+        dispatch(processTemplateActions.getProcessTemplateRequest());
+        dispatch(usersActions.getUsersRequest());
+    }, []);
+
+    useEffect(() => {
+        if (!saveProcessRequest && isSaveProcessSuccess) {
+            nextProcess();
+            dispatch(processActions.resetStatus());
         }
-      `;
-    const { data1, error1, loading1 } = useQuery(GET_PROCESS_TEMPLATES, {
-        notifyOnNetworkStatusChange: true,
-        variables: { nameFilter: getUserId() },
-        onCompleted: (dataValue) => {
-            console.log(dataValue.processTemplates.results);
-            setProcessListData(dataValue.processTemplates.results.map(e => { return { ...e, showPopup: false } }));
-            setStatus(true);
+    }, [saveProcessRequest, isSaveProcessSuccess])
+
+
+    const deletePopupHandler = (selectedId) => {
+        console.log(selectedId, selectedItemId, 'dd')
+        if (selectedId === selectedItemId) {
+            setSelectedItemId("");
+            return;
         }
-    });
-
-    const { data2, error3, loading3 } = useQuery(GET_PROJECTS, {
-        notifyOnNetworkStatusChange: true,
-        variables: { nameFilter: getUserId() },
-        onCompleted: (dataValue) => {
-            console.log(dataValue.projs.results);
-            setPro(dataValue.projs.results);
-            console.log(status)
-            setStatus(true);
-            console.log(status)
-        }
-    });
-console.log(status)
-
-    let arr = [];
-    pro.forEach(e => {
-        processListData.forEach(o => {
-
-            if (e._id === o.parentProject) {
-                o.project = e.name;
-                o.project_id=e._id;
-                arr.push(o)
-            }
-        })})
-    // useEffect(() => {
-        
-        
-    //     })
-    //     console.log(arr, '*************')
-    //     setFinalList(arr)
-    // }, [pro]);
-
-    console.log(status)
-    if(status){
-        console.log(status)
-        setFinalList([...arr]);
-        setStatus(false);
+        setSelectedItemId(selectedId);
     }
-    console.log(status)
 
-  
-
-
-
-
-    console.log(finalList);
-
-
-
-
-    const deletePopupHandler = (index) => {
-        // console.log(finalList)
-        // let data = (JSON.parse(JSON.stringify(finalList)));
-        // console.log('**************',data)
-        // data.splice(index,1);
-        // console.log('*(&',data)
+    const deleteHandler = (itemId) => {
+        // let data = [...finalList]
+        // data.splice(index, 1);
         // setFinalList(data);
-
-        
-
-        let data=[...finalList]
-        data.forEach((e,i)=>{
-           if(i==index){
-            if(e.showPopup==false){
-                e.showPopup=true
-            }
-            else{
-                e.showPopup=false
-            }
-           }
-           else{
-            e.showPopup=false
-           }
-        })
-        //data[index].showPopup=true;
-        setFinalList(data);
-    }
-
-    const deleteHandler = (index) => {
-        
-       let data=[...finalList]
-        data.splice(index,1);
-        setFinalList(data);
+        dispatch(processTemplateActions.deleteProcessTemplateRequest(itemId))
     }
 
     const [createDetails, setCreateDetails] = useState(false)
@@ -139,26 +74,26 @@ console.log(status)
     const [votedModal, setVotedModal] = useState(false)
     const [votingStepModal, setVotingStepModal] = useState(false)
 
-    const CreatePage = () => {
-        setProcessList(false);
-        setCreateDetails(false);
-        setProcessModal(false);
-        setModal(false);
-        setOnTrackModal(false)
-        setVotedModal(false)
-        setVotingStepModal(false)
+    // const CreatePage = () => {
+    //     setProcessList(false);
+    //     setCreateDetails(false);
+    //     setProcessModal(false);
+    //     setModal(false);
+    //     setOnTrackModal(false)
+    //     setVotedModal(false)
+    //     setVotingStepModal(false)
 
-        console.log({
-            project: project,
-            name: proName,
-            duration: estDuration,
-            description: desc,
-            step: step,
-            title: stepTitle,
-            textDescription: text
+    //     console.log({
+    //         project: project,
+    //         name: proName,
+    //         duration: estDuration,
+    //         description: desc,
+    //         step: step,
+    //         title: stepTitle,
+    //         textDescription: text
 
-        })
-    }
+    //     })
+    // }
 
     const processCreated = () => {
         setProcessModal(true);
@@ -178,9 +113,9 @@ console.log(status)
         setProcessModal(false);
 
     }
-    const createList = (item) => {
+    const createProcessList = (item) => {
 
-        setProcessItemName(item);
+        setProcessItem(item);
         setCreateDetails(true);
         setProcessModal(false);
         setOnTrackModal(false)
@@ -195,8 +130,6 @@ console.log(status)
         setCreateDetails(false);
         setProcessModal(false);
         setModal(false)
-
-
     }
     const showVotedModal = () => {
         setOnTrackModal(false)
@@ -215,7 +148,7 @@ console.log(status)
         setModal(false)
     }
 
-    const closeModal = () => {
+    const onCloseModal = () => {
         setCreateDetails(false)
     }
     const nextProcess = () => {
@@ -234,8 +167,12 @@ console.log(status)
         setOnTrackModal(true)
 
     }
-    console.log(pro)
-    console.log(finalList);
+    // console.log(pro)
+    console.log(processTemplates, "processTemplates", selectedItemId);
+
+    const handleCeateProcess = (processData) => {
+        dispatch(processActions.saveProcessRequest(processData));
+    }
 
     return (
         <>
@@ -281,32 +218,37 @@ console.log(status)
                                 </h4>
                             </div>
                             <div className="flex bg-kelvinLight p-4 rounded-md w-full flex-wrap">
-                                {finalList ? finalList.map((item,index) => {
+                                {processTemplates ? processTemplates.map((item, index) => {
                                     return (
-                                        <div key={item._id}
+                                        <div key={index}
                                             className="flex items-center w-full min-h-8 justify-between pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2 ">
                                             <h6 className="mr-2 w-1/2">{item.name}</h6>
-                                            <p className="text-sm opacity-50 mr-2 font-normal w-32" style={{ marginRight: '37%' }}>{item.project}</p>
+                                            <p className="text-sm opacity-50 mr-2 font-normal w-32" style={{ marginRight: '37%' }}>{item.project?.title}</p>
                                             <div className="flex items-center">
-                                                <button onClick={() => { createList(item) }}
+                                                <button onClick={() => { createProcessList(item) }}
                                                     className="text-white bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-6 text-left w-44 text-center items-center mr-2"
                                                     data-modal-toggle="large-modal">
                                                     <i className="fa-solid fa-play text-white mt-1 mr-1 text-xs"></i>
                                                     Create Process</button>
-                                               <Link href={{
-                                                                            pathname: "/update-process-template",
-                                                                            query: {...item}, // the data
-                                                                        }}> 
-                                               <button onClick={() => { console.log(item.id) }}
-                                                    className="text-white bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-6 text-left w-20 text-center "
-                                                    data-modal-toggle="large-modal">
-                                                    Edit</button>
-                                                    </Link>
-                                                <a href="#" className=" px-4 hover:bg-kelvinLight rounded-full" onClick={() => { deletePopupHandler(index) }}>
+                                                <Link href={{
+                                                    pathname: "/update-process-template",
+                                                    query: {
+                                                        data: JSON.stringify(item)
+                                                    }, // the data
+                                                    state: {
+                                                        processTemplate: item
+                                                    }
+                                                }}>
+                                                    <button
+                                                        className="text-white bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-6 text-left w-20 text-center "
+                                                        data-modal-toggle="large-modal">
+                                                        Edit</button>
+                                                </Link>
+                                                <a href="#" className=" px-4 hover:bg-kelvinLight rounded-full" onClick={() => { deletePopupHandler(item.id) }}>
                                                     <i className="fa-solid fa-ellipsis-vertical mt-1 text-xl"></i>
 
                                                 </a>
-                                                {item.showPopup ? <button onClick={() => { deleteHandler(index) }}  className=" bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-2  h-6 text-left mr-2 w-24 text-center ">delete</button> : null}
+                                                {item.id === selectedItemId ? <button onClick={() => { deleteHandler(item.id) }} className=" bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-2  h-6 text-left mr-2 w-24 text-center ">delete</button> : null}
                                             </div>
                                         </div>
                                     )
@@ -321,8 +263,17 @@ console.log(status)
                 }
 
 
-                {createDetails ? <CreateProcessList nextProcess={nextProcess} processItem={processItemName} userId={userId} closeModal={closeModal} processCreated={processCreated} /> : null}
-                {processModal ? <CreatedTemplateSuccess createdModal={createdModal} /> : null}
+                {createDetails &&
+                    <CreateProcessList
+                        users={users}
+                        nextProcess={nextProcess}
+                        processItem={processItem}
+                        userId={userId}
+                        onCloseModal={onCloseModal}
+                        processCreated={processCreated}
+                        handleCeateProcess={handleCeateProcess}
+                    />}
+                {processModal && <CreatedTemplateSuccess createdModal={createdModal} />}
 
             </MainLayout>
         </>

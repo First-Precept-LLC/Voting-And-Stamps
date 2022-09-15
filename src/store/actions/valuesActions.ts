@@ -6,6 +6,7 @@ export type Values = {
   description: string
   orgId: string
   userId: string
+  votes: number
 }
 
 const initialState = {

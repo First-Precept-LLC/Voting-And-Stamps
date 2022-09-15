@@ -1,87 +1,96 @@
-import React, { useState } from 'react'
-import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
-import { getUserId } from '../../services/user.service';
+import React, { useEffect, useState } from 'react'
 
 
 const VotingSteps = (props) => {
-    const { closeModal ,stepName,values,setValues,selectedValue,setVotingStepModal,setVotedModal,setSelectedValue,setStepName} = props
-    const [search,setSearch]=useState('');
-    const [searchedValues,setSearchedValues]=useState([...values])
-    console.log(selectedValue)
-//     const [votes,setVotes] = useState([])
+    const {
+        closeModal,
+        stepName,
+        values,
+        selectedStep,
+        onSaveClick
+    } = props;
 
-//     const GET_Value = gql`
-//     query values($nameFilter: String!) {
-//         values(input: {filter:{userId:{_neq:$nameFilter}}}) {
-//           results {_id,title}
-//         }
-//     }`;
-// const { data,error,loading } = useQuery(GET_Value, {
-//       notifyOnNetworkStatusChange: true,
-//       variables: { nameFilter: getUserId() },
-//       onCompleted: (dataValue) => {
-//           console.log(data,dataValue,"hiiiiiiii");
-//           setVotes(dataValue.values.results)
-//           console.log(dataValue.values.results,".....................")
-//       }
-//   });
-console.log(stepName)
-const incrementHandler=(item)=>{
-   // console.log(item.count,item.title)
-//    if(parseInt(item.count)<parseInt(selectedValue)){
-    item.count=parseInt(item.count)+1;
-    setValues(values.map(e=>{if(e._id===item._id){return {...e,count:`${item.count}`}} else{return {...e}}}))
-   
-   
-}
+    const [search, setSearch] = useState('');
+    const [searchedValues, setSearchedValues] = useState([...values]);
+    const [selectedStepVotes, setSelectedStepVotes] = useState({});
 
-const decrementHandler=(item)=>{
-    console.log(item.count)
-    if(parseInt(item.count)>0){
-        item.count=parseInt(item.count)-1;
-        setValues(values.map(e=>{if(e._id===item._id){return {...e,count:`${item.count}`}} else{return {...e}}}))
+    useEffect(() => {
+        if (selectedStep?.votes) {
+            setSelectedStepVotes({
+                ...selectedStep?.votes
+            })
+        }
+    }, [selectedStep]);
+
+    const handleUpVoteHandler = (item) => {
+        const copyStepValue = { ...selectedStepVotes };
+        const totalValueVotes = Number(item.votes ?? 0);
+        const stepValuePresent = copyStepValue?.[item?.id] ? { ...copyStepValue?.[item?.id] } : null;
+        if (stepValuePresent) {
+            const valueDownVotes = Number(stepValuePresent.downVotes);
+            const valueUpVotes = Number(stepValuePresent.upVotes);
+            if ((valueDownVotes + valueUpVotes + 1) <= totalValueVotes) {
+                stepValuePresent.upVotes = stepValuePresent.upVotes + 1;
+            }
+            copyStepValue[item?.id] = stepValuePresent;
+        } else {
+            copyStepValue[item.id] = {
+                downVotes: 0,
+                upVotes: 1,
+                valueId: item.id,
+                valueName: item.name,
+                stepId: selectedStep.id
+            }
+        }
+        setSelectedStepVotes(copyStepValue);
     }
-   
-}
- const searchInputHandler=(e)=>{
-    console.log(e.target.value);
-    e.preventDefault();
-        setSearch(e.target.value);
-     let value=e.target.value;
-        if(e.target.value){
-            setSearchedValues(values.filter(e=>e.title.includes(value)))
-          }
-          else{
-            setSearchedValues([...values])
-          }
-  
-  if(e.target.value===''){
-    setSearchedValues([...values])
-  }
- }
 
-console.log(searchedValues);
-console.log(values);
-const closeHandler=()=>{
-    let arr=[...values];
-    arr.forEach(e=>{
-        e.count=5;
-    })
-    const index = arr.findIndex(object => {
-        return object._id === selectedValue._id;
-      });
-      arr.splice(index,1);
-      setValues([...arr]);
-      setSelectedValue({});
-      setStepName('');
-      closeModal();
-}
+    const handleDownVoteHandler = (item) => {
+        const copyStepValue = { ...selectedStepVotes };
+        const totalValueVotes = Number(item.votes ?? 0);
+        const stepValuePresent = copyStepValue?.[item?.id] ? { ...copyStepValue?.[item?.id] } : null;
+        if (stepValuePresent) {
+            const valueDownVotes = Number(stepValuePresent.downVotes);
+            const valueUpVotes = Number(stepValuePresent.upVotes);
+            if ((valueDownVotes + valueUpVotes + 1) <= totalValueVotes) {
+                stepValuePresent.downVotes = stepValuePresent.downVotes + 1;
+            }
+            copyStepValue[item?.id] = stepValuePresent;
+        } else {
+            copyStepValue[item.id] = {
+                downVotes: 1,
+                upVotes: 0,
+                valueId: item.id,
+                valueName: item.name,
+                stepId: selectedStep.id
+            }
+        }
+        setSelectedStepVotes(copyStepValue);
+
+    }
+
+    const searchInputHandler = (e) => {
+        e.preventDefault();
+        const { value } = e.target;
+        setSearch(value);
+        if (value) {
+            setSearchedValues(values.filter(e => e.title?.includes(value)))
+        } else {
+            setSearchedValues([...values])
+        }
+    }
+
+    const handleSave = () => {
+        onSaveClick(selectedStepVotes);
+        closeModal();
+    }
+
     return (
         <>
 
             <div id="success-modal"
                 className=" overflow-y-auto overflow-x-hidden md:inset-0 "
-                style={{ zIndex: 1,display: 'flex',justifyContent: 'center' }}
+                style={{ zIndex: 1, display: 'flex', justifyContent: 'center' }}
             >
                 <div className="relative p-4 w-full max-w-xl md:h-auto">
 
@@ -92,11 +101,11 @@ const closeHandler=()=>{
 
                             </h3>
                             <div className='flex justify-between'>
-                                <div onClick={()=>{setVotingStepModal(false),setVotedModal(true)}}>
+                                {/* <div onClick={()=>{setVotingStepModal(false),setVotedModal(true)}}>
                                     <i
                                         
                                         className="fa-solid text-kelvinDark mr-6 fa-chevron-left text-3xl"></i>
-                                </div>
+                                </div> */}
                                 <div>
                                     <button type="button"
                                         onClick={closeModal}
@@ -133,9 +142,15 @@ const closeHandler=()=>{
                                                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                             </svg>
                                         </div>
-                                        <input type="search" id="default-search" onChange={e=>{searchInputHandler(e)}}
+                                        <input
+                                            type="search"
+                                            id="default-search"
+                                            onChange={e => { searchInputHandler(e) }}
                                             className="block p-4 pl-10 w-full text-sm text-gray-900 bg-kelvinLight rounded-lg border-2 border-gray-300 focus:ring-kelvinMedium focus:border-kelvinMedium dark:bg-kelvinLight dark:border-gray-300 dark:placeholder-gray-400 dark:text-white dark:focus:ring-kelvinMedium dark:focus:border-kelvinMedium"
-                                            placeholder= {`Search ${values.length} values` }required />
+                                            placeholder={`Search ${values.length} values`}
+                                            required
+                                            value={search}
+                                        />
                                         {/* <button type="submit"  style={{marginRight:'40px'}}
                                            
                                            className="text-white absolute right-2.5 bottom-2.5 bg-kelvinMedium hover:bg-kelvinDark focus:ring-4 focus:outline-none focus:ring-kelvinMedium font-medium rounded-lg text-sm px-4 py-2 dark:bg-kelvinMedium dark:hover:bg-kelvinDark dark:focus:ring-blue-800">Search</button> */}
@@ -172,34 +187,35 @@ const closeHandler=()=>{
                                     </div>
                                 </div> */}
                                 {/* <!-- card --> */}
-                                {searchedValues.map(item=>
-                                    <div className="flex shadow shadow-md rounded-md py-4 px-6 my-2 items-center justify-between">
-                                    <div className="flex">
-                                        <div className="flex flex-col justify-start items-start mr-2">
-                                            <i className="fa-solid text-kelvinDark mr-2 fa-circle text-xl"></i>
-                                        </div>
-                                        <div className="mr-8">
-                                            <h6 className="leading-none mb-2 ">{item.title}</h6>
-                                            <p className="text-gray-400">{item.description}</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex flex-col items-end">
+                                {searchedValues.map(item =>
+                                    <div key={item.id} className="flex shadow shadow-md rounded-md py-4 px-6 my-2 items-center justify-between">
                                         <div className="flex">
-                                            <p className="text-kelvinDark bg-kelvinLight px-3 py-2  font-bold rounded">{selectedValue.title}</p>
+                                            <div className="flex flex-col justify-start items-start mr-2">
+                                                <i className="fa-solid text-kelvinDark mr-2 fa-circle text-xl"></i>
+                                            </div>
+                                            <div className="mr-8">
+                                                <h6 className="leading-none mb-2 ">{item.title}</h6>
+                                                <p className="text-gray-400">{item.description}</p>
+                                            </div>
                                         </div>
-                                        <div className="flex my-4">
-                                            <button onClick={()=>{incrementHandler(item)}}
-                                                className="focus:outline-none text-white bg-kelvinDark hover:bg-kelvinBold focus:ring-4 focus:ring-kelvinDark font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-kelvinDark dark:hover:bg-kelvinBold dark:focus:ring-kelvinDark"><i
-                                                    className="fa-solid text-white fa-thumbs-up"></i></button>
-                                            <label htmlFor="" className="p-2 mx-2 font-medium text-lg">{item.count}</label>
-                                            <button onClick={()=>{decrementHandler(item)}}
-                                                className="focus:outline-none text-white bg-kelvinDark hover:bg-kelvinBold focus:ring-4 focus:ring-kelvinDark font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-kelvinDark dark:hover:bg-kelvinBold dark:focus:ring-kelvinDark"><i
-                                                    className="fa-solid text-white fa-thumbs-down"></i></button>
+                                        <div className="flex flex-col items-end">
+                                            <div className="flex">
+                                                <p className="text-kelvinDark bg-kelvinLight px-3 py-2  font-bold rounded">{item.votes - ((selectedStepVotes?.[item.id]?.upVotes ?? 0) + (selectedStepVotes?.[item.id]?.downVotes ?? 0))}</p>
+                                            </div>
+                                            <div className="flex my-4">
+                                                <button onClick={() => { handleUpVoteHandler(item) }}
+                                                    className="focus:outline-none text-white bg-kelvinDark hover:bg-kelvinBold focus:ring-4 focus:ring-kelvinDark font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-kelvinDark dark:hover:bg-kelvinBold dark:focus:ring-kelvinDark"><i
+                                                        className="fa-solid text-white fa-thumbs-up"></i></button>
+                                                <label htmlFor="" className="p-2 mx-2 font-medium text-lg">{selectedStepVotes?.[item.id]?.upVotes ?? ''}</label>
+                                                <button onClick={() => { handleDownVoteHandler(item) }}
+                                                    className="focus:outline-none text-white bg-kelvinDark hover:bg-kelvinBold focus:ring-4 focus:ring-kelvinDark font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-kelvinDark dark:hover:bg-kelvinBold dark:focus:ring-kelvinDark"><i
+                                                        className="fa-solid text-white fa-thumbs-down"></i></button>
+                                                <label htmlFor="" className="p-2 mx-2 font-medium text-lg">{selectedStepVotes?.[item.id]?.downVotes ?? ''}</label>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
                                 )}
-                                
+
                                 {/* <!-- card --> */}
                                 {/* <div className="flex shadow shadow-md rounded-md py-4 px-6 my-2 items-center justify-between">
                                     <div className="flex">
@@ -281,7 +297,7 @@ const closeHandler=()=>{
                             </div>
                             <div className="flex px-10 mt-4">
                                 <button type="button"
-                                    onClick={closeHandler}
+                                    onClick={handleSave}
                                     className="text-white bg-gradient-to-r from-kelvinDark  to-kelvinBold hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2 w-36">Save</button>
                             </div>
                         </div>

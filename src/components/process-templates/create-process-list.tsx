@@ -1,49 +1,54 @@
 import React, { useState } from 'react';
-import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
 import { getUserId } from '~/services/user.service';
 
 
 const CreateProcessList = (props) => {
-    const [processName, setProcessName] = useState('')
-    const [user, setUser] = useState(getUserId() || '')
-    const [date, setDate] = useState('')
-    const [errorMsg,setErrorMsg] = React.useState(false);
+    const { onCloseModal, processItem } = props;
+    const [errorMsg, setErrorMsg] = React.useState(false);
+    const [state, setState] = useState({
+        name: '',
+        user: {},
+        dueDate: ''
+    })
 
-
-    const {closeModal,processItem,userId}=props;
-    const CREATE_PROCESS = gql`
-          mutation  createProcess($userId:String!,$name: String!, $dueDate: Date!,$parentProcessTemplate:String!) {
-            createProcess(input: {data: {userId:$userId ,name: $name,dueDate: $dueDate,parentProcessTemplate:$parentProcessTemplate,progress:0}}) {
-              data {_id}
-            }
-          }`;
-    let [createProces, { loading: _loading, data: _data, error: _error }] = useMutation(
-        CREATE_PROCESS, {
-        onCompleted: (_data) => {
-        props.nextProcess();
-
-        },
-        onError: (error) => console.error("Error creating a post", error),
+    const handleInputChange = (event) => {
+        const { name, value } = event.target;
+        if (name === 'user') {
+            const findUser = props.users?.find(user => user.id === value);
+            setState(state => ({
+                ...state,
+                [name]: findUser ?? {}
+            }))
+            return;
+        }
+        setState(state => ({
+            ...state,
+            [name]: value
+        }))
     }
-    );
 
 
-    const processCreated = (parentProcessTemplate) => {
-        if(processName && getUserId() && date && parentProcessTemplate)
-        {   
-            setErrorMsg(false);
-            createProces({
-            variables: {
-                name: processName,
+    const handleCreateProcess = () => {
+        const {
+            processItem,
+            handleCeateProcess
+        } = props;
+        if (state.name && state.dueDate && Object.keys(state.user).length && processItem) {
+            handleCeateProcess({
+                ...state,
+                processTemplateId: processItem.id,
+                processTemplateName: processItem.name,
+                processTemplateDescription: processItem.description,
+                steps: processItem.steps,
                 userId: getUserId(),
-                dueDate: date,
-                parentProcessTemplate:parentProcessTemplate
-
-            }
-        })}else{
+                orgId: processItem.orgId,
+                projectId: processItem.projectId
+            });
+        } else {
             setErrorMsg(true);
         }
     }
+
     return (
         <>
             <div
@@ -68,16 +73,29 @@ const CreateProcessList = (props) => {
                                         <input
                                             type="text"
                                             id="process"
-                                            onChange={(e) => setProcessName(e.target.value)}
+                                            name="name"
+                                            onChange={handleInputChange}
                                             className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                             placeholder="Title of the process"
                                             required
+                                            value={state.name}
                                         />
                                     </div>
 
                                     <div className="flex flex-col mb-8">
                                         <h4 className="text-lg mb-2">User</h4>
-                                        <input 
+                                        <select
+                                            value={state.user?.id}
+                                            name="user"
+                                            id="countries"
+                                            onChange={handleInputChange}
+                                            className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                            <option>Select User</option>
+                                            {props?.users?.map((user) => (
+                                                <option key={user.id} value={user.id}>{user.name}</option>
+                                            ))}
+                                        </select>
+                                        {/* <input 
                                             type="text"
                                             id="user"
                                             value={user}
@@ -86,7 +104,7 @@ const CreateProcessList = (props) => {
                                             placeholder=""
                                             required
 
-                                        />
+                                        /> */}
                                         <p className="text-xs opacity-50 mt-2">
                                             Default user is populated from the role selected while creating process
                                         </p>
@@ -96,7 +114,8 @@ const CreateProcessList = (props) => {
                                         <input
                                             type="date"
                                             id="date"
-                                            onChange={(e) => setDate(e.target.value)}
+                                            name="dueDate"
+                                            onChange={handleInputChange}
                                             className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                             placeholder="John"
                                             required
@@ -105,18 +124,18 @@ const CreateProcessList = (props) => {
                                             Auto calculated if it has estimated duration
                                         </p>
                                     </div>
-                                    
+
                                     {
-                  errorMsg? <p style={{color:'red', marginBottom:'25px'}}>Please complete the form to proceed</p> : null
-                }
+                                        errorMsg && <p style={{ color: 'red', marginBottom: '25px' }}>Please complete the form to proceed</p>
+                                    }
                                 </div>
-                                
+
                             </div>
                             <div className="flex items-center space-x-2 rounded-b dark:border-gray-600" style={{ paddingLeft: '235px', marginTop: '-17px' }}>
 
                                 <button
                                     type="button"
-                                    onClick={()=>{processCreated(processItem._id)}}
+                                    onClick={handleCreateProcess}
                                     className="text-white bg-gradient-to-r from-kelvinDark  to-kelvinBold hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6"
                                     data-modal-toggle="success-modal"
                                 >
@@ -124,7 +143,7 @@ const CreateProcessList = (props) => {
                                 </button>
                                 <button
                                     type="button"
-                                    onClick={closeModal}
+                                    onClick={onCloseModal}
                                     className="text-black from-kelvinDark to-kelvinBold hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6"
                                     data-modal-toggle="success-modal"
                                 >

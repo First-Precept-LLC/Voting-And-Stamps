@@ -1,156 +1,75 @@
-import Link from 'next/link';
-import React from 'react';
-import { useState, useEffect ,useRef} from 'react';
+
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import MainLayout from '../../components/layout/MainLayout';
-import ViewProcess from '../../components/process-templates/view-process';
-import VotingDetails from '../../components/process-templates/voting-details';
-import VotingSteps from '../../components/process-templates/voting-steps';
-import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
-import { getUserId } from '../../services/user.service';
+import { processActions } from "../../store/actions/processActions";
+import { valuesActions } from "../../store/actions/valuesActions";
+import ViewProcessList from "../../components/process-templates/view-process-content";
 
 const ProcessListGroup = (props) => {
+    const [selectedId, setSelectedId] = useState("");
+    const [selectedProcess, setSelectedProcess] = useState(null);
 
-    let arr=[];
-    const [votedModal, setVotedModal] = useState(false)
-    const [votingStepModal, setVotingStepModal] = useState(false)
-    const [processListSelectedData, setProcessListSelectedData] = useState({});
-    const [onTrackModal, setOnTrackModal] = useState(false)
-    const [templateList,setTemplateList]=useState([]);
-    const [status,setStatus]=useState('false');
-    const [processListData, setProcessListData] = useState([
-        { process: 'Research of Model v1', processTemplate: 'Start research development', dueBy: 'Aug 22, 2022', assignees: 'Matt', votes: '24', id: '1', percent: '70%', deletePopup: false },
-        { process: 'Submission of Model v2', processTemplate: 'Submitting Designs', dueBy: 'Aug 28, 2022', assignees: 'Saidutt', votes: '2', id: '2', percent: '33%', deletePopup: false }
+    const dispatch = useDispatch();
 
-    ]);
-    const [finalProcessList,setFinalProcessList]=useState([]);
+    const {
+        process: processList,
+        updateStepVotesSuccess
+    } = useSelector(state => state.process);
+
+    const {
+        values: organizationValues
+    } = useSelector(state => state.values);
 
 
-    const GET_PROCESS_TEMPLATES = gql`
-        query processTemplates($nameFilter: String!) {
-            processTemplates(input: {filter:{name:{_neq:$nameFilter}}}) {
-              results {_id,name,
-                parentProject,userId,}
-            }
-        }`;
-        const { data1, error1, loading1 } = useQuery(GET_PROCESS_TEMPLATES, {
-            notifyOnNetworkStatusChange: true,
-            variables: { nameFilter: getUserId() },
-            onCompleted: (dataValue) => {
-                console.log(dataValue.processTemplates.results);
-                setTemplateList(dataValue.processTemplates.results)
-                setStatus(true);
-            }
-        });
+    useEffect(() => {
+        dispatch(processActions.getProcessRequest());
+        dispatch(valuesActions.getValuesRequest());
+    }, []);
 
-        const GET_PROCESS = gql`
-        query processes($nameFilter: String!) {
-            processes(input: {filter:{userId:{_neq:$nameFilter}}}) {
-              results {_id,name,dueDate,parentProcessTemplate,progress,userId}
+    useEffect(() => {
+        if (updateStepVotesSuccess && selectedProcess) {
+            const currentProcess = processList.find((process) => process.id === selectedProcess.id);
+            if (currentProcess) {
+                setSelectedProcess(currentProcess);
             }
         }
-      `;
-        const { data2, error3, loading3 } = useQuery(GET_PROCESS, {
-            notifyOnNetworkStatusChange: true,
-            variables: { nameFilter: "''"},
-            onCompleted: (dataValue) => {
-                console.log(dataValue.processes.results);
-                setProcessListData(dataValue.processes.results.map(e => { return { ...e, showPopup: false } }));
-               setStatus(true);
-            }
-        });
-    const deletePopupHandler = (index) => {
-
-        let data = [...finalProcessList];
-        data.forEach((e,i)=>{
-            if(i==index){
-             if(e.showPopup==false){
-                 e.showPopup=true
-             }
-             else{
-                 e.showPopup=false
-             }
-            }
-            else{
-             e.showPopup=false
-            }
-         })
-        setFinalProcessList([...data])
-    }
+    }, [updateStepVotesSuccess]);
 
     const deleteHandler = (id) => {
-        let arr = [...processListData];
-        let index = arr.findIndex(object => {
-            return object.id == id;
+        dispatch(processActions.deleteProcessRequest(id))
+    }
+
+
+    const updateProcessStepVotes = (data) => {
+        dispatch(processActions.updateStepVotesRequest(data));
+    }
+
+    const getProcessStepVotesCount = (currentSteps) => {
+        let count = 0;
+        currentSteps?.forEach(step => {
+            if (step.votes && Object.keys(step.votes).length) {
+                Object.keys(step.votes).forEach((key) => {
+                    const currentVote = step.votes[key] ?? {};
+                    count += (Number(currentVote.downVotes ?? 0) + Number(currentVote.upVotes ?? 0));
+                })
+            }
         });
-        console.log(index);
-        arr.splice(index, 1);
-        setProcessListData([...arr]);
+        return count;
     }
 
-    const showVotedModal = () => {
-        setOnTrackModal(false)
-        setVotedModal(true)
-        setVotingStepModal(false)
-        // setCreateDetails(false);
-        // setProcessModal(false);
-        // setModal(false)
-    }
-    const showVotingStepModal = () => {
-        setOnTrackModal(false)
-        setVotedModal(false)
-        setVotingStepModal(true)
-        // setCreateDetails(false);
-        // setProcessModal(false);
-        // setModal(false)
-    }
-
-    const closeVotingModal = () => {
-        setVotedModal(false)
-        setOnTrackModal(true)
+    const getProcessStepProgress = (currentSteps) => {
+        let progress = 0;
+        const totalStepsCount = currentSteps?.length;
+        const totalCompletedStepsCount = currentSteps?.filter(step => step.isCompleted).length;
+        if (totalCompletedStepsCount) {
+            console.log(totalStepsCount / totalStepsCount - totalCompletedStepsCount, totalStepsCount, totalCompletedStepsCount)
+            const remainingStepsCount = totalStepsCount - totalCompletedStepsCount;
+            progress = remainingStepsCount > 0 ? 100 - ((remainingStepsCount / totalStepsCount) * 100) : 100
+        }
+        return progress.toFixed(0);
 
     }
-    const closeVotingStepModal = () => {
-        setVotingStepModal(false)
-        setVotedModal(false)
-        setOnTrackModal(true)
-
-    }
-    const ontrackModal = (id) => {
-        setOnTrackModal(true)
-        setVotedModal(false)
-        setVotingStepModal(false)
-        // setCreateDetails(false);
-        // setProcessModal(false);
-        // setModal(false)
-        setProcessListSelectedData(processListData.find(e => (e.id === id)))
-
-    }
-
-    
-
-     
-        // useEffect(() => {
-     
-        //     setFinalProcessList([...arr])
-        // },[])
-        console.log(status.current)
-     if(status){
-        
-        processListData.forEach(e=>{
-            templateList.forEach(e1=>{
-                if(e.parentProcessTemplate==e1._id){
-                    console.log(e1.userId);
-                    let obj={...e,processTemplate:`${e1.name}`,processTemplateId:`${e1._id}`};
-                    arr.push(obj);
-                }
-            })
-        })
-        console.log('************')
-        setFinalProcessList([...arr])
-        setStatus(false);
-        
-     }
-     console.log(finalProcessList);
 
     return (
         <>
@@ -171,7 +90,7 @@ const ProcessListGroup = (props) => {
                 <script src="/tailwind.js"></script>
             </head>
             <MainLayout>
-                {!onTrackModal && !votedModal && !votingStepModal ?
+                {!selectedProcess ?
                     <div className="flex w-full p-8 flex-col">
                         <div className="flex justify-between">
                             <h1 className="text-3xl mb-8">Process List</h1>
@@ -203,44 +122,54 @@ const ProcessListGroup = (props) => {
 
 
                             <div className="flex bg-kelvinLight p-4 rounded-md w-full flex-wrap ">
-                                {finalProcessList.map((item) => {
+                                {processList?.map((item) => {
                                     return (
                                         <>
-                                         <Link key={item._id}  href={{
-                                                                            pathname: "/research-model",
-                                                                            query: {templateId:`${item.processTemplateId}`,processName:`${item.name}`,assignees:`${item.userId}`}, // the data
-                                                                        }}>
-                                            <div key={item.id}
-                                                className="flex items-center w-full min-h-8 justify-between pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2 ">
+                                            {/* <Link 
+                                         key={item._id}  
+                                         href={{
+                                                pathname: "/research-model",
+                                                query: {templateId:`${item.processTemplateId}`,processName:`${item.name}`,assignees:`${item.userId}`}, // the data
+                                            }}
+                                        > */}
+                                            <div
+                                                key={item.id}
+                                                className="flex items-center w-full min-h-8 justify-between pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2 "
+                                                onClick={() => setSelectedProcess(item)}
+                                            >
                                                 <h6 className="mr-2 items-center"> {item.process || item.name}</h6>
-                                                <h6 className="mr-2 text-black/50 items-center">{item.processTemplate}</h6>
+                                                <h6 className="mr-2 text-black/50 items-center">{item.processTemplate || item.processTemplateName}</h6>
                                                 <p className="text-sm opacity-50 mr-2 font-normal items-center">{item.dueDate}</p>
-                                                <p className="text-sm opacity-50 mr-2 font-normal items-center">{item.assignees}</p>
+                                                <p className="text-sm opacity-50 mr-2 font-normal items-center">{item.assignees || item?.user?.name}</p>
                                                 <div className="flex flex-col">
-                                                    <div className="mb-1 text-xs text-black/50 items-center" style={{ textAlign: 'center' }}>{item.progress}</div>
+                                                    <div className="mb-1 text-xs text-black/50 items-center" style={{ textAlign: 'center' }}>{getProcessStepProgress(item.steps)}</div>
                                                     <div className="w-32 bg-gray-400 rounded-full h-1.5 items-center">
                                                         <div className=" h-1.5 rounded-full " style={{ width: `${item.progress}`, background: "#6cef6c" }}></div>
                                                     </div>
                                                 </div>
                                                 <div className="flex">
-                                                    
-                                                   
-                                                        <button
-                                                            //onClick={()=>{ontrackModal(item.id)}}
 
-                                                            className=" bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-2  h-6 text-left mr-2 w-24 text-center "
-                                                            data-modal-toggle="large-modal">
-                                                            On Track</button>
-                                                    
+                                                    <button
+                                                        //onClick={()=>{ontrackModal(item.id)}}
+                                                        className=" bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-2  h-6 text-left mr-2 w-24 text-center "
+                                                        data-modal-toggle="large-modal">
+                                                        On Track
+                                                    </button>
 
-                                                    <p style={{ lineHeight: '10px', textAlign: 'center' }}><span style={{ fontSize: '20px' }} >{item.votes}</span><br /><span style={{ fontSize: '10px' }}>Votes</span></p>
-                                                    <a href="#" className=" px-4 hover:bg-kelvinLight rounded-full" >
+
+                                                    <p style={{ lineHeight: '10px', textAlign: 'center' }}><span style={{ fontSize: '20px' }} >{getProcessStepVotesCount(item.steps)}</span><br /><span style={{ fontSize: '10px' }}>Votes</span></p>
+                                                    <span href="#" className=" px-4 hover:bg-kelvinLight rounded-full"
+                                                        onClick={(event) => {
+                                                            event.stopPropagation();
+                                                            setSelectedId(id => id === item.id ? "" : item.id)
+                                                        }
+                                                        } >
                                                         <i className="fa-solid fa-ellipsis-vertical text-xl"></i>
-                                                    </a>
-                                                    {item.deletePopup ? <button onClick={() => { deleteHandler(item.id) }}>delete</button> : null}
+                                                    </span>
+                                                    {item.id === selectedId ? <button onClick={() => { deleteHandler(item.id) }}>delete</button> : null}
                                                 </div>
                                             </div>
-                                            </Link>
+                                            {/* </Link> */}
                                         </>
                                     )
                                 })}
@@ -249,12 +178,17 @@ const ProcessListGroup = (props) => {
                         </div>
 
                     </div>
-                    : null
-                }
+                    :
+                    <ViewProcessList
+                        processItem={selectedProcess}
+                        organizationValues={organizationValues}
+                        updateProcessStepVotes={updateProcessStepVotes}
+                        isStepVoteUpdated={updateStepVotesSuccess}
+                        resetProcessRequestStatus={() => dispatch(processActions.resetStatus())}
+                        onCloseModal={() => setSelectedProcess(null)}
+                    />
 
-                {onTrackModal ? <ViewProcess votedModal={showVotedModal} processListSelectedData={processListSelectedData} /> : null}
-                {votedModal ? <VotingDetails closeModal={closeVotingModal} votingStepModal={showVotingStepModal} /> : null}
-                {votingStepModal ? <VotingSteps closeModal={closeVotingStepModal} /> : null}
+                }
             </MainLayout>
         </>
     )

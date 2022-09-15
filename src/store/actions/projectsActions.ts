@@ -4,6 +4,7 @@ export type Projects = {
   title: string
   orgId: string
   userId: string
+  id: string
 }
 
 const initialState = {
@@ -33,7 +34,10 @@ export const projectsSlice = createSlice({
       state.saveProjectsRequest = true;
     },
     saveProjectsSuccess: (state, action) => {
-      const copyState = [...state.projects, action.payload] as any;
+      const localProjects = localStorage.getItem("projects");
+      const copyProjects = localProjects ? JSON.parse(localProjects) : state.projects;
+      const copyState = [...copyProjects, action.payload] as any;
+
       state.saveProjectsRequest = true;
       state.isSaveProjectsSuccess = true;
       state.isSaveProjectsFailure = false;
