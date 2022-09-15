@@ -6,6 +6,7 @@ var Eth = require('web3-eth');
 
 
 import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client';
+import { passThroughSymbol } from 'next/dist/server/web/spec-compliant/fetch-event';
 
 import { useEffect } from "react";
 
@@ -29,13 +30,13 @@ const NearUpdate = (props) => {
  const GET_WALLET = gql`
    query wallet($id: String!) {
 	 wallet(input: {filter: {vulcanId: {_in: [$id]}}}) {
-		 result {auroraWallet}
+		 result {auroraWallet, vulcanId}
 	 }
    }
  `
  
  
-   const {loading: queryLoading, data: queryData, error: queryError, refetch} = useQuery(
+   const {loading: queryLoading, data: queryData, error: queryError, refetch, networkStatus} = useQuery(
 	 GET_USERS,
 	 {
 	   variables: {limit: 9999999},
@@ -43,7 +44,7 @@ const NearUpdate = (props) => {
 	 }
    )
  
-   const {loading: stampsLoading, data: stampsData, error: stampsError, refetch: stampsRefetch} = useQuery(
+   const {loading: stampsLoading, data: stampsData, error: stampsError, refetch: stampsRefetch, networkStatus: stampsStatus} = useQuery(
 	 GET_STAMPS,
 	 {
 	   variables: {user: "61b7d95a8e7c07eb90d8a8ce", collection: SAMPLE_VALUES[0]},
@@ -51,13 +52,61 @@ const NearUpdate = (props) => {
 	 }
    );
  
-   const {loading: walletLoading, data: walletData, error: walletError, refetch: walletRefetch} = useQuery(
+   const {loading: walletLoading, data: walletData, error: walletError, refetch: walletRefetch, networkStatus: walletStatus} = useQuery(
 	 GET_WALLET,
 	 {
 	   variables: {id: "61b7d95a8e7c07eb90d8a8ce"},
 	   notifyOnNetworkStatusChange: true
 	 }
    );
+
+   let userIds = [] as any;
+   let stampCounts = [] as any;
+   let avgStamps = 0;
+
+   useEffect(() => {
+	console.log("entered effect!");
+	console.log(walletData);
+	if (walletData && walletData["wallet"] && walletData["wallet"]["result"]) {
+		console.log("Wallet found in effect!");
+		console.log(walletData["wallet"]["result"]);
+	if(walletData["wallet"]["result"]["auroraWallet"] != "none") {
+		console.log("Real wallet found in effect!")
+		userIds.push(walletData["wallet"]["result"]["auroraWallet"]);
+		avgStamps = 0;
+		for(let j = 0; j < SAMPLE_VALUES.length; j++) {
+			console.log("Sample value:")
+			console.log(SAMPLE_VALUES[j]);
+			stampsRefetch({user: walletData["wallet"]["result"]["vulcanId"], collection: SAMPLE_VALUES[j]});
+		}
+		stampCounts.push(avgStamps);
+	}
+	}
+   }, [JSON.stringify(walletData)]);
+
+   useEffect(() => {
+	console.log("stamp time!");
+	console.log(stampsData);
+	if(stampsData) {
+		console.log("eep!");
+		console.log(stampsData);
+		avgStamps += stampsData["getUserStamps"]/SAMPLE_VALUES.length;
+	 }
+   }, [JSON.stringify(stampsData)]);
+
+   useEffect(() => {
+	if(queryData) {
+		console.log("got data!");
+		console.log(queryData);
+		for(let i = 0; i < queryData["vulcanUsers"]["results"].length; i++) {
+			let user = queryData["vulcanUsers"]["results"][i];
+			console.log("user!");
+			console.log(user);
+			walletRefetch({id: queryData["vulcanUsers"]["results"][i]._id});
+			}
+		}
+	}
+   , [JSON.stringify(queryData)]);
 
    const jsonInterface = [
 	{
@@ -572,7 +621,7 @@ const NearUpdate = (props) => {
 
 
  return <div>
-	<button onClick={() =>
+	<button onClick={async () =>
 	{
    Contract.setProvider('wss://testnet.aurora.dev');
    let eth = new Eth(Eth.givenProvider || 'wss://testnet.aurora.dev');
@@ -587,35 +636,48 @@ const NearUpdate = (props) => {
 
 
 
-    let userIds = [] as any;
-    let stampCounts = [] as any;
-	refetch().then(() => {
+    userIds = [] as any;
+    stampCounts = [] as any;
+	refetch().then(async () => {
 	if(queryData) {
 		console.log("got data!");
 		console.log(queryData);
 		for(let i = 0; i < queryData["vulcanUsers"]["results"].length; i++) {
 			let user = queryData["vulcanUsers"]["results"][i];
-			walletRefetch({id: user._id}).then(() => {
-				if (walletData && walletData["wallet"] && walletData["wallet"]["result"]) {
-				if(walletData["wallet"]["result"]["auroraWallet"] != "none") {
-					userIds.push(walletData["wallet"]["result"]["auroraWallet"]);
-					let avgStamps = 0;
-					for(let j = 0; j < SAMPLE_VALUES.length; j++) {
-						stampsRefetch({user: user._id, collection: SAMPLE_VALUES[j]}).then(() => {
-							if(stampsData) {
-							   avgStamps += stampsData["getUserStamps"]/SAMPLE_VALUES.length;
-							}
-						});
-				    }
-					stampCounts.push(avgStamps);
+			console.log("user!");
+			console.log(i);
+			console.log(user._id);
+			await walletRefetch({id: user._id});
+			console.log(walletData);
+			/*while(walletLoading) {
+				console.log("loading!");
+			}
+			if (walletData && walletData["wallet"] && walletData["wallet"]["result"]) {
+				console.log("Wallet found!");
+				console.log(walletData["wallet"]["result"]);
+			if(walletData["wallet"]["result"]["auroraWallet"] != "none") {
+				console.log("Real wallet found!")
+				userIds.push(walletData["wallet"]["result"]["auroraWallet"]);
+				let avgStamps = 0;
+				for(let j = 0; j < SAMPLE_VALUES.length; j++) {
+					console.log("Sample value:")
+					console.log(SAMPLE_VALUES[j]);
+					await stampsRefetch({user: user._id, collection: SAMPLE_VALUES[j]});
+					if(stampsData) {
+						console.log("eep!");
+						console.log(stampsData);
+						avgStamps += stampsData["getUserStamps"]/SAMPLE_VALUES.length;
+					}
+				
 				}
-				}
-			})
+				stampCounts.push(avgStamps);
+			}
+		    }
 
 			
 			
 			
-
+		  user = queryData["vulcanUsers"]["results"][i];*/
 		}
 
 	console.log("Calling contract!");
@@ -646,13 +708,30 @@ const NearUpdate = (props) => {
 
 	window.ethereum.request({ method: 'eth_requestAccounts' }).then((accounts) => {
 		console.log(accounts);
-		let encodedABI = contract.methods.buyTokens(1).encodeABI();
-		eth.sendTransaction({from: accounts[0], to: "0x5fe76a1CA26e1812dBdBb487454d30d4bA560110", data: encodedABI});
+		let encodedABI = contract.methods.buyTokens(100).encodeABI();
+		eth.sendTransaction({from: accounts[0], to: "0xeBB484E55c8F7263cdD831E587487F2ED3791e68", data: encodedABI});
 		//contract.methods.fullOverride(userIds, stampCounts).send({from: accounts[0]});
 		console.log("mint?");
     });
 
 }}>Mint some coins!</button>
+
+<button onClick={() => {
+	Contract.setProvider('wss://testnet.aurora.dev');
+	let eth = new Eth(Eth.givenProvider || 'wss://testnet.aurora.dev');
+	let address = "0xeBB484E55c8F7263cdD831E587487F2ED3791e68";
+	let recipient = "0xfb23bA9b689D139Dd8D5f029F89698f3D1141297";
+	let contract = new Contract(jsonInterface, address);
+
+	window.ethereum.request({ method: 'eth_requestAccounts' }).then((accounts) => {
+		console.log(accounts);
+		let encodedABI = contract.methods.transferFrom(accounts[0], recipient, 100).encodeABI();
+		eth.sendTransaction({from: accounts[0], to: "0xeBB484E55c8F7263cdD831E587487F2ED3791e68", data: encodedABI});
+		//contract.methods.fullOverride(userIds, stampCounts).send({from: accounts[0]});
+		console.log("transfer?");
+    });
+
+}}>Transfer some coins!</button>
 
 </div>
 ;
