@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import dayjs from 'dayjs';
 import MainLayout from '../../components/layout/MainLayout';
 import { processActions } from "../../store/actions/processActions";
 import { valuesActions } from "../../store/actions/valuesActions";
@@ -139,10 +140,10 @@ const ProcessListGroup = (props) => {
                                             >
                                                 <h6 className="mr-2 items-center"> {item.process || item.name}</h6>
                                                 <h6 className="mr-2 text-black/50 items-center">{item.processTemplate || item.processTemplateName}</h6>
-                                                <p className="text-sm opacity-50 mr-2 font-normal items-center">{item.dueDate}</p>
+                                                <p className="text-sm opacity-50 mr-2 font-normal items-center">by {item.dueDate ? dayjs(item.dueDate).format("MMM DD, YYYY") : ''}</p>
                                                 <p className="text-sm opacity-50 mr-2 font-normal items-center">{item.assignees || item?.user?.name}</p>
                                                 <div className="flex flex-col">
-                                                    <div className="mb-1 text-xs text-black/50 items-center" style={{ textAlign: 'center' }}>{getProcessStepProgress(item.steps)}</div>
+                                                    <div className="mb-1 text-xs text-black/50 items-center" style={{ textAlign: 'center' }}>{getProcessStepProgress(item.steps)}%</div>
                                                     <div className="w-32 bg-gray-400 rounded-full h-1.5 items-center">
                                                         <div className=" h-1.5 rounded-full " style={{ width: `${item.progress}`, background: "#6cef6c" }}></div>
                                                     </div>

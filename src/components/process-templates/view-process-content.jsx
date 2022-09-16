@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import dayjs from 'dayjs';
 import VotingSteps from './voting-steps';
 
 
@@ -76,7 +77,8 @@ const ViewProcess = (props) => {
         return totalVotes;
     }
 
-
+    const dueDate = templateData?.dueDate ? dayjs(templateData?.dueDate).format("DD MMM, YYYY") : '';
+    
     return (
         <>
             <head>
@@ -108,7 +110,7 @@ const ViewProcess = (props) => {
 
                             <div className="flex flex-col mb-4">
                                 <div className="flex mb-4">
-                                    <p className="text-kelvinDark p-2 px-4 border-2 mr-4 text-sm border-gray-300 rounded">Due by {templateData?.dueDate}
+                                    <p className="text-kelvinDark p-2 px-4 border-2 mr-4 text-sm border-gray-300 rounded">Due by {dueDate}
 
                                     </p>
                                     <div className="text-kelvinDark p-2 px-4 border-2 text-sm border-gray-300 rounded">Assignee <span
@@ -140,7 +142,7 @@ const ViewProcess = (props) => {
                                 <div className="flex flex-col bg-kelvinLight p-8">
                                     <h5 className="text-lg mb-4">{selectedStep?.name}</h5>
                                     <div className="flex mb-4 flex-wrap">
-                                        <p className="text-kelvinDark p-2 px-4 border-2 mr-4 text-sm border-gray-200 rounded">Due by {templateData?.dueDate}
+                                        <p className="text-kelvinDark p-2 px-4 border-2 mr-4 text-sm border-gray-200 rounded">Due by {dueDate}
 
                                         </p>
                                         <div className="text-kelvinDark p-2 px-4 border-2 text-sm border-gray-200 rounded mr-2">Assignee

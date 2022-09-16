@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { getUserId } from '~/services/user.service';
+import { Users} from "~/store/actions/usersActions";
 
 
 const CreateProcessList = (props) => {
@@ -7,9 +8,26 @@ const CreateProcessList = (props) => {
     const [errorMsg, setErrorMsg] = React.useState(false);
     const [state, setState] = useState({
         name: '',
-        user: {},
+        user: {} as Users,
         dueDate: ''
-    })
+    });
+
+    useEffect(() => {
+        if (processItem && processItem.estimatedDate && processItem.estimatedDate.length) {
+            const estimatedDate = processItem.estimatedDate?.[0]?.split("days")?.[0] ?? 0;
+            const estimatedHrs = processItem.estimatedDate?.[1]?.split("hrs")?.[0] ?? 0;
+            const estimatedMins = processItem.estimatedDate?.[2]?.split("mins")?.[0] ?? 0;
+            const currentDate = new Date();
+            currentDate.setDate(currentDate.getDate() + Number(estimatedDate));
+            console.log(currentDate, 'currentDate',estimatedHrs,  estimatedDate, estimatedMins)
+            currentDate.setHours(Number(estimatedHrs));
+            currentDate.setMinutes(Number(estimatedMins));
+            setState((state): any => ({
+                ...state,
+                dueDate: currentDate.toString()
+            }))
+        }
+    }, [processItem])
 
     const handleInputChange = (event) => {
         const { name, value } = event.target;
@@ -112,13 +130,15 @@ const CreateProcessList = (props) => {
                                     <div className="flex flex-col mb-8">
                                         <h4 className="text-lg mb-2">Due Date</h4>
                                         <input
-                                            type="date"
+                                            type="text"
                                             id="date"
                                             name="dueDate"
-                                            onChange={handleInputChange}
+                                            value={state.dueDate}
+                                            // onChange={handleInputChange}
                                             className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                             placeholder="John"
-                                            required
+                                            // required
+                                            disabled
                                         />
                                         <p className="text-xs opacity-50 mt-2">
                                             Auto calculated if it has estimated duration
