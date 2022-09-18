@@ -5,7 +5,7 @@ var Eth = require('web3-eth');
 
 
 
-import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client';
+import { gql, useMutation, useLazyQuery, NetworkStatus } from '@apollo/client';
 import { passThroughSymbol } from 'next/dist/server/web/spec-compliant/fetch-event';
 
 import { useEffect } from "react";
@@ -36,7 +36,7 @@ const NearUpdate = (props) => {
  `
  
  
-   const {loading: queryLoading, data: queryData, error: queryError, refetch, networkStatus} = useQuery(
+   const [refetch, {loading: queryLoading, data: queryData, error: queryError, networkStatus}] = useLazyQuery(
 	 GET_USERS,
 	 {
 	   variables: {limit: 9999999},
@@ -44,7 +44,7 @@ const NearUpdate = (props) => {
 	 }
    )
  
-   const {loading: stampsLoading, data: stampsData, error: stampsError, refetch: stampsRefetch, networkStatus: stampsStatus} = useQuery(
+   const [stampsRefetch, {loading: stampsLoading, data: stampsData, error: stampsError, networkStatus: stampsStatus}] = useLazyQuery(
 	 GET_STAMPS,
 	 {
 	   variables: {user: "61b7d95a8e7c07eb90d8a8ce", collection: SAMPLE_VALUES[0]},
@@ -52,7 +52,7 @@ const NearUpdate = (props) => {
 	 }
    );
  
-   const {loading: walletLoading, data: walletData, error: walletError, refetch: walletRefetch, networkStatus: walletStatus} = useQuery(
+   const [walletRefetch, {loading: walletLoading, data: walletData, error: walletError, networkStatus: walletStatus}] = useLazyQuery(
 	 GET_WALLET,
 	 {
 	   variables: {id: "61b7d95a8e7c07eb90d8a8ce"},
@@ -77,7 +77,7 @@ const NearUpdate = (props) => {
 		for(let j = 0; j < SAMPLE_VALUES.length; j++) {
 			console.log("Sample value:")
 			console.log(SAMPLE_VALUES[j]);
-			stampsRefetch({user: walletData["wallet"]["result"]["vulcanId"], collection: SAMPLE_VALUES[j]});
+			stampsRefetch({variables: {user: walletData["wallet"]["result"]["vulcanId"], collection: SAMPLE_VALUES[j]}});
 		}
 		stampCounts.push(avgStamps);
 	}
@@ -102,7 +102,7 @@ const NearUpdate = (props) => {
 			let user = queryData["vulcanUsers"]["results"][i];
 			console.log("user!");
 			console.log(user);
-			walletRefetch({id: queryData["vulcanUsers"]["results"][i]._id});
+			walletRefetch({variables: {id: queryData["vulcanUsers"]["results"][i]._id}});
 			}
 		}
 	}
@@ -647,7 +647,7 @@ const NearUpdate = (props) => {
 			console.log("user!");
 			console.log(i);
 			console.log(user._id);
-			await walletRefetch({id: user._id});
+			await walletRefetch({variables: {id: user._id}});
 			console.log(walletData);
 			/*while(walletLoading) {
 				console.log("loading!");
