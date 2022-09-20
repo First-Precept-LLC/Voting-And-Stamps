@@ -72,6 +72,18 @@ const ProcessListGroup = (props) => {
 
     }
 
+    const getProcessStatus = (currentSteps, dueDate) => {
+        const completedSteps = currentSteps?.filter(step => step.isCompleted);
+        const isDueDateOver = dayjs(dueDate).isBefore(dayjs());
+        if (completedSteps?.length === currentSteps?.length) {
+            return "Completed";
+        }
+        if (isDueDateOver && completedSteps?.length !== currentSteps?.length) {
+            return "Over Due";
+        }
+        return "On Track";
+    }
+
     return (
         <>
             <head>
@@ -154,7 +166,7 @@ const ProcessListGroup = (props) => {
                                                         //onClick={()=>{ontrackModal(item.id)}}
                                                         className=" bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-2  h-6 text-left mr-2 w-24 text-center "
                                                         data-modal-toggle="large-modal">
-                                                        On Track
+                                                        {getProcessStatus(item.steps, item.dueDate)}
                                                     </button>
 
 
