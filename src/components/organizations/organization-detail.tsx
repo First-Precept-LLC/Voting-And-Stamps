@@ -46,7 +46,7 @@ const OrganizationDetail = (props) => {
                     </div>))
                     }
 
-                    <button type="button"
+                    <button 
                         className="text-white  bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py-2 h-8 text-center mr-2 mb-2 hover:bg-kelvinBold"
                         data-modal-toggle="large-modal"
                         onClick={onAddValue} >
@@ -64,7 +64,7 @@ const OrganizationDetail = (props) => {
                         </div>)
                     })}
 
-                    <button type="button"
+                    <button 
                         className="text-white bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py-2 h-8 text-center mr-2 mb-2 hover:bg-kelvinBold"
                         data-modal-toggle="large-modal"
                         onClick={() => props.showSkills()} >
@@ -87,7 +87,7 @@ const OrganizationDetail = (props) => {
                     </div>))
                     }
 
-                    <button type="button"
+                    <button 
                         className="text-white bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py-1 min-h-8 text-left w-full mb-2 hover:bg-kelvinBold"
                         data-modal-toggle="large-modal"
                         onClick={() => props.showGoal()} >
@@ -110,7 +110,7 @@ const OrganizationDetail = (props) => {
                         </div>
                     </div>))}
 
-                    <button type="button"
+                    <button 
                         className="text-white  bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-pur w-full py-6ple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py-2 h-8 text-center mr-2 mb-2 hover:bg-kelvinBold"
                         data-modal-toggle="large-modal"
                         onClick={onAddProject} >

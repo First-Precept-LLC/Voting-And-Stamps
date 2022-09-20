@@ -63,7 +63,7 @@ function Users() {
             <div className="flex w-full p-8 flex-col">
             <div className="flex justify-between">
                 <h1 className="text-3xl mb-8">Users</h1>
-                <button type="button"
+                <button 
                    className="bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5  h-8 text-left mb-2 hover:bg-kelvinBold"
                    id="dropdownDefault" data-dropdown-toggle="dropdown">
                     <i className="fa-solid fa-sort"></i>
@@ -105,7 +105,7 @@ function Users() {
                         )
                     })}
                  
-                    <button type="button"
+                    <button 
                     disabled={!organizations}
                         className="text-white bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-8 text-left w-full mb-2 hover:bg-kelvinBold"
                         data-modal-toggle="large-modal" onClick={()=>{setAddUserPopup(true)}}>
