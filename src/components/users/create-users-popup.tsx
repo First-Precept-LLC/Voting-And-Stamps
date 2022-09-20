@@ -15,7 +15,7 @@ const CreateUserPopup = (props) => {
         setUsers, 
         addUser, 
         setAddUser, 
-        setAddUserPopup, 
+        onCloseModal, 
         organizations, 
         onCreateUsers,
         isEditMode,
@@ -57,7 +57,7 @@ const CreateUserPopup = (props) => {
     //     console.log(arr);
     //     setUsers([...arr]);
     //     createPUsersData({variables:{'name':addUser.name,'levelUp': addUser.levelUp,'department':addUser.department}});
-    //     setAddUserPopup(false);
+    //     onCloseModal(false);
     // }
 
     const handleCreateUsers = () => {
@@ -72,7 +72,7 @@ const CreateUserPopup = (props) => {
                 ...state
             });
         }
-        setAddUserPopup(false);
+        onCloseModal();
     }
 
     const handleInputChange = (event) => {
@@ -89,6 +89,8 @@ const CreateUserPopup = (props) => {
         department,
         levelUp
     } = state;
+
+    const labelText = isEditMode ? 'Update' : 'Create';
 
     return (
         <>
@@ -111,7 +113,7 @@ const CreateUserPopup = (props) => {
                                     <div className="flex flex-col ">
 
                                         <div className="flex flex-col mb-8">
-                                            <h2 className="text-3xl mb-2">Create User</h2>
+                                            <h2 className="text-3xl mb-2">{labelText} User</h2>
                                         </div>
                                         <div className="flex flex-col mb-8">
                                             <h4 className="text-xs font-bold mb-2">Name</h4>
@@ -120,7 +122,7 @@ const CreateUserPopup = (props) => {
                                                 style={{width:'21rem'}}
                                                 placeholder="Enter full name" value={name} required />
                                         </div>
-                                        <div className="flex flex-col mb-8">
+                                        {/* <div className="flex flex-col mb-8">
                                             <label htmlFor="countries" className="text-xs font-bold mb-2" >Role </label>
                                             <select value={role} id="countries" name="role" defaultValue={'DEFAULT'} onChange={handleInputChange}
                                                 className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
@@ -135,7 +137,7 @@ const CreateUserPopup = (props) => {
                             
                                             <p className="text-xs opacity-50 mt-2">you can select multiple roles for the users
                                             </p>
-                                        </div>
+                                        </div> */}
                                         <div className="flex flex-col mb-8">
                                             <label htmlFor="countries" className="text-xs font-bold mb-2" >1 Level Up </label>
                                             <select value={levelUp} id="countries" defaultValue={'DEFAULT'} name="levelUp"  onChange={handleInputChange}
@@ -189,14 +191,14 @@ const CreateUserPopup = (props) => {
                                 <div className="flex items-center p-6 space-x-2 rounded-b justify-end  dark:border-gray-600">
                                     <button type="button"
                                         className="text-kelvinBlack  hover:bg-kelvinLight focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6"
-                                        data-modal-toggle="success-modal"  onClick={()=>{setAddUserPopup(false)}}>Cancel</button>
+                                        data-modal-toggle="success-modal"  onClick={onCloseModal}>Cancel</button>
                                      <button 
                                         type="button"
                                         className="text-white bg-gradient-to-r from-kelvinDark to-kelvinBold hover:bg-gradient-to-br focus:ring-4  focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6"
                                         data-modal-toggle="success-modal" 
                                         onClick={handleCreateUsers}
-                                        disabled={!name || !role || !department || !levelUp}
-                                    >Create</button>
+                                        disabled={!name || !department || !levelUp}
+                                    >{labelText}</button>
                                 </div>
                             </form>
                         </div>

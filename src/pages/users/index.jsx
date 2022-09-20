@@ -81,9 +81,9 @@ function Users() {
                                 <h6 className="">{item.name}</h6>
                                 {/* <p class="text-xs text-kelvinBlack opacity-50">@saidutt</p> */}
                             </div>
-                            <div className="flex">
+                            {/* <div className="flex">
                                 <h6 className="">{item.role}</h6>
-                            </div>
+                            </div> */}
                             <a href="#" className="text-kelvinDark text-sm hover:underline">
                             {item.levelUp}
                             </a>
@@ -115,7 +115,10 @@ function Users() {
                 </div>
                 { addUserPopup && 
                     <CreateUserPopup 
-                        setAddUserPopup={setAddUserPopup}
+                    onCloseModal={() =>  {
+                        setAddUserPopup(false);
+                        setSelectedUser(null)
+                    }}
                         organizations={organizations}
                         onCreateUsers={handleCreateUsers}
                         isEditMode={!!selectedUser}

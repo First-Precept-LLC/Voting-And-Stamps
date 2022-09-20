@@ -8,7 +8,7 @@ const CreateValue = ({ onCloseModal, onCreateValue, organizations }) => {
     title: '',
     icon: '',
     description: '',
-    votes: 0
+    votes: 20
   })
 
 
@@ -104,19 +104,6 @@ const CreateValue = ({ onCloseModal, onCreateValue, organizations }) => {
                     <p className="text-xs opacity-50 mt-2">
                       Select the approriate icon for the value you want to add
                     </p>
-                  </div>
-                  <div className="flex flex-col mb-8">
-                    <h4 className="text-lg mb-2">Value Votes</h4>
-                    <input
-                      type="number"
-                      id="votes"
-                      name="votes"
-                      value={votes}
-                      onChange={handleInputChange}
-                      className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                      placeholder="Votes"
-                      required
-                    />
                   </div>
                   <div className="flex flex-col">
                     <h4 className="text-lg mb-2">Description</h4>

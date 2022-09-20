@@ -92,6 +92,7 @@ function ProcessTemplates() {
                         organizations={organizations}
                         onCreateProcess={handleEditProcess}
                         processTemplateData={item}
+                        isEditItem={true}
                     />
                 }
                 {createModal && <TemplateSuccess closeModal={closeModal} /> }

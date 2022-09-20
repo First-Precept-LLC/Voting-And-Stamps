@@ -1,16 +1,21 @@
+import Link from 'next/link';
+
 function Header() {
   return (
     <>
       <nav className="bg-white border-gray-200 px-2 sm:px-4 py-2.5 rounded shadow shadow-md sticky top-0">
         <div className=" flex flex-wrap justify-between items-center mx-auto">
-          <a href="#" className="flex items-center">
-            <img
-              src="/logo.svg"
-              className="mr-3 h-6 sm:h-9"
-              alt="Project Kelvin Logo"
-            />
-            <span className="self-center text-xl font-semibold whitespace-nowrap dark:text-white"></span>
-          </a>
+          <Link href="/organizations" className="flex items-center">
+            <button>  
+              <img
+                src="/logo.svg"
+                className="mr-3 h-6 sm:h-9"
+                alt="Project Kelvin Logo"
+              />
+              <span className="self-center text-xl font-semibold whitespace-nowrap dark:text-white"></span>
+            </button>
+            
+          </Link>
           <div className="flex md:order-2">
             <button
               type="button"

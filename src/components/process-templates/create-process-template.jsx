@@ -2,9 +2,10 @@
 import { v4 as uuidV4 } from "uuid";
 import { useState, useEffect } from 'react';
 import { getUserId } from '../../services/user.service';
+import Link from "next/link";
 
 const CreateProcessTemplates = (props) => {
-    const { projects, organizations, onCreateProcess, processTemplateData } = props;
+    const { projects, organizations, onCreateProcess, processTemplateData, isEditItem } = props;
     const [showDate, setShowDate] = useState(false)
     const [isEstimateDateModalOpen, setIsEstimateDateModalOpen] = useState(false)
     const [selectedStep, setSelectedStep] = useState({});
@@ -201,16 +202,27 @@ const CreateProcessTemplates = (props) => {
     }
 
     const currentSelectedStep = selectedStep && selectedStep.id ? fields.find(field => field.id === selectedStep.id) ?? {} : {};
-
+    const labelText = isEditItem  ? 'Update' : 'Create';
     return (
         <>
             <div className="flex w-full p-8 flex-col">
                 <div className="flex justify-between">
-                    <h1 className="text-3xl mb-8">Create Process Template</h1>
-                    <button type="button" onClick={handleCreateProcess}
-                        className="text-white h-10 bg-gradient-to-r from-kelvinDark  to-kelvinBold hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2">
-                        Create
-                    </button>
+                    <h1 className="text-3xl mb-8">{labelText} Process Template</h1>
+                    <div>
+                        {isEditItem && <Link href="/process-template-list">
+                            <button
+                                type="button"
+                                className="text-black from-kelvinDark  to-kelvinBold hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6"
+                                data-modal-toggle="success-modal"
+                            >
+                            Cancel
+                            </button>
+                        </Link> }
+                        <button type="button" onClick={handleCreateProcess}
+                            className="text-white h-10 bg-gradient-to-r from-kelvinDark  to-kelvinBold hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2">
+                            {labelText}
+                        </button>
+                    </div> 
                 </div>
 
                 <div className="flex flex-col">

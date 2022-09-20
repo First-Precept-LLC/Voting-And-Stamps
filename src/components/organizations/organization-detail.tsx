@@ -30,9 +30,14 @@ const OrganizationDetail = (props) => {
                 </div>
                 <div
                     className="flex bg-kelvinLight p-4 rounded-md w-full flex-wrap grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5  items-end">
-                    {values?.map(item => (<div className="flex  p-2 ">
+                    {values?.map(item => (<div className="flex  p-2 " key={item.id}>
                         <div className="flex tems-center w-full p-4 bg-white shadow shadow-md rounded-md">
-                            <i className={"fa-solid " + item.icon + " text-2xl justify-center rounded-full p-4 bg-kelvinMedium text-white mr-2"}></i>
+                            {/* <i className={"fa-solid " + item.icon + " text-2xl justify-center rounded-full p-4 bg-kelvinMedium text-white mr-2"}></i> */}
+                            <img 
+                                src={'data:image/png;base64,' + item.icon} 
+                                alt={item.title} 
+                                style={{display: 'block', width: '50px', height: '50px', borderRadius: '50%'}}
+                            />
                             <div className="flex flex-col items-center">
                                 <h4>{item.title}</h4>
                                 <p className="text-xs px-4 opacity-50 font-normal text-center">{item.description}</p>
@@ -98,7 +103,7 @@ const OrganizationDetail = (props) => {
                 </div>
                 <div
                     className="flex bg-kelvinLight p-4 rounded-md w-full flex-wrap grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5  items-end">
-                    {projects?.map(item => (<div className="flex  p-2">
+                    {projects?.map(item => (<div className="flex  p-2" key={item.id}>
                         <div
                             className="flex items-center w-full py-6 justify-center p-4 bg-white shadow shadow-md rounded-md">
                             <h4>{item.title || item.name}</h4>
