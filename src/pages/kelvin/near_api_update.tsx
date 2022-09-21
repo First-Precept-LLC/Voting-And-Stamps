@@ -40,7 +40,8 @@ const NearUpdate = (props) => {
 	 GET_USERS,
 	 {
 	   variables: {limit: 9999999},
-	   notifyOnNetworkStatusChange: true
+	   notifyOnNetworkStatusChange: true,
+	   fetchPolicy: 'network-only'
 	 }
    )
  
@@ -48,7 +49,7 @@ const NearUpdate = (props) => {
 	 GET_STAMPS,
 	 {
 	   variables: {user: "61b7d95a8e7c07eb90d8a8ce", collection: SAMPLE_VALUES[0]},
-	   notifyOnNetworkStatusChange: true
+	   notifyOnNetworkStatusChange: true,
 	 }
    );
  
@@ -56,7 +57,7 @@ const NearUpdate = (props) => {
 	 GET_WALLET,
 	 {
 	   variables: {id: "61b7d95a8e7c07eb90d8a8ce"},
-	   notifyOnNetworkStatusChange: true
+	   notifyOnNetworkStatusChange: true,
 	 }
    );
 
@@ -95,18 +96,38 @@ const NearUpdate = (props) => {
    }, [JSON.stringify(stampsData)]);
 
    useEffect(() => {
-	if(queryData) {
-		console.log("got data!");
-		console.log(queryData);
-		for(let i = 0; i < queryData["vulcanUsers"]["results"].length; i++) {
-			let user = queryData["vulcanUsers"]["results"][i];
-			console.log("user!");
-			console.log(user);
-			walletRefetch({variables: {id: queryData["vulcanUsers"]["results"][i]._id}});
+	let body = async () => {
+
+		if(queryData) {
+			Contract.setProvider('wss://testnet.aurora.dev');
+            let eth = new Eth(Eth.givenProvider || 'wss://testnet.aurora.dev');
+            console.log("set!");
+            let address = "0xeBB484E55c8F7263cdD831E587487F2ED3791e68";
+            let contract = new Contract(jsonInterface, address);
+            userIds = [] as any;
+            stampCounts = [] as any;
+			console.log("got data in effect!");
+			console.log(queryData);
+			for(let i = 0; i < queryData["vulcanUsers"]["results"].length; i++) {
+				let user = queryData["vulcanUsers"]["results"][i];
+				console.log("user!");
+				console.log(user);
+				await walletRefetch({variables: {id: queryData["vulcanUsers"]["results"][i]._id}});
 			}
+			console.log("Calling contract!");
+	        window.ethereum.request({ method: 'eth_requestAccounts' }).then((accounts) => {
+		    console.log(accounts);
+		    let encodedABI = contract.methods.fullOverride(userIds, stampCounts).encodeABI();
+		    eth.sendTransaction({from: accounts[0], to: "0x5fe76a1CA26e1812dBdBb487454d30d4bA560110", data: encodedABI});
+		//contract.methods.fullOverride(userIds, stampCounts).send({from: accounts[0]});
+    });
 		}
-	}
-   , [JSON.stringify(queryData)]);
+
+	};
+	body();
+
+    }
+   , [JSON.stringify(networkStatus)]);
 
    const jsonInterface = [
 	{
@@ -638,7 +659,7 @@ const NearUpdate = (props) => {
 
     userIds = [] as any;
     stampCounts = [] as any;
-	refetch().then(async () => {
+	refetch();/*.then(async () => {
 	if(queryData) {
 		console.log("got data!");
 		console.log(queryData);
@@ -677,18 +698,14 @@ const NearUpdate = (props) => {
 			
 			
 			
-		  user = queryData["vulcanUsers"]["results"][i];*/
+		  user = queryData["vulcanUsers"]["results"][i];
 		}
 
-	console.log("Calling contract!");
-	window.ethereum.request({ method: 'eth_requestAccounts' }).then((accounts) => {
-		console.log(accounts);
-		let encodedABI = contract.methods.fullOverride(userIds, stampCounts).encodeABI();
-		eth.sendTransaction({from: accounts[0], to: "0x5fe76a1CA26e1812dBdBb487454d30d4bA560110", data: encodedABI});
-		//contract.methods.fullOverride(userIds, stampCounts).send({from: accounts[0]});
-    });
+	
+  } else {
+	console.log("no data in main body");
   }
-  });
+  });*/
 
 
  }
