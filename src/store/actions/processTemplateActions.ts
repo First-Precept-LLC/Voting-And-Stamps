@@ -17,6 +17,13 @@ type Steps = {
     isCompleted: false
 }
 
+export type Project = {
+    title: string
+    orgId: string
+    userId: string
+    id: string
+  }
+
 export type ProcessTemplate = {
   orgId: string
   userId: string
@@ -27,6 +34,7 @@ export type ProcessTemplate = {
   description: string
   steps: Steps[]
   id: string
+  project: Project
 }
 
 const initialState = {

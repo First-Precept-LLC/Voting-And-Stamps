@@ -1,4 +1,5 @@
 import React from "react";
+import Link from 'next/link';
 import { routes } from "~/lib/routes";
 import CreateValue from "./create-value";
 import CreateProject from "./create-projects";
@@ -103,12 +104,24 @@ const OrganizationDetail = (props) => {
                 </div>
                 <div
                     className="flex bg-kelvinLight p-4 rounded-md w-full flex-wrap grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5  items-end">
-                    {projects?.map(item => (<div className="flex  p-2" key={item.id}>
-                        <div
-                            className="flex items-center w-full py-6 justify-center p-4 bg-white shadow shadow-md rounded-md">
-                            <h4>{item.title || item.name}</h4>
-                        </div>
-                    </div>))}
+                    {projects?.map(item => (
+                        <Link 
+                            href={{
+                                pathname: "/project-process",
+                                query: {
+                                    id: item.id
+                                },
+                            }}
+                            key={item.id}
+                        >
+                            <div className="flex  p-2">
+                                <div
+                                    className="flex items-center w-full py-6 justify-center p-4 bg-white shadow shadow-md rounded-md">
+                                    <h4>{item.title || item.name}</h4>
+                                </div>
+                            </div>
+                        </Link>
+                    ))}
 
                     <button 
                         className="text-white  bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-pur w-full py-6ple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py-2 h-8 text-center mr-2 mb-2 hover:bg-kelvinBold"

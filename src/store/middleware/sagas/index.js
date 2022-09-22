@@ -10,10 +10,10 @@ import { processActions } from "~/store/actions/processActions"
 
 import { saveOrganizations, getOrganizations } from "./organizationsSaga";
 import { saveValues, getValues } from "./valuesSaga";
-import { saveProjects, getProjects } from "./projectsSaga";
+import { saveProjects, getProjects, getProjectById } from "./projectsSaga";
 import { getUsers, saveUsers, editUsers } from "./usersSaga";
 import { getProcessTemplates, saveProcessTemplates, editProcessTemplates, deleteProcessTemplates } from "./processTemplateSaga";
-import { getProcess, saveProcess, editProcess, deleteProcess, updateProcessStepVotes } from "./processSaga"
+import { getProcess, saveProcess, editProcess, deleteProcess, updateProcessStepVotes, getProcessByProjectId } from "./processSaga"
 
 
 export default function* rootSagas() {
@@ -29,6 +29,7 @@ export default function* rootSagas() {
     // projects
     takeLatest(projectsActions.saveProjectsRequest.type, saveProjects),
     takeLatest(projectsActions.getProjectsRequest.type, getProjects),
+    takeLatest(projectsActions.getProjectByIdRequest.type, getProjectById),
 
 
     // users
@@ -48,6 +49,8 @@ export default function* rootSagas() {
     takeLatest(processActions.saveProcessRequest.type, saveProcess),
     takeLatest(processActions.editProcessRequest.type, editProcess),
     takeLatest(processActions.deleteProcessRequest.type, deleteProcess),
-    takeLatest(processActions.updateStepVotesRequest.type, updateProcessStepVotes)
+    takeLatest(processActions.updateStepVotesRequest.type, updateProcessStepVotes),
+    takeLatest(processActions.getProcessByProjectIdRequest.type, getProcessByProjectId)
+
   ])
 }

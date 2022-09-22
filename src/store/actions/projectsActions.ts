@@ -11,8 +11,11 @@ const initialState = {
   getProjectsRequest: false,
   projects: [],
   saveProjectsRequest: false,
-    isSaveProjectsSuccess: false,
-    isSaveProjectsFailure: false
+  isSaveProjectsSuccess: false,
+  isSaveProjectsFailure: false,
+
+  getProjectByIdRequest: false,
+  projectById: {},
 }
 
 export const projectsSlice = createSlice({
@@ -53,6 +56,17 @@ export const projectsSlice = createSlice({
       state.isSaveProjectsSuccess = false;
       state.isSaveProjectsFailure = false;
     },
+    getProjectByIdRequest: (state, action) => {
+      state.getProjectByIdRequest = true;
+    },
+    getProjectByIdSuccess: (state, action) => {
+      state.getProjectByIdRequest = false;
+      state.projectById = action.payload;
+    },
+    getProjectByIdFailure: (state, action) => {
+      state.getProjectByIdRequest = false;
+      state.projectById = {};
+    }
   },
 })
 

@@ -34,3 +34,18 @@ export function* saveProjects({payload}) {
   }
 }
 
+export function* getProjectById({payload}) {
+  const localProjects = localStorage.getItem("projects") ? JSON.parse(localStorage.getItem("projects")) : [];
+  const project = localProjects?.find((process) => process?.id === payload);
+  try {
+    yield put({
+      type: projectsActions.getProjectByIdSuccess.type,
+      payload: project ?? {}
+    })
+  } catch (error) {
+    yield put({
+      type: projectsActions.getProjectByIdFailure.type,
+    })
+  }
+}
+

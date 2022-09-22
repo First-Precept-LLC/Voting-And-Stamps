@@ -13,16 +13,11 @@ import { usersActions } from '../../store/actions/usersActions';
 const ProcessTemplateList = (props) => {
 
     const [processItem, setProcessItem] = useState({})
-    const [userId, setUserId] = useState('');
-    const [status, setStatus] = useState(false);
-    const [processListData, setProcessListData] = useState([
-        { process: 'Research of Model v1', processTemplate: 'Start research development', project: 'R&D', dueBy: 'Aug 22, 2022', assignees: 'Matt', votes: '24', id: '1', percent: '70%', deletePopup: false },
-        { process: 'Submission of Model v2', processTemplate: 'Submitting Designs', project: 'R&D', dueBy: 'Aug 28, 2022', assignees: 'Saidutt', votes: '2', id: '2', percent: '33%', deletePopup: false }
-
-    ]);
-    const [pro, setPro] = useState([]);
-    const [finalList, setFinalList] = useState([]);
     const [selectedItemId, setSelectedItemId] = useState('');
+    const [createDetails, setCreateDetails] = useState(false);
+    const [processModal, setProcessModal] = useState(false);
+    const [search, setSearch] = useState('');
+    const [searchedTemplate, setSearchedTemplate] = useState([]);
 
     const dispatch = useDispatch();
     const {
@@ -48,7 +43,16 @@ const ProcessTemplateList = (props) => {
             nextProcess();
             dispatch(processActions.resetStatus());
         }
-    }, [saveProcessRequest, isSaveProcessSuccess])
+    }, [saveProcessRequest, isSaveProcessSuccess]);
+
+    useEffect(() => {
+        let copyTemplate = [...processTemplates];
+        if (search?.trim()) {
+            copyTemplate = copyTemplate.filter((template) => template.name?.toLowerCase().includes(search.toLowerCase()) 
+            || template?.project?.title?.toLowerCase()?.includes(search))
+        }
+        setSearchedTemplate(copyTemplate);
+    }, [search, processTemplates]);
 
 
     const deletePopupHandler = (selectedId) => {
@@ -61,111 +65,28 @@ const ProcessTemplateList = (props) => {
     }
 
     const deleteHandler = (itemId) => {
-        // let data = [...finalList]
-        // data.splice(index, 1);
-        // setFinalList(data);
         dispatch(processTemplateActions.deleteProcessTemplateRequest(itemId))
     }
 
-    const [createDetails, setCreateDetails] = useState(false)
-    const [processModal, setProcessModal] = useState(false)
-    const [modal, setModal] = useState(false)
-    const [onTrackModal, setOnTrackModal] = useState(false)
-    const [votedModal, setVotedModal] = useState(false)
-    const [votingStepModal, setVotingStepModal] = useState(false)
 
-    // const CreatePage = () => {
-    //     setProcessList(false);
-    //     setCreateDetails(false);
-    //     setProcessModal(false);
-    //     setModal(false);
-    //     setOnTrackModal(false)
-    //     setVotedModal(false)
-    //     setVotingStepModal(false)
-
-    //     console.log({
-    //         project: project,
-    //         name: proName,
-    //         duration: estDuration,
-    //         description: desc,
-    //         step: step,
-    //         title: stepTitle,
-    //         textDescription: text
-
-    //     })
-    // }
-
-    const processCreated = () => {
-        setProcessModal(true);
-        setOnTrackModal(false)
-        setCreateDetails(false);
-        setVotedModal(false)
-        setVotingStepModal(false)
-        setModal(false)
-        console.log()
-    }
     const createdModal = () => {
-        setModal(true)
-        setOnTrackModal(false)
-        setVotedModal(false)
-        setVotingStepModal(false)
         setCreateDetails(false);
         setProcessModal(false);
 
     }
     const createProcessList = (item) => {
-
         setProcessItem(item);
         setCreateDetails(true);
         setProcessModal(false);
-        setOnTrackModal(false)
-        setVotedModal(false)
-        setVotingStepModal(false)
-        setModal(false)
     }
-    const ontrackModal = (id) => {
-        setOnTrackModal(true)
-        setVotedModal(false)
-        setVotingStepModal(false)
-        setCreateDetails(false);
-        setProcessModal(false);
-        setModal(false)
-    }
-    const showVotedModal = () => {
-        setOnTrackModal(false)
-        setVotedModal(true)
-        setVotingStepModal(false)
-        setCreateDetails(false);
-        setProcessModal(false);
-        setModal(false)
-    }
-    const showVotingStepModal = () => {
-        setOnTrackModal(false)
-        setVotedModal(false)
-        setVotingStepModal(true)
-        setCreateDetails(false);
-        setProcessModal(false);
-        setModal(false)
-    }
-
+    
     const onCloseModal = () => {
         setCreateDetails(false)
     }
+
     const nextProcess = () => {
-        console.log("hiiiiiiiii")
         setCreateDetails(false);
         setProcessModal(true);
-    }
-    const closeVotingModal = () => {
-        setVotedModal(false)
-        setOnTrackModal(true)
-
-    }
-    const closeVotingStepModal = () => {
-        setVotingStepModal(false)
-        setVotedModal(false)
-        setOnTrackModal(true)
-
     }
     // console.log(pro)
     console.log(processTemplates, "processTemplates", selectedItemId);
@@ -201,7 +122,7 @@ const ProcessTemplateList = (props) => {
                             <div className="flex">
                                 <input type="text" id="search-process-template"
                                     className="block p-2 px-5  h-8  w-44 text-gray-900 bg-white rounded-lg border border-gray-300 sm:text-sm focus:ring-blue-500 focus:border-blue-500 mr-2"
-                                    placeholder="Search..." />
+                                    placeholder="Search..." onChange={(event) => setSearch(event.target.value)} />
                                 <button
                                     className="text-white  bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5  h-8 text-left mb-2 hover:bg-kelvinBold"
                                     id="dropdownDefault" data-dropdown-toggle="dropdown">
@@ -218,7 +139,7 @@ const ProcessTemplateList = (props) => {
                                 </h4>
                             </div>
                             <div className="flex bg-kelvinLight p-4 rounded-md w-full flex-wrap">
-                                {processTemplates ? processTemplates.map((item, index) => {
+                                {searchedTemplate ? searchedTemplate.map((item, index) => {
                                     return (
                                         <div key={index}
                                             className="flex items-center w-full min-h-8 justify-between pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2 ">
@@ -230,7 +151,8 @@ const ProcessTemplateList = (props) => {
                                                     data-modal-toggle="large-modal">
                                                     <i className="fa-solid fa-play text-white mt-1 mr-1 text-xs"></i>
                                                     Create Process</button>
-                                                <Link href={{
+                                                <Link 
+                                                href={{
                                                     pathname: "/update-process-template",
                                                     query: {
                                                         data: JSON.stringify(item)
@@ -266,11 +188,8 @@ const ProcessTemplateList = (props) => {
                 {createDetails &&
                     <CreateProcessList
                         users={users}
-                        nextProcess={nextProcess}
                         processItem={processItem}
-                        userId={userId}
                         onCloseModal={onCloseModal}
-                        processCreated={processCreated}
                         handleCeateProcess={handleCeateProcess}
                     />}
                 {processModal && <CreatedTemplateSuccess createdModal={createdModal} />}

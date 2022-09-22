@@ -33,11 +33,10 @@ export type Project = {
     id: string
   }
 
-export type ProcessTemplate = {
+export type Process = {
   orgId: string
   userId: Project
   processTemplateId: string
-  project: string
   projectName: string
   name: string
   user: User
@@ -46,6 +45,7 @@ export type ProcessTemplate = {
   id: string
   processTemplateName: string
   processTemplateDescription: string
+  processTemplateProject: Project
 }
 
 const initialState = {
@@ -65,7 +65,10 @@ const initialState = {
 
   updateStepVotesRequest: false,
   updateStepVotesSuccess: false,
-  updateStepVotesFailure: false
+  updateStepVotesFailure: false,
+
+  getProcessByProjectId: false,
+  projectProcess: []
 }
 
 export const processTemplateSlice = createSlice({
@@ -175,6 +178,18 @@ export const processTemplateSlice = createSlice({
         state.updateStepVotesSuccess = false;
         state.updateStepVotesFailure = false;
     },
+    getProcessByProjectIdRequest: (state, action) => {
+        state.getProcessByProjectId = true;
+    },
+    getProcessByProjectIdSuccess: (state, action) => { 
+        state.getProcessByProjectId = false;
+        state.projectProcess = action.payload ?? [];
+    },
+    getProcessByProjectIdFailure: (state) => { 
+        state.getProcessByProjectId = false;
+        state.projectProcess = [];
+    },
+
     resetStatus: (state) => {
       state.isSaveProcessSuccess = false;
       state.isSaveProcessFailure = false;

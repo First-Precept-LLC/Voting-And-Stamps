@@ -77,3 +77,18 @@ export function* editProcess({payload}) {
     }
   }
 
+  export function* getProcessByProjectId({payload}) {
+    const localProcess = localStorage.getItem("process") ? JSON.parse(localStorage.getItem("process")) : [];
+    const projectProcess = localProcess?.filter((process) => process?.processTemplateProject?.id === payload);
+    try {
+      yield put({
+        type: processActions.getProcessByProjectIdSuccess.type,
+        payload: projectProcess
+      })
+    } catch (error) {
+      yield put({
+        type: processActions.getProcessByProjectIdFailure.type,
+      })
+    }
+  }
+

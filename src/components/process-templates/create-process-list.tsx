@@ -57,6 +57,7 @@ const CreateProcessList = (props) => {
                 processTemplateId: processItem.id,
                 processTemplateName: processItem.name,
                 processTemplateDescription: processItem.description,
+                processTemplateProject: processItem.project,
                 steps: processItem.steps,
                 userId: getUserId(),
                 orgId: processItem.orgId,
