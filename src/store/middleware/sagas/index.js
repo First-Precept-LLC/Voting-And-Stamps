@@ -12,7 +12,7 @@ import { saveOrganizations, getOrganizations } from "./organizationsSaga";
 import { saveValues, getValues } from "./valuesSaga";
 import { saveProjects, getProjects, getProjectById } from "./projectsSaga";
 import { getUsers, saveUsers, editUsers } from "./usersSaga";
-import { getProcessTemplates, saveProcessTemplates, editProcessTemplates, deleteProcessTemplates } from "./processTemplateSaga";
+import { getProcessTemplates, saveProcessTemplates, editProcessTemplates, deleteProcessTemplates, getProcessTemplateByProjectId } from "./processTemplateSaga";
 import { getProcess, saveProcess, editProcess, deleteProcess, updateProcessStepVotes, getProcessByProjectId } from "./processSaga"
 
 
@@ -43,6 +43,7 @@ export default function* rootSagas() {
     takeLatest(processTemplateActions.saveProcessTemplateRequest.type, saveProcessTemplates),
     takeLatest(processTemplateActions.editProcessTemplateRequest.type, editProcessTemplates),
     takeLatest(processTemplateActions.deleteProcessTemplateRequest.type, deleteProcessTemplates),
+    takeLatest(processTemplateActions.getProcessTemplateByProjectIdRequest.type, getProcessTemplateByProjectId),
 
     // process 
     takeLatest(processActions.getProcessRequest.type, getProcess),

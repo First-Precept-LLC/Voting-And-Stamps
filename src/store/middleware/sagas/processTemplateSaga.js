@@ -62,3 +62,18 @@ export function* editProcessTemplates({payload}) {
     }
   }
 
+  export function* getProcessTemplateByProjectId({payload}) {
+    const localProcessTemplates = localStorage.getItem("processTemplates") ? JSON.parse(localStorage.getItem("processTemplates")) : [];
+    const projectProcessTemplates = localProcessTemplates?.filter((template) => template?.project?.id === payload);
+    try {
+      yield put({
+        type: processTemplateActions.getProcessTemplateByProjectIdSuccess.type,
+        payload: projectProcessTemplates
+      })
+    } catch (error) {
+      yield put({
+        type: processTemplateActions.getProcessTemplateByProjectIdFailure.type,
+      })
+    }
+  }
+

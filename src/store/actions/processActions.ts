@@ -167,6 +167,12 @@ export const processTemplateSlice = createSlice({
                 copyState[findTemplateIndex] = processData;
             }
         }
+        if (state.projectProcess.length) {
+            const copyProjectProcess = state.projectProcess as any;
+            const projectProcessIds = [...copyProjectProcess].map((process) => process.id);
+            const filterprojectProcess = copyState.filter((process) => projectProcessIds.includes(process.id))
+            state.projectProcess = filterprojectProcess;
+        }
         state.updateStepVotesRequest = false;
         state.updateStepVotesSuccess = true;
         state.updateStepVotesFailure = false;

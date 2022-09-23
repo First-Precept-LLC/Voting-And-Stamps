@@ -51,6 +51,9 @@ const initialState = {
   deleteProcessTemplateRequest: false,
   isDeleteProcessTemplateSuccess: false,
   isDeleteProcessTemplateFailure: false,
+
+  getProcessTemplateByProjectId: false,
+  projectProcessTemplates: []
 }
 
 export const processTemplateSlice = createSlice({
@@ -119,9 +122,20 @@ export const processTemplateSlice = createSlice({
         state.processTemplates = copyState;
       },
     deleteProcessTemplateFailure: (state) => {
-    state.deleteProcessTemplateRequest = false;
-    state.isDeleteProcessTemplateSuccess = false;
-    state.isDeleteProcessTemplateFailure = true;
+        state.deleteProcessTemplateRequest = false;
+        state.isDeleteProcessTemplateSuccess = false;
+        state.isDeleteProcessTemplateFailure = true;
+    },
+    getProcessTemplateByProjectIdRequest: (state, action) => {
+        state.getProcessTemplateByProjectId = true;
+    },
+    getProcessTemplateByProjectIdSuccess: (state, action) => { 
+        state.getProcessTemplateByProjectId = false;
+        state.projectProcessTemplates = action.payload ?? [];
+    },
+    getProcessTemplateByProjectIdFailure: (state) => { 
+        state.getProcessTemplateByProjectId = false;
+        state.projectProcessTemplates = [];
     },
     resetStatus: (state) => {
       state.isSaveProcessTemplateSuccess = false;
