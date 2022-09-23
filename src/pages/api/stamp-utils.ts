@@ -140,7 +140,7 @@ export class Utilities {
   //Find all the votes a user has made.
   static async get_votes_by_user(userwallet, collection){
 		let targetTable = Utilities.UserVotes;
-    let allUserVotes = await targetTable.find({user: Utilities.db.collection("users").findOne({username: userwallet}), graph: collection}).toArray();
+    let allUserVotes = await targetTable.find({user: userwallet, graph: collection}).toArray();
     let total = 0;
     for (let i = 0; i < allUserVotes.length; i++) {
         total += allUserVotes[i].votecount;
@@ -172,12 +172,14 @@ export class Utilities {
   }
   //Get the total votes for a provided trust graph.
   static async get_total_votes(collection){
+    console.log("Total votes for " + collection);
 		let targetTable = Utilities.UserVotes;
     let allUserVotes = await targetTable.find({graph: collection}).toArray();
     let total = 0;
     for (let i = 0; i < allUserVotes.length; i++) {
         total += allUserVotes[i].votecount;
     }
+    console.log(total)
     return total;
   }
   //Get every vote for a provided trust graph.
@@ -198,9 +200,6 @@ export class Utilities {
               users.push(allUserVotes[i].votedFor);
           }
       }
-      console.log("dupes?");
-      console.log(users);
-      console.log([...new Set(users)]);
       return [...new Set(users)];
   }
   //Get every trust graph.
@@ -450,16 +449,13 @@ export class StampsModule {
     //Calculate the stamps each user has, given all the votes thus far.
     async calculate_stamps(collection) {
       //set up and solve the system of linear equations
-      console.log("RECALCULATING STAMP SCORES");
+      console.log("RECALCULATING STAMP SCORES for " + collection);
       let allUsers = [] as any;
       for (let i = 0; i < this.graphs.length; i++) {
           let users = await this.utils.get_users(this.graphs[i]);
-          console.log("Adding!");
-          console.log(users);
           allUsers = [...new Set([...allUsers, ...users])];
-          console.log("userz!");
-          console.log(allUsers);
       }
+
 
 
 		  this.utils.users = allUsers;
@@ -473,7 +469,7 @@ export class StampsModule {
 
       let users_matrix = Matrix.zeros(user_count, user_count);
 
-      let votes = await this.utils.get_all_user_votes(collection);		
+      let votes = await this.utils.get_all_user_votes(collection);
 
 
 
@@ -483,7 +479,18 @@ export class StampsModule {
         let votes_for_user = votes[i]['votecount'];
         let from_id_index = targetIndex[from_id];
         let toi = targetIndex[to_id];
+        
+
         let total_votes_by_user = await this.utils.get_votes_by_user(from_id, collection);
+        
+        if(collection == "Truth") {
+          console.log("Truly!");
+          console.log(from_id_index);
+          console.log(toi);
+          console.log(total_votes_by_user);
+          console.log(this.user_karma);
+        }
+
         if (total_votes_by_user != 0) {
             let score = (this.user_karma * votes_for_user) / total_votes_by_user;
             users_matrix.set(toi, from_id_index, users_matrix.get(toi, from_id_index) + score); 
@@ -560,21 +567,24 @@ export class StampsModule {
 
     //Get the stamps a user has regarding a particular trust graph.
     get_user_stamps(user, collection) {
+      console.log("start getting stamps for " + String(user)+ ", collection=" + collection);
 		  if (!user) {
 			  return 0;
 		  }
       let index = this.utils.index_dammit(user, collection);
       console.log("get_user_stamps for " + String(user)+ ", index=" + String(index) + ", collection=" + collection);
       let stamps = 0.0; //Maybe readd nonzero predicate when seed users are figured out?
-      if (!collection || !index ) {
+      if (!collection || (!index && index != 0) ) {
         return stamps;
       }
-			stamps = this.utils.scores[collection][index] * this.total_votes;
+			stamps = this.utils.scores[collection][index] * this.total_votes[collection];
 	
 
-			console.log(this.utils.scores[index]);
+			console.log(this.utils.scores[collection][index]);
 		  console.log(this.utils.scores);
       console.log(this.total_votes);
+      console.log(stamps);
+      console.log("done!");
       return stamps;
     }
 

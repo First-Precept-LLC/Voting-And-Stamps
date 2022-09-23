@@ -50,6 +50,7 @@ const NearUpdate = (props) => {
 	 {
 	   variables: {user: "61b7d95a8e7c07eb90d8a8ce", collection: SAMPLE_VALUES[0]},
 	   notifyOnNetworkStatusChange: true,
+	   fetchPolicy: 'network-only'
 	 }
    );
  
