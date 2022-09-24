@@ -146,7 +146,7 @@ const ViewProcess = (props) => {
 
                                         </p>
                                         <div className="text-kelvinDark p-2 px-4 border-2 text-sm border-gray-200 rounded mr-2">Assignee
-                                            <span className="text-white bg-kelvinDark p-1 px-2 ml-2 rounded text-sm">{templateData?.user?.name}</span>
+                                            <span className="text-white bg-kelvinDark p-1 px-2 ml-2 rounded text-sm">{selectedStep?.user?.name}</span>
                                         </div>
                                         <button disabled={selectedStep.isCompleted} onClick={() => { if (selectedStep?.name) { setVotingStepModal(true) } }} className="flex text-white bg-kelvinDark items-center px-2 rounded text-sm">
                                             {/* <!-- navigate to voting widget --> */}

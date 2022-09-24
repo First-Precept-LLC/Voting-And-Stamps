@@ -34,3 +34,16 @@ export function* saveValues({payload}) {
   }
 }
 
+export function* editValues({payload}) {
+  try {
+    yield put({
+      type: valuesActions.editValuesSuccess.type,
+      payload,
+    })
+  } catch (error) {
+    yield put({
+      type: valuesActions.editValuesFailure.type,
+    })
+  }
+}
+

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { projectsActions } from "../../store/actions/projectsActions";
 import { organizationActions } from "../../store/actions/organizationsActions";
 import { processTemplateActions } from "../../store/actions/processTemplateActions";
+import { usersActions } from "../../store/actions/usersActions";
 import TemplateSuccess from '../../components/process-templates/template-success';
 import CreateProcessTemplates from "../../components/process-templates/create-process-template";
 import MainLayout from '../../components/layout/MainLayout';
@@ -28,10 +29,15 @@ function ProcessTemplates(props) {
         projects
     } = useSelector(state => state.projects);
 
+    const {
+        users
+    } = useSelector((state) => state.users);
+
 
     useEffect(() => {
         dispatch(organizationActions.getOrganizationRequest());
         dispatch(processTemplateActions.getProcessTemplateRequest());
+        dispatch(usersActions.getUsersRequest());
     }, []);
 
     useEffect(() => {
@@ -84,6 +90,7 @@ function ProcessTemplates(props) {
                         projects={projects}
                         organizations={organizations}
                         onCreateProcess={handleCreateProcess}
+                        users={users}
                     /> :
                     <TemplateSuccess closeModal={closeModal} />
                 }

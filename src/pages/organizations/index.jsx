@@ -31,6 +31,7 @@ function Organization() {
   const [skill, setSkills] = useState([])
   const [departmentValue, setDepartmentValues] = useState([])
   const [orgData, setOrgData] = useState({});
+  const [selectedValue, setSelectedValue] = useState(null);
 
   const {
     organizations,
@@ -82,17 +83,19 @@ function Organization() {
     // createExample({variables: {name:data.orgName,vision:data.vision,userId: getUserId()}});
   }
 
-  const handleAddValue = () => {
+  const handleAddValue = (value) => {
     setShowCreateModal(false);
     setShowSuccessModal(false);
     setShowOrgDetail(false);
     setShowCreateValue(true);
+    setSelectedValue(value);
   }
 
 
   const handleCloseValueModal = () => {
     setShowOrgDetail(true);
     setShowCreateValue(false);
+    setSelectedValue(null);
   }
 
   const handleCloseProjectModal = () => {
@@ -165,6 +168,10 @@ function Organization() {
     dispatch(valuesActions.saveValuesRequest(valuesData));
   }
 
+  const handleEditValues = (valuesData) => {
+    dispatch(valuesActions.editValuesRequest(valuesData));
+  }
+
   return (
     <>
       <head>
@@ -212,7 +219,16 @@ function Organization() {
                 showValue={showValue}
               />
             }
-            {showCreateValue && <CreateValue organizations={organizations} onCreateValue={handleCreateValues} onCloseModal={handleCloseValueModal} />}
+            {showCreateValue && 
+              <CreateValue 
+                organizations={organizations} 
+                onCreateValue={handleCreateValues} 
+                onCloseModal={handleCloseValueModal} 
+                onEditValue={handleEditValues}
+                selectedValue={selectedValue}
+                isEditMode={!!selectedValue}
+              />
+            }
 
             {showAddGoal && <CreateGoal createValue={createValue} closeModal={closeValueModal} />}
 

@@ -7,7 +7,7 @@ const CreateUserPopup = (props) => {
         name: '',
         levelUp: '',
         role: '',
-        department: ''
+        department: {} as any
     });
 
     const { 
@@ -77,6 +77,14 @@ const CreateUserPopup = (props) => {
 
     const handleInputChange = (event) => {
         const { name, value } = event.target;
+        if (name === 'department') {
+            const findDepartment = props.departments?.find(dep => dep.id === value);
+            setState(state => ({
+                ...state,
+                [name]: findDepartment ?? {}
+            }))
+            return;
+        }
         setState(copyState => ({
             ...copyState,
             [name]: value
@@ -138,7 +146,7 @@ const CreateUserPopup = (props) => {
                                             <p className="text-xs opacity-50 mt-2">you can select multiple roles for the users
                                             </p>
                                         </div> */}
-                                        <div className="flex flex-col mb-8">
+                                        {/* <div className="flex flex-col mb-8">
                                             <label htmlFor="countries" className="text-xs font-bold mb-2" >1 Level Up </label>
                                             <select value={levelUp} id="countries" defaultValue={'DEFAULT'} name="levelUp"  onChange={handleInputChange}
                                                 className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
@@ -153,16 +161,19 @@ const CreateUserPopup = (props) => {
                             
                                             <p className="text-xs opacity-50 mt-2">select the users 1 level above the user
                                             </p>
-                                        </div>
+                                        </div> */}
                                         <div className="flex flex-col mb-8">
                                             <label htmlFor="countries" className="text-xs font-bold mb-2" >Department </label>
-                                            <select value={department} id="countries" defaultValue={'DEFAULT'} name="department"  onChange={handleInputChange}
+                                            <select value={department?.id} id="countries" defaultValue={''} name="department"  onChange={handleInputChange}
                                                 className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                                                <option value="DEFAULT">Select the department user belongs to</option>
-                                                <option value="Department1">Department1</option>
+                                                <option value="">Select the department user belongs to</option>
+                                                {/* <option value="Department1">Department1</option>
                                                 <option value="Department2">Department2</option>
                                                 <option value="Department3">Department3</option>
-                                                <option value="Department4">Department4</option>
+                                                <option value="Department4">Department4</option> */}
+                                                {props?.departments?.map((dep) => (
+                                                    <option key={dep.id} value={dep.id}>{dep.title}</option>
+                                                ))}
                                             </select>
 
 
@@ -197,7 +208,7 @@ const CreateUserPopup = (props) => {
                                         className="text-white bg-gradient-to-r from-kelvinDark to-kelvinBold hover:bg-gradient-to-br focus:ring-4  focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6"
                                         data-modal-toggle="success-modal" 
                                         onClick={handleCreateUsers}
-                                        disabled={!name || !department || !levelUp}
+                                        disabled={!name || !department}
                                     >{labelText}</button>
                                 </div>
                             </form>

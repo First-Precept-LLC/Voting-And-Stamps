@@ -15,6 +15,7 @@ type Steps = {
     description: string
     votes: {}
     isCompleted: false
+    user: User
 }
 
 type User = {

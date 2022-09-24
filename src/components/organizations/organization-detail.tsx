@@ -32,7 +32,10 @@ const OrganizationDetail = (props) => {
                 <div
                     className="flex bg-kelvinLight p-4 rounded-md w-full flex-wrap grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5  items-end">
                     {values?.map(item => (<div className="flex  p-2 " key={item.id}>
-                        <div className="flex tems-center w-full p-4 bg-white shadow shadow-md rounded-md">
+                        <div  
+                            className="flex tems-center w-full p-4 bg-white shadow shadow-md rounded-md"
+                            onClick={() => onAddValue(item)}
+                        >
                             {/* <i className={"fa-solid " + item.icon + " text-2xl justify-center rounded-full p-4 bg-kelvinMedium text-white mr-2"}></i> */}
                             <img 
                                 src={'data:image/png;base64,' + item.icon} 
@@ -50,7 +53,7 @@ const OrganizationDetail = (props) => {
                     <button 
                         className="text-white  bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py-2 h-8 text-center mr-2 mb-2 hover:bg-kelvinBold"
                         data-modal-toggle="large-modal"
-                        onClick={onAddValue} >
+                        onClick={() => onAddValue()} >
                         <i className="fa-solid fa-plus"></i>
                         Add Value </button>
                 </div>

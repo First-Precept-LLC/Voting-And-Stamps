@@ -7,6 +7,7 @@ export type Values = {
   orgId: string
   userId: string
   votes: number
+  iconFileName: string
 }
 
 const initialState = {
@@ -14,7 +15,10 @@ const initialState = {
   values: [],
   saveValuesRequest: false,
    isSaveValuesSuccess: false,
-   isSaveValuesFailure: false
+   isSaveValuesFailure: false,
+   editUsersRequest: false,
+   isEditValuesSuccess: false,
+   isEditValuesFailure: false
 }
 
 export const valuesSlice = createSlice({
@@ -47,6 +51,27 @@ export const valuesSlice = createSlice({
       state.saveValuesRequest = true;
       state.isSaveValuesSuccess = false;
       state.isSaveValuesFailure = true;
+    },
+    editValuesRequest: (state, action) => {
+      state.editUsersRequest = true;
+    },
+    editValuesSuccess: (state, action) => {
+      const localValues = localStorage.getItem("values");
+      const copyValues = localValues ? JSON.parse(localValues) : [];
+      const findUserIndex = copyValues.findIndex((value) => value.id === action.payload?.id);
+      if (findUserIndex !== -1) {
+        copyValues[findUserIndex] = action.payload;
+      }
+      state.editUsersRequest = true;
+      state.isEditValuesSuccess = true;
+      state.isEditValuesFailure = false;
+      localStorage.setItem("values", JSON.stringify(copyValues));
+      state.values = copyValues;
+    },
+    editValuesFailure: (state) => {
+      state.editUsersRequest = true;
+      state.isEditValuesSuccess = false;
+      state.isEditValuesFailure = true;
     },
     resetStatus: (state, action) => {
       state.isSaveValuesSuccess = false;

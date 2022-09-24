@@ -1,24 +1,36 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { getUserId } from "~/services/user.service";
 
 
-const CreateValue = ({ onCloseModal, onCreateValue, organizations }) => {
+const CreateValue = ({ onCloseModal, onCreateValue, organizations, selectedValue, isEditMode, onEditValue }) => {
   const [errorMsg, setError] = React.useState(false);
   const [state, setState] = useState({
     title: '',
     icon: '',
     description: '',
-    votes: 20
-  })
+    votes: 20,
+    iconFileName: ''
+  });
+
+  useEffect(() => {
+    if(selectedValue) {
+      setState(selectedValue);
+    }
+  }, [selectedValue, isEditMode])
 
 
   const handleCreateValue = () => {
     onCloseModal();
+    if (isEditMode) {
+      onEditValue(state);
+      return;
+    }
     onCreateValue({
       ...state,
       orgId: organizations?.id,
       userId: getUserId()
     });
+
   }
 
 
@@ -37,25 +49,28 @@ const CreateValue = ({ onCloseModal, onCreateValue, organizations }) => {
       reader.onload = (fileEvent: any) => {
         setState(copyState => ({
           ...copyState,
-          icon: fileEvent.target.result.split('base64,')[1]
+          icon: fileEvent.target.result.split('base64,')[1],
+          iconFileName: file?.name ?? '',
         }))
       }
       reader.onerror = () => {
         setState(copyState => ({
           ...copyState,
-          icon: ""
+          icon: "",
+          iconFileName: ''
         }))
       }
       reader.readAsDataURL(file)
     } catch (err) {
       setState(copyState => ({
         ...copyState,
-        icon: ""
+        icon: "",
+        iconFileName: ''
       }))
     }
   }
 
-  const { title, icon, description, votes } = state;
+  const { title, icon, description, votes, iconFileName } = state;
 
   return (
     <>
@@ -102,7 +117,7 @@ const CreateValue = ({ onCloseModal, onCreateValue, organizations }) => {
                       onChange={handleFileChange}
                     />
                     <p className="text-xs opacity-50 mt-2">
-                      Select the approriate icon for the value you want to add
+                      {iconFileName || 'Select the approriate icon for the value you want to add'}
                     </p>
                   </div>
                   <div className="flex flex-col">
@@ -140,7 +155,7 @@ const CreateValue = ({ onCloseModal, onCreateValue, organizations }) => {
                   className="text-white bg-gradient-to-r from-kelvinDark  to-kelvinBold hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6"
                   data-modal-toggle="success-modal"
                 >
-                  Create
+                  {isEditMode ? 'Update' :  'Create'}
                 </button>
               </div>
             </form>

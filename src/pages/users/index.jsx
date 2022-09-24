@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { usersActions } from "../../store/actions/usersActions";
 import { organizationActions } from "../../store/actions/organizationsActions";
+import { projectsActions } from "../../store/actions/projectsActions";
 import MainLayout from '../../components/layout/MainLayout';
 import  CreateUserPopup from '../../components/users/create-users-popup'
 
@@ -19,6 +20,10 @@ function Users() {
         users
       } = useSelector(state => state.users);
 
+    const {
+        projects
+      } = useSelector(state => state.projects);
+    
     useEffect(() => {
         if (organizations) {
             dispatch(usersActions.getUsersRequest())
@@ -27,6 +32,7 @@ function Users() {
 
     useEffect(() => {
         dispatch(organizationActions.getOrganizationRequest());
+        dispatch(projectsActions.getProjectsRequest());
       }, []);
 
     
@@ -88,7 +94,7 @@ function Users() {
                             {item.levelUp}
                             </a>
                             <a href="#" className="text-kelvinDark text-sm hover:underline">
-                            {item.department} </a>
+                            {item.department?.title} </a>
                             <button 
                             onClick={() => {
                                 setAddUserPopup(true);
@@ -124,6 +130,7 @@ function Users() {
                         isEditMode={!!selectedUser}
                         selectedUser={selectedUser}
                         onEditUsers={handleEditUsers}
+                        departments={projects}
                     /> 
                 }
             </div>

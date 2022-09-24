@@ -1,10 +1,17 @@
 import { createSlice } from '@reduxjs/toolkit'
 
+export type Department = {
+  title: string
+  orgId: string
+  userId: string
+  id: string
+}
+
 export type Users = {
   name: string
   roleId: string
   levelUp: string
-  departmentId: string
+  department: Department
   id: string
   orgId: string
 }

@@ -10,7 +10,7 @@ const CreateProcessTemplates = (props) => {
     const [isEstimateDateModalOpen, setIsEstimateDateModalOpen] = useState(false)
     const [selectedStep, setSelectedStep] = useState({});
     const [fields, setFields] = useState([
-        { name: '', step: '', estimatedDate: [], description: '', showPopup: false, id: uuidV4(), selected: true, isCompleted: false, index: 0 }
+        { name: '', step: '', estimatedDate: [], description: '', showPopup: false, id: uuidV4(), selected: true, isCompleted: false, index: 0, user: {} }
     ]);
     const [errorMsg, setErrorMsg] = useState(false);
     const [processTemplate, setProcessTemplate] = useState({
@@ -121,8 +121,8 @@ const CreateProcessTemplates = (props) => {
 
     }
     const handleBlurOfstep = () => {
-        const currentSelectedStep = selectedStep && selectedStep.id ? fields.find(field => field.id === selectedStep.id) ?? {} : {};
-        if (currentSelectedStep?.estimatedDate?.length >= 3) {
+        const copyCurrentSelectedStep = selectedStep && selectedStep.id ? fields.find(field => field.id === selectedStep.id) ?? {} : {};
+        if (copyCurrentSelectedStep?.estimatedDate?.length >= 3) {
             setShowDate(false);
         }
     }
@@ -196,6 +196,13 @@ const CreateProcessTemplates = (props) => {
                     copyFields[index][name] = value;
                 }
                 break;
+            case "user": 
+            const findUser = props.users?.find(user => user.id === value);
+            console.log(value, 'ff', findUser, copyFields[index], index)
+            if (copyFields[index]) {
+                copyFields[index][name] = findUser ?? {};
+            }
+            break;
             default: break;
         }
         setFields(copyFields);
@@ -203,6 +210,7 @@ const CreateProcessTemplates = (props) => {
 
     const currentSelectedStep = selectedStep && selectedStep.id ? fields.find(field => field.id === selectedStep.id) ?? {} : {};
     const labelText = isEditItem  ? 'Update' : 'Create';
+    console.log(currentSelectedStep, 'currentSelectedStep')
     return (
         <>
             <div className="flex w-full p-8 flex-col">
@@ -344,8 +352,26 @@ const CreateProcessTemplates = (props) => {
                                 </button>
                             </div>
                         </div>
+                        {currentSelectedStep && !!Object.keys(currentSelectedStep).length &&
                         <div className="flex flex-col bg-kelvinLight p-4">
                             <h5 className="text-xl mb-4">{currentSelectedStep?.name}</h5>
+                            <div className="flex flex-col mb-8">
+                                        <h4 className="text-lg mb-2">User</h4>
+                                        <select
+                                            value={currentSelectedStep?.user?.id ?? ''}
+                                            name="user"
+                                            id="user"
+                                            onChange={(e) => handleStepInputChange(e, currentSelectedStep.index)}
+                                            className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                            <option>Select User</option>
+                                            {props?.users?.map((user) => (
+                                                <option key={user.id} value={user.id}>{user.name}</option>
+                                            ))}
+                                        </select>
+                                        <p className="text-xs opacity-50 mt-2">
+                                            Default user is populated from the role selected while creating process
+                                        </p>
+                                    </div>
                             <div className="flex flex-col mb-8">
                                 <h4 className="mb-2">Estimated Duration</h4>
                                 <div className="relative" onClick={stepEstimatedDate} >
@@ -450,7 +476,7 @@ const CreateProcessTemplates = (props) => {
                             {
                                 errorMsg ? <p style={{ color: 'red' }}>Please complete the form to proceed</p> : null
                             }
-                        </div>
+                        </div>}
                     </div>
                 </div>
             </div>

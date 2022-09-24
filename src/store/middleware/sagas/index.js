@@ -9,7 +9,7 @@ import { processActions } from "~/store/actions/processActions"
 
 
 import { saveOrganizations, getOrganizations } from "./organizationsSaga";
-import { saveValues, getValues } from "./valuesSaga";
+import { saveValues, getValues, editValues } from "./valuesSaga";
 import { saveProjects, getProjects, getProjectById } from "./projectsSaga";
 import { getUsers, saveUsers, editUsers } from "./usersSaga";
 import { getProcessTemplates, saveProcessTemplates, editProcessTemplates, deleteProcessTemplates, getProcessTemplateByProjectId } from "./processTemplateSaga";
@@ -25,6 +25,7 @@ export default function* rootSagas() {
     // values
     takeLatest(valuesActions.saveValuesRequest.type, saveValues),
     takeLatest(valuesActions.getValuesRequest.type, getValues),
+    takeLatest(valuesActions.editValuesRequest.type, editValues),
 
     // projects
     takeLatest(projectsActions.saveProjectsRequest.type, saveProjects),
