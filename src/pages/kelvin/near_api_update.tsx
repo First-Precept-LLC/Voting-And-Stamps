@@ -67,18 +67,11 @@ const NearUpdate = (props) => {
    let avgStamps = 0;
 
    useEffect(() => {
-	console.log("entered effect!");
-	console.log(walletData);
 	if (walletData && walletData["wallet"] && walletData["wallet"]["result"]) {
-		console.log("Wallet found in effect!");
-		console.log(walletData["wallet"]["result"]);
 	if(walletData["wallet"]["result"]["auroraWallet"] != "none") {
-		console.log("Real wallet found in effect!")
 		userIds.push(walletData["wallet"]["result"]["auroraWallet"]);
 		avgStamps = 0;
 		for(let j = 0; j < SAMPLE_VALUES.length; j++) {
-			console.log("Sample value:")
-			console.log(SAMPLE_VALUES[j]);
 			stampsRefetch({variables: {user: walletData["wallet"]["result"]["vulcanId"], collection: SAMPLE_VALUES[j]}});
 		}
 		stampCounts.push(avgStamps);
@@ -87,11 +80,7 @@ const NearUpdate = (props) => {
    }, [JSON.stringify(walletData)]);
 
    useEffect(() => {
-	console.log("stamp time!");
-	console.log(stampsData);
 	if(stampsData) {
-		console.log("eep!");
-		console.log(stampsData);
 		avgStamps += stampsData["getUserStamps"]/SAMPLE_VALUES.length;
 	 }
    }, [JSON.stringify(stampsData)]);
@@ -107,17 +96,11 @@ const NearUpdate = (props) => {
             let contract = new Contract(jsonInterface, address);
             userIds = [] as any;
             stampCounts = [] as any;
-			console.log("got data in effect!");
-			console.log(queryData);
 			for(let i = 0; i < queryData["vulcanUsers"]["results"].length; i++) {
 				let user = queryData["vulcanUsers"]["results"][i];
-				console.log("user!");
-				console.log(user);
 				await walletRefetch({variables: {id: queryData["vulcanUsers"]["results"][i]._id}});
 			}
-			console.log("Calling contract!");
 	        window.ethereum.request({ method: 'eth_requestAccounts' }).then((accounts) => {
-		    console.log(accounts);
 		    let encodedABI = contract.methods.fullOverride(userIds, stampCounts).encodeABI();
 		    eth.sendTransaction({from: accounts[0], to: "0x5fe76a1CA26e1812dBdBb487454d30d4bA560110", data: encodedABI});
 		//contract.methods.fullOverride(userIds, stampCounts).send({from: accounts[0]});
@@ -647,7 +630,6 @@ const NearUpdate = (props) => {
 	{
    Contract.setProvider('wss://testnet.aurora.dev');
    let eth = new Eth(Eth.givenProvider || 'wss://testnet.aurora.dev');
-   console.log("set!");
     let address = "0xeBB484E55c8F7263cdD831E587487F2ED3791e68";
 
     let contract = new Contract(jsonInterface, address);
@@ -660,54 +642,7 @@ const NearUpdate = (props) => {
 
     userIds = [] as any;
     stampCounts = [] as any;
-	refetch();/*.then(async () => {
-	if(queryData) {
-		console.log("got data!");
-		console.log(queryData);
-		for(let i = 0; i < queryData["vulcanUsers"]["results"].length; i++) {
-			let user = queryData["vulcanUsers"]["results"][i];
-			console.log("user!");
-			console.log(i);
-			console.log(user._id);
-			await walletRefetch({variables: {id: user._id}});
-			console.log(walletData);
-			/*while(walletLoading) {
-				console.log("loading!");
-			}
-			if (walletData && walletData["wallet"] && walletData["wallet"]["result"]) {
-				console.log("Wallet found!");
-				console.log(walletData["wallet"]["result"]);
-			if(walletData["wallet"]["result"]["auroraWallet"] != "none") {
-				console.log("Real wallet found!")
-				userIds.push(walletData["wallet"]["result"]["auroraWallet"]);
-				let avgStamps = 0;
-				for(let j = 0; j < SAMPLE_VALUES.length; j++) {
-					console.log("Sample value:")
-					console.log(SAMPLE_VALUES[j]);
-					await stampsRefetch({user: user._id, collection: SAMPLE_VALUES[j]});
-					if(stampsData) {
-						console.log("eep!");
-						console.log(stampsData);
-						avgStamps += stampsData["getUserStamps"]/SAMPLE_VALUES.length;
-					}
-				
-				}
-				stampCounts.push(avgStamps);
-			}
-		    }
-
-			
-			
-			
-		  user = queryData["vulcanUsers"]["results"][i];
-		}
-
-	
-  } else {
-	console.log("no data in main body");
-  }
-  });*/
-
+	refetch();
 
  }
 }>Call the contract!</button>

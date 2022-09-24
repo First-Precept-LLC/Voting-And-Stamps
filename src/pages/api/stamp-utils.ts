@@ -114,9 +114,7 @@ export class Utilities {
     static get_user_score(user, collection) {
         let userIndex = this.index_dammit(user, collection);
         if (userIndex) {
-          console.log(Utilities.scores);
           let res = Utilities.scores[collection][userIndex];
-          console.log("Aha!");
           return res;
         }
         return 0.0;
@@ -172,14 +170,12 @@ export class Utilities {
   }
   //Get the total votes for a provided trust graph.
   static async get_total_votes(collection){
-    console.log("Total votes for " + collection);
 		let targetTable = Utilities.UserVotes;
     let allUserVotes = await targetTable.find({graph: collection}).toArray();
     let total = 0;
     for (let i = 0; i < allUserVotes.length; i++) {
         total += allUserVotes[i].votecount;
     }
-    console.log(total)
     return total;
   }
   //Get every vote for a provided trust graph.
@@ -482,14 +478,6 @@ export class StampsModule {
         
 
         let total_votes_by_user = await this.utils.get_votes_by_user(from_id, collection);
-        
-        if(collection == "Truth") {
-          console.log("Truly!");
-          console.log(from_id_index);
-          console.log(toi);
-          console.log(total_votes_by_user);
-          console.log(this.user_karma);
-        }
 
         if (total_votes_by_user != 0) {
             let score = (this.user_karma * votes_for_user) / total_votes_by_user;
@@ -578,13 +566,6 @@ export class StampsModule {
         return stamps;
       }
 			stamps = this.utils.scores[collection][index] * this.total_votes[collection];
-	
-
-			console.log(this.utils.scores[collection][index]);
-		  console.log(this.utils.scores);
-      console.log(this.total_votes);
-      console.log(stamps);
-      console.log("done!");
       return stamps;
     }
 
