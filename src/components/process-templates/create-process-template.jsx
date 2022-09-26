@@ -1,6 +1,6 @@
 
 import { v4 as uuidV4 } from "uuid";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Router from 'next/router'
 import { getUserId } from '../../services/user.service';
 
@@ -19,6 +19,8 @@ const CreateProcessTemplates = (props) => {
         estimatedDate: [],
         description: ""
     })
+    const processEstimatedRef = useRef(null);
+    const stepEstimatedRef = useRef(null);
 
     useEffect(() => {
         if (processTemplateData) {
@@ -34,8 +36,29 @@ const CreateProcessTemplates = (props) => {
                 setSelectedStep(processTemplateData?.steps[0])
             }
         }
-    }, [processTemplateData])
+    }, [processTemplateData]);
 
+    useEffect(() => {
+        document.addEventListener("mousedown", handleProcessEstimatedClickOutside);
+        document.addEventListener("mousedown", handleStepEstimatedClickOutside);
+        return () => {
+            // Unbind the event listener on clean up
+            document.removeEventListener("mousedown", handleProcessEstimatedClickOutside);
+            document.removeEventListener("mousedown", handleStepEstimatedClickOutside);
+        };
+    }, []);
+
+    const handleProcessEstimatedClickOutside = (event) => {
+        if (processEstimatedRef && !processEstimatedRef.current?.contains(event.target)) {
+            setIsEstimateDateModalOpen(false);
+        }
+    }
+
+    const handleStepEstimatedClickOutside = (event) => {
+        if (stepEstimatedRef && !stepEstimatedRef.current?.contains(event.target)) {
+            setShowDate(false);
+        }
+    }
 
     const handleInputChange = (event) => {
         const { name, value } = event.target;
@@ -45,7 +68,7 @@ const CreateProcessTemplates = (props) => {
                 ...state,
                 [name]: findProject ?? {}
             }));
-            return; 
+            return;
         }
         setProcessTemplate(state => ({
             ...state,
@@ -107,24 +130,11 @@ const CreateProcessTemplates = (props) => {
     }
 
     const stepEstimatedDate = () => {
-        setShowDate(!showDate);
+        setShowDate(state => !state);
     }
 
     const showEstimateDateModal = () => {
         setIsEstimateDateModalOpen(state => !state);
-    }
-
-    const handleBlur = () => {
-        if (processTemplate.estimatedDate.length === 3) {
-            setIsEstimateDateModalOpen(false);
-        }
-
-    }
-    const handleBlurOfstep = () => {
-        const copyCurrentSelectedStep = selectedStep && selectedStep.id ? fields.find(field => field.id === selectedStep.id) ?? {} : {};
-        if (copyCurrentSelectedStep?.estimatedDate?.length >= 3) {
-            setShowDate(false);
-        }
     }
 
     const setSelectedStepData = (item, index) => {
@@ -136,6 +146,7 @@ const CreateProcessTemplates = (props) => {
 
 
     const handleStepsEstimatedDuration = (event) => {
+        event.preventDefault();
         const { name, value } = event.target;
         const copyFields = [...fields];
         const selectedStepIndex = selectedStep && selectedStep.id ? copyFields.findIndex(field => field.id === selectedStep.id) : -1;
@@ -161,6 +172,7 @@ const CreateProcessTemplates = (props) => {
     }
 
     const handleProcessEstimatedDuration = (event) => {
+        event.preventDefault();
         const { name, value } = event.target;
         const duration = [...processTemplate.estimatedDate];
         switch (name) {
@@ -175,7 +187,7 @@ const CreateProcessTemplates = (props) => {
                 break;
             default: break;
         }
-
+       
         setProcessTemplate(state => ({
             ...state,
             estimatedDate: duration
@@ -196,21 +208,20 @@ const CreateProcessTemplates = (props) => {
                     copyFields[index][name] = value;
                 }
                 break;
-            case "user": 
-            const findUser = props.users?.find(user => user.id === value);
-            console.log(value, 'ff', findUser, copyFields[index], index)
-            if (copyFields[index]) {
-                copyFields[index][name] = findUser ?? {};
-            }
-            break;
+            case "user":
+                const findUser = props.users?.find(user => user.id === value);
+                console.log(value, 'ff', findUser, copyFields[index], index)
+                if (copyFields[index]) {
+                    copyFields[index][name] = findUser ?? {};
+                }
+                break;
             default: break;
         }
         setFields(copyFields);
     }
 
     const currentSelectedStep = selectedStep && selectedStep.id ? fields.find(field => field.id === selectedStep.id) ?? {} : {};
-    const labelText = isEditItem  ? 'Update' : 'Create';
-    console.log(currentSelectedStep, 'currentSelectedStep')
+    const labelText = isEditItem ? 'Update' : 'Create';
     return (
         <>
             <div className="flex w-full p-8 flex-col">
@@ -224,14 +235,14 @@ const CreateProcessTemplates = (props) => {
                                 data-modal-toggle="success-modal"
                                 onClick={() => Router.back()}
                             >
-                            Cancel
+                                Cancel
                             </button>
                         }
                         <button type="button" onClick={handleCreateProcess}
                             className="text-white h-10 bg-gradient-to-r from-kelvinDark  to-kelvinBold hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2">
                             {labelText}
                         </button>
-                    </div> 
+                    </div>
                 </div>
 
                 <div className="flex flex-col">
@@ -255,7 +266,7 @@ const CreateProcessTemplates = (props) => {
                         </div>
                         <div className="flex flex-col mb-8">
                             <h4 className="text-xs font-bold mb-2">Estimated Duration</h4>
-                            <div className="relative" onClick={showEstimateDateModal}>
+                            <div ref={processEstimatedRef} className="relative" onClick={showEstimateDateModal}>
                                 <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                     <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="kelvinBold"
                                         viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -270,39 +281,44 @@ const CreateProcessTemplates = (props) => {
                                     data-dropdown-toggle="dropdownDivider"
                                     className="bg-white border-2 border-gray-300 text-gray-900 sm:text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5"
                                     placeholder="Estimated Duration" disabled readOnly />
+                                <div>
+                                {isEstimateDateModalOpen &&
+                                    <div id="dropdownDivider" onClick={() => {
+                                        setIsEstimateDateModalOpen(state => !state);
+                                    }}
+                                        className="z-10 p-4 bg-kelvinLight divide-y divide-gray-100 rounded rounded-lg shadow w-80 "
+                                        data-popper-reference-hidden="" data-popper-escaped="" data-popper-placement="top"
+                                        style={{ position: 'absolute', inset: 'auto auto 0px 0px', top: '43px', left: '22px', height: '200px', margin: '0px'}}>
+                                        <div className="py-1">
+                                            <span
+                                                className="block px-4 py-2 text-xs text-center text-gray-700 hover:bg-gray-100">Dynamic
+                                                Estimated Duration</span>
+                                        </div>
+                                        <ul className="py-1 flex text-sm text-gray-700 dark:text-gray-200 justify-between"
+                                            aria-labelledby="dropdownDividerButton">
+                                            <li className="">
+                                                <span className="block px-4 py-2 hover:bg-gray-100 text-kelvinDark">Days</span>
+                                                <input type="number" name="days" required value={parseInt(processTemplate.estimatedDate?.[0] ?? '')} onChange={handleProcessEstimatedDuration}
+                                                    className="w-20 bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
+                                            </li>
+                                            <li>
+                                                <span className="block px-4 py-2 hover:bg-gray-100 text-kelvinDark  ">Hours</span>
+                                                <input type="number" name="hrs" required value={parseInt(processTemplate.estimatedDate?.[1] ?? '')} onChange={handleProcessEstimatedDuration}
+                                                    className="w-20 bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
+                                            </li>
+                                            <li>
+                                                <span className="block px-4 py-2 hover:bg-gray-100 text-kelvinDark  ">Minutes</span>
+                                                <input type="number" name="mins" required value={parseInt(processTemplate.estimatedDate?.[2] ?? '')} onChange={handleProcessEstimatedDuration}
+                                                    className="w-20 bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
+                                            </li>
+                                        </ul>
+
+                                    </div>
+                                }
+                                </div>
                             </div>
                         </div>
-                        {isEstimateDateModalOpen &&
-                            <div id="dropdownDivider" onBlur={handleBlur}
-                                className="z-10 p-4 bg-kelvinLight divide-y divide-gray-100 rounded rounded-lg shadow w-80 "
-                                data-popper-reference-hidden="" data-popper-escaped="" data-popper-placement="top"
-                                style={{ position: 'absolute', inset: 'auto auto 0px 0px', top: '250px', right: '1px', height: '200px', margin: '0px', transform: 'translate3d(970.5px, 11px, 0px)' }}>
-                                <div className="py-1">
-                                    <a href="#"
-                                        className="block px-4 py-2 text-xs text-center text-gray-700 hover:bg-gray-100">Dynamic
-                                        Estimated Duration</a>
-                                </div>
-                                <ul className="py-1 flex text-sm text-gray-700 dark:text-gray-200 justify-between"
-                                    aria-labelledby="dropdownDividerButton">
-                                    <li className="">
-                                        <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-kelvinDark">Days</a>
-                                        <input type="number" name="days" required value={parseInt(processTemplate.estimatedDate?.[0] ?? '')} onChange={handleProcessEstimatedDuration}
-                                            className="w-20 bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
-                                    </li>
-                                    <li>
-                                        <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-kelvinDark  ">Hours</a>
-                                        <input type="number" name="hrs" required value={parseInt(processTemplate.estimatedDate?.[1] ?? '')} onChange={handleProcessEstimatedDuration}
-                                            className="w-20 bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
-                                    </li>
-                                    <li>
-                                        <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-kelvinDark  ">Minutes</a>
-                                        <input type="number" name="mins" required value={parseInt(processTemplate.estimatedDate?.[2] ?? '')} onChange={handleProcessEstimatedDuration}
-                                            className="w-20 bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
-                                    </li>
-                                </ul>
 
-                            </div>
-                        }
 
 
                     </div>
@@ -344,7 +360,7 @@ const CreateProcessTemplates = (props) => {
                                     })
                                 }
 
-                                <button onClick={() => handleAddField()} 
+                                <button onClick={() => handleAddField()}
                                     className="text-white bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-8 text-left w-full mb-2 hover:bg-kelvinBold"
                                     data-modal-toggle="large-modal">
                                     <i className="fa-solid fa-plus"></i>
@@ -353,130 +369,132 @@ const CreateProcessTemplates = (props) => {
                             </div>
                         </div>
                         {currentSelectedStep && !!Object.keys(currentSelectedStep).length &&
-                        <div className="flex flex-col bg-kelvinLight p-4">
-                            <h5 className="text-xl mb-4">{currentSelectedStep?.name}</h5>
-                            <div className="flex flex-col mb-8">
-                                        <h4 className="text-lg mb-2">User</h4>
-                                        <select
-                                            value={currentSelectedStep?.user?.id ?? ''}
-                                            name="user"
-                                            id="user"
-                                            onChange={(e) => handleStepInputChange(e, currentSelectedStep.index)}
-                                            className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                                            <option>Select User</option>
-                                            {props?.users?.map((user) => (
-                                                <option key={user.id} value={user.id}>{user.name}</option>
-                                            ))}
-                                        </select>
-                                        <p className="text-xs opacity-50 mt-2">
-                                            Default user is populated from the role selected while creating process
-                                        </p>
-                                    </div>
-                            <div className="flex flex-col mb-8">
-                                <h4 className="mb-2">Estimated Duration</h4>
-                                <div className="relative" onClick={stepEstimatedDate} >
-                                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                        <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="kelvinBold"
-                                            viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                            <path fillRule="evenodd"
-                                                d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                                                clipRule="evenodd"></path>
-                                        </svg>
-                                    </div>
-                                    <input id="dropdownDividerButton" data-dropdown-toggle="dropdownDivider"
-                                        className="bg-white border-2 border-gray-300 text-gray-900 sm:text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  datepicker-input"
-                                        placeholder="Estimated Duration" disabled
-                                        value={currentSelectedStep?.estimatedDate} />
+                            <div className="flex flex-col bg-kelvinLight p-4">
+                                <h5 className="text-xl mb-4">{currentSelectedStep?.name}</h5>
+                                <div className="flex flex-col mb-8">
+                                    <h4 className="text-lg mb-2">User</h4>
+                                    <select
+                                        value={currentSelectedStep?.user?.id ?? ''}
+                                        name="user"
+                                        id="user"
+                                        onChange={(e) => handleStepInputChange(e, currentSelectedStep.index)}
+                                        className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                        <option>Select User</option>
+                                        {props?.users?.map((user) => (
+                                            <option key={user.id} value={user.id}>{user.name}</option>
+                                        ))}
+                                    </select>
+                                    <p className="text-xs opacity-50 mt-2">
+                                        Default user is populated from the role selected while creating process
+                                    </p>
                                 </div>
-                            </div>
-
-                            {showDate ?
-                                <div id="dropdownDivider" onBlur={handleBlurOfstep}
-                                    className="z-10 p-4 bg-kelvinLight divide-y divide-gray-100 rounded rounded-lg shadow w-80 "
-                                    data-popper-reference-hidden="" data-popper-escaped="" data-popper-placement="top"
-                                    style={{ position: 'absolute', inset: 'auto auto 0px 0px', top: '250px', right: '1px', height: '200px', margin: '0px', transform: 'translate3d(842.5px, 344px, 0px)' }}>
-                                    <div className="py-1">
-                                        <a href="#"
-                                            className="block px-4 py-2 text-xs text-center text-gray-700 hover:bg-gray-100">Dynamic
-                                            Estimated Duration</a>
-                                    </div>
-                                    <ul className="py-1 flex text-sm text-gray-700 dark:text-gray-200 justify-between"
-                                        aria-labelledby="dropdownDividerButton">
-                                        <li className="">
-                                            <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-kelvinDark">Days</a>
-                                            <input type="number" name="days" required value={(currentSelectedStep && currentSelectedStep.estimatedDate && currentSelectedStep.estimatedDate[0] && currentSelectedStep.name !== null) ? parseInt(currentSelectedStep.estimatedDate[0]) : null} onChange={handleStepsEstimatedDuration}
-                                                className="w-20 bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
-                                        </li>
-                                        <li>
-                                            <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-kelvinDark  ">Hours</a>
-                                            <input type="number" name="hrs" required value={(currentSelectedStep && currentSelectedStep.estimatedDate && currentSelectedStep.estimatedDate[1] && currentSelectedStep.name !== null) ? parseInt(currentSelectedStep.estimatedDate[1]) : null} onChange={handleStepsEstimatedDuration}
-                                                className="w-20 bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
-                                        </li>
-                                        <li>
-                                            <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-kelvinDark  ">Minutes</a>
-                                            <input type="number" name="mins" required value={(currentSelectedStep && currentSelectedStep.estimatedDate && currentSelectedStep.estimatedDate[2] && currentSelectedStep.name !== null) ? parseInt(currentSelectedStep.estimatedDate[2]) : null} onChange={handleStepsEstimatedDuration}
-                                                className="w-20 bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
-                                        </li>
-                                    </ul>
-
-                                </div>
-                                : null}
-                            <div className="flex flex-col mb-4">
-                                <h4 className="mb-2">Description</h4>
-                                <form>
-                                    <div className="mb-4 w-full bg-gray-100 rounded-lg border border-gray-300 ">
-                                        <div className="py-2 px-4 bg-white rounded-b-lg ">
-                                            <textarea name="description" id="editor" rows="8" onChange={(e) => { handleStepInputChange(e, currentSelectedStep.index) }}
-                                                className="block px-0 w-full text-sm text-gray-800 bg-white border-0  focus:ring-0" style={{ height: '50px' }}
-                                                placeholder="Enter Description" required value={currentSelectedStep?.description ?? ''} >{currentSelectedStep?.description}</textarea>
+                                <div className="flex flex-col mb-8">
+                                    <h4 className="mb-2">Estimated Duration</h4>
+                                    <div ref={stepEstimatedRef} className="relative" onClick={stepEstimatedDate} >
+                                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                            <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="kelvinBold"
+                                                viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                                <path fillRule="evenodd"
+                                                    d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                                                    clipRule="evenodd"></path>
+                                            </svg>
                                         </div>
+                                        <input id="dropdownDividerButton" data-dropdown-toggle="dropdownDivider"
+                                            className="bg-white border-2 border-gray-300 text-gray-900 sm:text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  datepicker-input"
+                                            placeholder="Estimated Duration" disabled
+                                            value={currentSelectedStep?.estimatedDate} />
+                                            {showDate &&
+                                    <div id="dropdownDivider" onClick={() => {
+                                        setShowDate(state => !state)
+                                    }}
+                                        className="z-10 p-4 bg-kelvinLight divide-y divide-gray-100 rounded rounded-lg shadow w-80 "
+                                        data-popper-reference-hidden="" data-popper-escaped="" data-popper-placement="top"
+                                        style={{ position: 'absolute', inset: 'auto auto 0px 0px', top: '43px', left: '5px', height: '200px', margin: '0px' }}>
+                                        <div className="py-1">
+                                            <span
+                                                className="block px-4 py-2 text-xs text-center text-gray-700 hover:bg-gray-100">Dynamic
+                                                Estimated Duration</span>
+                                        </div>
+                                        <ul className="py-1 flex text-sm text-gray-700 dark:text-gray-200 justify-between"
+                                            aria-labelledby="dropdownDividerButton">
+                                            <li className="">
+                                                <span  className="block px-4 py-2 hover:bg-gray-100 text-kelvinDark">Days</span>
+                                                <input type="number" name="days" required value={(currentSelectedStep && currentSelectedStep.estimatedDate && currentSelectedStep.estimatedDate[0] && currentSelectedStep.name !== null) ? parseInt(currentSelectedStep.estimatedDate[0]) : null} onChange={handleStepsEstimatedDuration}
+                                                    className="w-20 bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
+                                            </li>
+                                            <li>
+                                                <span className="block px-4 py-2 hover:bg-gray-100 text-kelvinDark  ">Hours</span>
+                                                <input type="number" name="hrs" required value={(currentSelectedStep && currentSelectedStep.estimatedDate && currentSelectedStep.estimatedDate[1] && currentSelectedStep.name !== null) ? parseInt(currentSelectedStep.estimatedDate[1]) : null} onChange={handleStepsEstimatedDuration}
+                                                    className="w-20 bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
+                                            </li>
+                                            <li>
+                                                <span className="block px-4 py-2 hover:bg-gray-100 text-kelvinDark  ">Minutes</span>
+                                                <input type="number" name="mins" required value={(currentSelectedStep && currentSelectedStep.estimatedDate && currentSelectedStep.estimatedDate[2] && currentSelectedStep.name !== null) ? parseInt(currentSelectedStep.estimatedDate[2]) : null} onChange={handleStepsEstimatedDuration}
+                                                    className="w-20 bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
+                                            </li>
+                                        </ul>
 
-                                        <div className="flex flex-row float-right">
-                                            <div className="flex items-center space-x-1">
-                                                <button type="button"
-                                                    className="p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600">
-                                                    <i className="fa-solid fa-bold" style={{ color: '#0707ae', fontSize: '15px' }}></i>
-                                                </button>
-                                                <button type="button"
-                                                    className="p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600">
-                                                    <i className="fa-solid fa-italic" style={{ color: '#0707ae', fontSize: '15px' }}></i>
-                                                </button>
-                                                <button type="button"
-                                                    className="p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600">
-                                                    <i className="fa-solid fa-underline" style={{ color: '#0707ae', fontSize: '15px' }}></i>
-                                                </button>
-                                                <button type="button"
-                                                    className="p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600">
-                                                    <i className="fa-solid fa-link" style={{ color: '#0707ae', fontSize: '15px' }}></i>
-                                                </button>
+                                    </div>
+                                  }
+                                    </div>
+                                </div>
 
+                                <div className="flex flex-col mb-4">
+                                    <h4 className="mb-2">Description</h4>
+                                    <form>
+                                        <div className="mb-4 w-full bg-gray-100 rounded-lg border border-gray-300 ">
+                                            <div className="py-2 px-4 bg-white rounded-b-lg ">
+                                                <textarea name="description" id="editor" rows="8" onChange={(e) => { handleStepInputChange(e, currentSelectedStep.index) }}
+                                                    className="block px-0 w-full text-sm text-gray-800 bg-white border-0  focus:ring-0" style={{ height: '50px' }}
+                                                    placeholder="Enter Description" required value={currentSelectedStep?.description ?? ''} >{currentSelectedStep?.description}</textarea>
                                             </div>
-                                            <button type="button"
-                                                className="p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600">
-                                                <i className="fa-solid fa-align-left" style={{ color: '#0707ae', fontSize: '15px' }}></i>
-                                            </button>
-                                            <button type="button"
-                                                className="p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600">
-                                                <i className="fa-solid fa-align-center" style={{ color: '#0707ae', fontSize: '15px' }}></i>
-                                            </button>
-                                            <button type="button"
-                                                className="p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600">
-                                                <i className="fa-solid fa-align-right" style={{ color: '#0707ae', fontSize: '15px' }}></i>
-                                            </button>
-                                            <button type="button"
-                                                className="p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600">
-                                                <i className="fa-solid fa-list" style={{ color: '#0707ae', fontSize: '15px' }}></i>
-                                            </button>
+
+                                            <div className="flex flex-row float-right">
+                                                <div className="flex items-center space-x-1">
+                                                    <button type="button"
+                                                        className="p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600">
+                                                        <i className="fa-solid fa-bold" style={{ color: '#0707ae', fontSize: '15px' }}></i>
+                                                    </button>
+                                                    <button type="button"
+                                                        className="p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600">
+                                                        <i className="fa-solid fa-italic" style={{ color: '#0707ae', fontSize: '15px' }}></i>
+                                                    </button>
+                                                    <button type="button"
+                                                        className="p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600">
+                                                        <i className="fa-solid fa-underline" style={{ color: '#0707ae', fontSize: '15px' }}></i>
+                                                    </button>
+                                                    <button type="button"
+                                                        className="p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600">
+                                                        <i className="fa-solid fa-link" style={{ color: '#0707ae', fontSize: '15px' }}></i>
+                                                    </button>
+
+                                                </div>
+                                                <button type="button"
+                                                    className="p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600">
+                                                    <i className="fa-solid fa-align-left" style={{ color: '#0707ae', fontSize: '15px' }}></i>
+                                                </button>
+                                                <button type="button"
+                                                    className="p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600">
+                                                    <i className="fa-solid fa-align-center" style={{ color: '#0707ae', fontSize: '15px' }}></i>
+                                                </button>
+                                                <button type="button"
+                                                    className="p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600">
+                                                    <i className="fa-solid fa-align-right" style={{ color: '#0707ae', fontSize: '15px' }}></i>
+                                                </button>
+                                                <button type="button"
+                                                    className="p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600">
+                                                    <i className="fa-solid fa-list" style={{ color: '#0707ae', fontSize: '15px' }}></i>
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                </form>
+                                    </form>
 
-                            </div>
-                            {
-                                errorMsg ? <p style={{ color: 'red' }}>Please complete the form to proceed</p> : null
-                            }
-                        </div>}
+                                </div>
+                                {
+                                    errorMsg ? <p style={{ color: 'red' }}>Please complete the form to proceed</p> : null
+                                }
+                            </div>}
                     </div>
                 </div>
             </div>
