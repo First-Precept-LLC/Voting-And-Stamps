@@ -2,11 +2,11 @@ import React from "react";
 import Link from 'next/link';
 import { routes } from "~/lib/routes";
 import CreateValue from "./create-value";
-import CreateProject from "./create-projects";
+import CreateDepartment from "./create-departments";
 
 const OrganizationDetail = (props) => {
     // console.log(props)
-    const { orgData, projects, values, onAddProject, onAddValue } = props;
+    const { orgData, departments, values, onAddDepartment, onAddValue } = props;
     const [value, setValue] = React.useState(false)
     // const showValueModal=()=>{
     //     setShowValue(!showValue);
@@ -101,16 +101,16 @@ const OrganizationDetail = (props) => {
             </div> */}
             <div className="flex flex-col mb-8">
                 <div className="flex justify-between items-center">
-                    <h4 className="mb-1 text-md">Projects</h4>
+                    <h4 className="mb-1 text-md">Departments</h4>
                     <p className="text-xs opacity-50 font-normal">Values are the guiding principles around how decisions
                         should be made at your company. Learn More</p>
                 </div>
                 <div
                     className="flex bg-kelvinLight p-4 rounded-md w-full flex-wrap grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5  items-end">
-                    {projects?.map(item => (
+                    {departments?.map(item => (
                         <Link 
                             href={{
-                                pathname: "/project-process",
+                                pathname: "/department-process",
                                 query: {
                                     id: item.id
                                 },
@@ -129,9 +129,9 @@ const OrganizationDetail = (props) => {
                     <button 
                         className="text-white  bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-pur w-full py-6ple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py-2 h-8 text-center mr-2 mb-2 hover:bg-kelvinBold"
                         data-modal-toggle="large-modal"
-                        onClick={onAddProject} >
+                        onClick={onAddDepartment} >
                         <i className="fa-solid fa-plus"></i>
-                        Add project</button>
+                        Add department</button>
                 </div>
             </div>
         </div>

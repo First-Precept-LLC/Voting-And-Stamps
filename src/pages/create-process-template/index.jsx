@@ -1,7 +1,7 @@
 
 import { useDispatch, useSelector } from 'react-redux';
 import { useState, useEffect } from 'react';
-import { projectsActions } from "../../store/actions/projectsActions";
+import { departmentsActions } from "../../store/actions/departmentsActions";
 import { organizationActions } from "../../store/actions/organizationsActions";
 import { processTemplateActions } from "../../store/actions/processTemplateActions";
 import { usersActions } from "../../store/actions/usersActions";
@@ -26,8 +26,8 @@ function ProcessTemplates(props) {
     } = useSelector(state => state.processTemplate);
 
     const {
-        projects
-    } = useSelector(state => state.projects);
+        departments
+    } = useSelector(state => state.departments);
 
     const {
         users
@@ -42,7 +42,7 @@ function ProcessTemplates(props) {
 
     useEffect(() => {
         if (!getOrganizationRequest && organizations) {
-            dispatch(projectsActions.getProjectsRequest());
+            dispatch(departmentsActions.getDepartmentsRequest());
         }
     }, [getOrganizationRequest, organizations]);
 
@@ -87,7 +87,7 @@ function ProcessTemplates(props) {
 
                 {!createModal ?
                     <CreateProcessTemplates
-                        projects={projects}
+                        departments={departments}
                         organizations={organizations}
                         onCreateProcess={handleCreateProcess}
                         users={users}

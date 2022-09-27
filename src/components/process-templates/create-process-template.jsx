@@ -5,7 +5,7 @@ import Router from 'next/router'
 import { getUserId } from '../../services/user.service';
 
 const CreateProcessTemplates = (props) => {
-    const { projects, organizations, onCreateProcess, processTemplateData, isEditItem } = props;
+    const { departments, organizations, onCreateProcess, processTemplateData, isEditItem } = props;
     const [showDate, setShowDate] = useState(false)
     const [isEstimateDateModalOpen, setIsEstimateDateModalOpen] = useState(false)
     const [selectedStep, setSelectedStep] = useState({});
@@ -14,7 +14,7 @@ const CreateProcessTemplates = (props) => {
     ]);
     const [errorMsg, setErrorMsg] = useState(false);
     const [processTemplate, setProcessTemplate] = useState({
-        project: {},
+        department: {},
         name: "",
         estimatedDate: [],
         description: ""
@@ -26,7 +26,7 @@ const CreateProcessTemplates = (props) => {
         if (processTemplateData) {
             setProcessTemplate(state => ({
                 ...state,
-                project: processTemplateData.project ?? {},
+                department: processTemplateData.department ?? {},
                 name: processTemplateData.name,
                 estimatedDate: processTemplateData.estimatedDate,
                 description: processTemplateData.description
@@ -62,11 +62,11 @@ const CreateProcessTemplates = (props) => {
 
     const handleInputChange = (event) => {
         const { name, value } = event.target;
-        if (name === 'project') {
-            const findProject = projects?.find(project => project.id === value)
+        if (name === 'department') {
+            const findDepartment = departments?.find(department => department.id === value)
             setProcessTemplate(state => ({
                 ...state,
-                [name]: findProject ?? {}
+                [name]: findDepartment ?? {}
             }));
             return;
         }
@@ -78,8 +78,8 @@ const CreateProcessTemplates = (props) => {
 
     const handleCreateProcess = () => {
         setErrorMsg(false);
-        const { project, name, estimatedDate, description } = processTemplate;
-        if (project?.id && name && estimatedDate && description && fields.length) {
+        const { department, name, estimatedDate, description } = processTemplate;
+        if (department?.id && name && estimatedDate && description && fields.length) {
             onCreateProcess({
                 ...processTemplate,
                 steps: fields,
@@ -248,12 +248,12 @@ const CreateProcessTemplates = (props) => {
                 <div className="flex flex-col">
                     <div className="flex grid grid-cols-3 gap-4">
                         <div className="flex flex-col mb-8">
-                            <label htmlFor="countries" className="text-xs font-bold mb-2">Project</label>
-                            <select value={processTemplate?.project?.id} name="project" id="countries" onChange={handleInputChange}
+                            <label htmlFor="countries" className="text-xs font-bold mb-2">Department</label>
+                            <select value={processTemplate?.department?.id} name="department" id="countries" onChange={handleInputChange}
                                 className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                                <option selected="">Select Project</option>
-                                {projects?.map((project) => (
-                                    <option key={project.id} value={project.id}>{project.title}</option>
+                                <option selected="">Select Department</option>
+                                {departments?.map((department) => (
+                                    <option key={department.id} value={department.id}>{department.title}</option>
                                 ))}
                             </select>
 
@@ -449,7 +449,7 @@ const CreateProcessTemplates = (props) => {
                                                     placeholder="Enter Description" required value={currentSelectedStep?.description ?? ''} >{currentSelectedStep?.description}</textarea>
                                             </div>
 
-                                            <div className="flex flex-row float-right">
+                                            {/* <div className="flex flex-row float-right">
                                                 <div className="flex items-center space-x-1">
                                                     <button type="button"
                                                         className="p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600">
@@ -485,7 +485,7 @@ const CreateProcessTemplates = (props) => {
                                                     className="p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600">
                                                     <i className="fa-solid fa-list" style={{ color: '#0707ae', fontSize: '15px' }}></i>
                                                 </button>
-                                            </div>
+                                            </div> */}
                                         </div>
 
                                     </form>

@@ -77,17 +77,17 @@ export function* editProcess({payload}) {
     }
   }
 
-  export function* getProcessByProjectId({payload}) {
+  export function* getProcessByDepartmentId({payload}) {
     const localProcess = localStorage.getItem("process") ? JSON.parse(localStorage.getItem("process")) : [];
-    const projectProcess = localProcess?.filter((process) => process?.processTemplateProject?.id === payload);
+    const departmentProcess = localProcess?.filter((process) => process?.processTemplateDepartment?.id === payload);
     try {
       yield put({
-        type: processActions.getProcessByProjectIdSuccess.type,
-        payload: projectProcess
+        type: processActions.getProcessByDepartmentIdSuccess.type,
+        payload: departmentProcess
       })
     } catch (error) {
       yield put({
-        type: processActions.getProcessByProjectIdFailure.type,
+        type: processActions.getProcessByDepartmentIdFailure.type,
       })
     }
   }

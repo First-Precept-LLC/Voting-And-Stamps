@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { projectsActions } from "../../store/actions/projectsActions";
+import { departmentsActions } from "../../store/actions/departmentsActions";
 import { organizationActions } from "../../store/actions/organizationsActions";
 import { processTemplateActions } from "../../store/actions/processTemplateActions";
 import TemplateSuccess from '../../components/process-templates/template-success';
@@ -26,8 +26,8 @@ function ProcessTemplates() {
       } = useSelector(state => state.processTemplate);
 
     const {
-        projects
-      } = useSelector(state => state.projects);
+        departments
+      } = useSelector(state => state.departments);
 
       useEffect(() => {
         if (router.query?.data) {
@@ -42,7 +42,7 @@ function ProcessTemplates() {
     
       useEffect(() => {
         if (!getOrganizationRequest && organizations) {
-          dispatch(projectsActions.getProjectsRequest());
+          dispatch(departmentsActions.getDepartmentsRequest());
         }
       }, [getOrganizationRequest, organizations]);
 
@@ -88,7 +88,7 @@ function ProcessTemplates() {
             <MainLayout>
                 {!createModal &&
                     <CreateProcessTemplates 
-                        projects={projects}
+                        departments={departments}
                         organizations={organizations}
                         onCreateProcess={handleEditProcess}
                         processTemplateData={item}

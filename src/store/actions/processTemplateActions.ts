@@ -18,7 +18,7 @@ type Steps = {
     user: any
 }
 
-export type Project = {
+export type Department = {
     title: string
     orgId: string
     userId: string
@@ -28,14 +28,14 @@ export type Project = {
 export type ProcessTemplate = {
   orgId: string
   userId: string
-  projectId: string
-  projectName: string
+  departmentIdId: string
+  departmentName: string
   name: string
   estimatedDate: any[] | string
   description: string
   steps: Steps[]
   id: string
-  project: Project
+  department: Department
 }
 
 const initialState = {
@@ -53,8 +53,8 @@ const initialState = {
   isDeleteProcessTemplateSuccess: false,
   isDeleteProcessTemplateFailure: false,
 
-  getProcessTemplateByProjectId: false,
-  projectProcessTemplates: []
+  getProcessTemplateByDepartmentId: false,
+  departmentProcessTemplates: []
 }
 
 export const processTemplateSlice = createSlice({
@@ -127,16 +127,16 @@ export const processTemplateSlice = createSlice({
         state.isDeleteProcessTemplateSuccess = false;
         state.isDeleteProcessTemplateFailure = true;
     },
-    getProcessTemplateByProjectIdRequest: (state, action) => {
-        state.getProcessTemplateByProjectId = true;
+    getProcessTemplateByDepartmentIdRequest: (state, action) => {
+        state.getProcessTemplateByDepartmentId = true;
     },
-    getProcessTemplateByProjectIdSuccess: (state, action) => { 
-        state.getProcessTemplateByProjectId = false;
-        state.projectProcessTemplates = action.payload ?? [];
+    getProcessTemplateByDepartmentIdSuccess: (state, action) => { 
+        state.getProcessTemplateByDepartmentId = false;
+        state.departmentProcessTemplates = action.payload ?? [];
     },
-    getProcessTemplateByProjectIdFailure: (state) => { 
-        state.getProcessTemplateByProjectId = false;
-        state.projectProcessTemplates = [];
+    getProcessTemplateByDepartmentIdFailure: (state) => { 
+        state.getProcessTemplateByDepartmentId = false;
+        state.departmentProcessTemplates = [];
     },
     resetStatus: (state) => {
       state.isSaveProcessTemplateSuccess = false;

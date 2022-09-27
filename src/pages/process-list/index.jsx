@@ -46,7 +46,7 @@ const ProcessListGroup = (props) => {
             process.processTemplateName?.toLowerCase().includes(search.toLowerCase()) || 
             process?.user?.name.toLowerCase().includes(search.toLowerCase()) ||
             process.dueDate?.toLowerCase().includes(search.toLowerCase()) 
-            || process?.project?.title?.toLowerCase()?.includes(search))
+            || process?.department?.title?.toLowerCase()?.includes(search))
         }
         setSearchedProcess(copyProcess);
     }, [search, processList]);

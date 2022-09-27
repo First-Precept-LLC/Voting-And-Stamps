@@ -1,6 +1,6 @@
 import organizationsReducer from "../actions/organizationsActions";
 import valuesReducer from "../actions/valuesActions";
-import projectsReducer from "../actions/projectsActions";
+import departmentsReducer from "../actions/departmentsActions";
 import usersReducer from "../actions/usersActions";
 import processTemplateReducer from "../actions/processTemplateActions";
 import processReducer from "../actions/processActions";
@@ -10,7 +10,7 @@ import processReducer from "../actions/processActions";
 const rootReducer = {
   organizations: organizationsReducer,
   values: valuesReducer,
-  projects: projectsReducer,
+  departments: departmentsReducer,
   users: usersReducer,
   processTemplate: processTemplateReducer,
   process: processReducer

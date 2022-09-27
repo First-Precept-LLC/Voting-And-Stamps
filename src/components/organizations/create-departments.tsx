@@ -2,9 +2,9 @@ import React from "react";
 import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
 import { getUserId } from "~/services/user.service";
 
-const CreateProject=({ onCloseModal, onCreateProject, organizations })=>{
+const CreateDepartment=({ onCloseModal, onCreateDepartment, organizations })=>{
     const [projName, setProjName] = React.useState('');
-    const [errorMsg,setError] = React.useState(false);
+    const [errorMsg, setError] = React.useState(false);
 
 
     // const GET_ORG_Project = gql`
@@ -13,7 +13,7 @@ const CreateProject=({ onCloseModal, onCreateProject, organizations })=>{
     //       result {_id,proj}
     //     }
     // }`;
-// const { data:data2, error:error2, loading:loading2 } = useQuery(GET_ORG_Project, {
+// const { data:data2, error:error2, loading:loading2 } = useQuery(GET_ORG_Department, {
 //       notifyOnNetworkStatusChange: true,
 //       variables: { nameFilter: getUserId() },
 //       onCompleted: (dataValue) => {
@@ -34,7 +34,7 @@ const CreateProject=({ onCloseModal, onCreateProject, organizations })=>{
     //     data {_id, name }
     //   }
     // }`;
-    // let [createProjectData, {loading, data, error}] = useMutation(
+    // let [createDepartmentData, {loading, data, error}] = useMutation(
     //     CREATE_PROJ,{
     //       onCompleted: (data) => {
     //         props.projValue({
@@ -47,8 +47,8 @@ const CreateProject=({ onCloseModal, onCreateProject, organizations })=>{
     //     }
     //   );
 
-    const handleCreateProject = () => {
-      onCreateProject({
+    const handleCreateDepartment = () => {
+      onCreateDepartment({
         title: projName,
         orgId: organizations?.id,
         userId: getUserId()
@@ -56,7 +56,7 @@ const CreateProject=({ onCloseModal, onCreateProject, organizations })=>{
       onCloseModal();
       // if(projName){
       //   setError(false)
-      //   createProjectData({variables:{'name':projName,'parent':'62a76b7f75bb9b447ffb6b22',userId: getUserId()}});
+      //   createDepartmentData({variables:{'name':projName,'parent':'62a76b7f75bb9b447ffb6b22',userId: getUserId()}});
       // }
       // else{
       //   setError(true)
@@ -80,16 +80,16 @@ const CreateProject=({ onCloseModal, onCreateProject, organizations })=>{
                 <div className="px-6 space-y-6 flex justify-center">
                   <div className="flex flex-col w-1/2 mx-8">
                     <div className="flex flex-col mb-8">
-                      <h2 className="text-3xl mb-2">Projects</h2>
+                      <h2 className="text-3xl mb-2">Departments</h2>
                     </div>
                     <div className="flex flex-col mb-8">
-                      <h4 className="text-lg mb-2">Projects title</h4>
+                      <h4 className="text-lg mb-2">Departments title</h4>
                       <input
                         type="text"
                         id="first_name"
                         onChange={(e)=>setProjName(e.target.value)}
                         className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                        placeholder="Projects"
+                        placeholder="Departments"
                         required
                       />
                     </div>
@@ -112,7 +112,7 @@ const CreateProject=({ onCloseModal, onCreateProject, organizations })=>{
                   </button>
                   <button
                     type="button"
-                    onClick={handleCreateProject}
+                    onClick={handleCreateDepartment}
                     className="text-white bg-gradient-to-r from-kelvinDark  to-kelvinBold hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6"
                     data-modal-toggle="success-modal"
                     disabled={!projName}
@@ -128,4 +128,4 @@ const CreateProject=({ onCloseModal, onCreateProject, organizations })=>{
     )
 
 }
-export default CreateProject;
+export default CreateDepartment;

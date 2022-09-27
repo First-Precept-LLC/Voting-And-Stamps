@@ -62,17 +62,17 @@ export function* editProcessTemplates({payload}) {
     }
   }
 
-  export function* getProcessTemplateByProjectId({payload}) {
+  export function* getProcessTemplateByDepartmentId({payload}) {
     const localProcessTemplates = localStorage.getItem("processTemplates") ? JSON.parse(localStorage.getItem("processTemplates")) : [];
-    const projectProcessTemplates = localProcessTemplates?.filter((template) => template?.project?.id === payload);
+    const departmentProcessTemplates = localProcessTemplates?.filter((template) => template?.department?.id === payload);
     try {
       yield put({
-        type: processTemplateActions.getProcessTemplateByProjectIdSuccess.type,
-        payload: projectProcessTemplates
+        type: processTemplateActions.getProcessTemplateByDepartmentIdSuccess.type,
+        payload: departmentProcessTemplates
       })
     } catch (error) {
       yield put({
-        type: processTemplateActions.getProcessTemplateByProjectIdFailure.type,
+        type: processTemplateActions.getProcessTemplateByDepartmentIdFailure.type,
       })
     }
   }

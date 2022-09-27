@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { usersActions } from "../../store/actions/usersActions";
 import { organizationActions } from "../../store/actions/organizationsActions";
-import { projectsActions } from "../../store/actions/projectsActions";
+import { departmentsActions } from "../../store/actions/departmentsActions";
 import MainLayout from '../../components/layout/MainLayout';
 import  CreateUserPopup from '../../components/users/create-users-popup'
 
@@ -21,8 +21,8 @@ function Users() {
       } = useSelector(state => state.users);
 
     const {
-        projects
-      } = useSelector(state => state.projects);
+        departments
+      } = useSelector(state => state.departments);
     
     useEffect(() => {
         if (organizations) {
@@ -32,7 +32,7 @@ function Users() {
 
     useEffect(() => {
         dispatch(organizationActions.getOrganizationRequest());
-        dispatch(projectsActions.getProjectsRequest());
+        dispatch(departmentsActions.getDepartmentsRequest());
       }, []);
 
     
@@ -85,7 +85,7 @@ function Users() {
                             className="flex items-center w-full  justify-between p-4 bg-white shadow shadow-md rounded-md mb-2">
                             <div className="flex flex-col">
                                 <h6 className="">{item.name}</h6>
-                                {/* <p class="text-xs text-kelvinBlack opacity-50">@saidutt</p> */}
+                                <p className="text-xs text-kelvinBlack opacity-50">{item.email}</p>
                             </div>
                             {/* <div className="flex">
                                 <h6 className="">{item.role}</h6>
@@ -130,7 +130,7 @@ function Users() {
                         isEditMode={!!selectedUser}
                         selectedUser={selectedUser}
                         onEditUsers={handleEditUsers}
-                        departments={projects}
+                        departments={departments}
                     /> 
                 }
             </div>

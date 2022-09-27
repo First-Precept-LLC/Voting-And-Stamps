@@ -15,7 +15,6 @@ type Steps = {
     description: string
     votes: {}
     isCompleted: false
-    user: User
 }
 
 type User = {
@@ -27,7 +26,7 @@ type User = {
     orgId: string
 }
 
-export type Project = {
+export type Department = {
     title: string
     orgId: string
     userId: string
@@ -36,9 +35,9 @@ export type Project = {
 
 export type Process = {
   orgId: string
-  userId: Project
+  // userId: Department
   processTemplateId: string
-  projectName: string
+  departmentName: string
   name: string
   user: User
   dueDate: string
@@ -46,7 +45,7 @@ export type Process = {
   id: string
   processTemplateName: string
   processTemplateDescription: string
-  processTemplateProject: Project
+  processTemplateDepartment: Department
 }
 
 const initialState = {
@@ -68,8 +67,8 @@ const initialState = {
   updateStepVotesSuccess: false,
   updateStepVotesFailure: false,
 
-  getProcessByProjectId: false,
-  projectProcess: []
+  getProcessByDepartmentId: false,
+  departmentProcess: []
 }
 
 export const processTemplateSlice = createSlice({
@@ -168,11 +167,11 @@ export const processTemplateSlice = createSlice({
                 copyState[findTemplateIndex] = processData;
             }
         }
-        if (state.projectProcess.length) {
-            const copyProjectProcess = state.projectProcess as any;
-            const projectProcessIds = [...copyProjectProcess].map((process) => process.id);
-            const filterprojectProcess = copyState.filter((process) => projectProcessIds.includes(process.id))
-            state.projectProcess = filterprojectProcess;
+        if (state.departmentProcess.length) {
+            const copydepartmentProcess = state.departmentProcess as any;
+            const departmentProcessIds = [...copydepartmentProcess].map((process) => process.id);
+            const filterdepartmentProcess = copyState.filter((process) => departmentProcessIds.includes(process.id))
+            state.departmentProcess = filterdepartmentProcess;
         }
         state.updateStepVotesRequest = false;
         state.updateStepVotesSuccess = true;
@@ -185,16 +184,16 @@ export const processTemplateSlice = createSlice({
         state.updateStepVotesSuccess = false;
         state.updateStepVotesFailure = false;
     },
-    getProcessByProjectIdRequest: (state, action) => {
-        state.getProcessByProjectId = true;
+    getProcessByDepartmentIdRequest: (state, action) => {
+        state.getProcessByDepartmentId = true;
     },
-    getProcessByProjectIdSuccess: (state, action) => { 
-        state.getProcessByProjectId = false;
-        state.projectProcess = action.payload ?? [];
+    getProcessByDepartmentIdSuccess: (state, action) => { 
+        state.getProcessByDepartmentId = false;
+        state.departmentProcess = action.payload ?? [];
     },
-    getProcessByProjectIdFailure: (state) => { 
-        state.getProcessByProjectId = false;
-        state.projectProcess = [];
+    getProcessByDepartmentIdFailure: (state) => { 
+        state.getProcessByDepartmentId = false;
+        state.departmentProcess = [];
     },
 
     resetStatus: (state) => {

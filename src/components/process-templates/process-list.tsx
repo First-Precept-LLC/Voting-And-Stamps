@@ -5,8 +5,8 @@ import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
 const ProcessList = (props) => {
     const {createList} = props;
     const [templateList,setTemplateList]=useState([
-        {processTemplate:'Start research development',project:'R&D',id:'1',deletePopup:false},
-        {processTemplate:'Submiting Designs',project:'R&D',id:'2',deletePopup:false}])
+        {processTemplate:'Start research development',department:'R&D',id:'1',deletePopup:false},
+        {processTemplate:'Submiting Designs',department:'R&D',id:'2',deletePopup:false}])
 
         const GET_PROCESS = gql`
         query process($nameFilter: String!) {
@@ -76,7 +76,7 @@ const ProcessList = (props) => {
                     <div className="flex  items-center">
                         <h4 className="text-kelvinDark mb-1 text-md">Process Template
                         </h4>
-                        <h4 className="text-kelvinDark mb-1 text-md" style={{ marginLeft: '190px' }}>Project
+                        <h4 className="text-kelvinDark mb-1 text-md" style={{ marginLeft: '190px' }}>Department
                         </h4>
                     </div>
                     <div className="flex bg-kelvinLight p-4 rounded-md w-full flex-wrap">
@@ -85,7 +85,7 @@ const ProcessList = (props) => {
                                 <div
                                 className="flex items-center w-full min-h-8 justify-between pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2 ">
                                 <h6 className="mr-2 w-1/2">{item.processTemplate}</h6>
-                                <p className="text-sm opacity-50 mr-2 font-normal w-32" style={{ marginRight: '37%' }}>{item.project}</p>
+                                <p className="text-sm opacity-50 mr-2 font-normal w-32" style={{ marginRight: '37%' }}>{item.department}</p>
                                 <div className="flex items-center">
                                     <button onClick={createList}
                                         className="text-white bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-6 text-left w-44 text-center items-center mr-2"

@@ -14,6 +14,7 @@ export type Users = {
   department: Department
   id: string
   orgId: string
+  email: string
 }
 
 const initialState = {

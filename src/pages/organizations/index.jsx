@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { organizationActions } from "../../store/actions/organizationsActions";
 import { valuesActions } from '../../store/actions/valuesActions';
-import { projectsActions } from "../../store/actions/projectsActions";
+import { departmentsActions } from "../../store/actions/departmentsActions";
 import MainLayout from '../../components/layout/MainLayout';
 import CreateOrganization from '../../components/organizations/create-organization'
 import SuccessOrganization from '../../components/organizations/success-organization'
@@ -11,10 +11,10 @@ import OrganizationDetail from '../../components/organizations/organization-deta
 import CreateValue from '../../components/organizations/create-value'
 import CreateSkills from '../../components/organizations/create-skills'
 import CreateGoal from '../../components/organizations/create-goal'
-import CreateDepartment from '../../components/organizations/create-department'
+// import CreateDepartment from '../../components/organizations/create-department'
 import CreateNewOrganization from "../../components/organizations/create-new-organization"
 
-import CreateProject from "../../components/organizations/create-projects"
+import CreateDepartment from "../../components/organizations/create-departments"
 
 function Organization() {
   const dispatch = useDispatch();
@@ -26,7 +26,7 @@ function Organization() {
   const [showAddGoal, setShowAddGoal] = useState(false)
   const [showAddSkills, setShowAddSkills] = useState(false)
   const [showDepartment, setDepartment] = useState(false)
-  const [showProject, setProject] = useState(false);
+  // const [showDepartment, setDepartment] = useState(false);
   const [goal, setGoal] = useState([])
   const [skill, setSkills] = useState([])
   const [departmentValue, setDepartmentValues] = useState([])
@@ -44,8 +44,8 @@ function Organization() {
   } = useSelector(state => state.values);
 
   const {
-    projects,
-  } = useSelector(state => state.projects);
+    departments,
+  } = useSelector(state => state.departments);
 
 
   useEffect(() => {
@@ -63,7 +63,7 @@ function Organization() {
       setShowOrgDetail(true);
       setOrgData(organizations);
       dispatch(valuesActions.getValuesRequest());
-      dispatch(projectsActions.getProjectsRequest());
+      dispatch(departmentsActions.getDepartmentsRequest());
     }
   }, [getOrganizationRequest, organizations]);
 
@@ -98,9 +98,9 @@ function Organization() {
     setSelectedValue(null);
   }
 
-  const handleCloseProjectModal = () => {
+  const handleCloseDepartmentModal = () => {
     setShowOrgDetail(true);
-    setProject(false);
+    setDepartment(false);
   }
 
   const closeValueModal = () => {
@@ -111,7 +111,7 @@ function Organization() {
     setShowAddGoal(false);
     setShowAddSkills(false);
     setDepartment(false);
-    setProject(false)
+    setDepartment(false)
   }
   const showGoal = () => {
     setShowCreateModal(false);
@@ -137,14 +137,14 @@ function Organization() {
     setShowAddSkills(false);
     setDepartment(true)
   }
-  const handleAddProject = () => {
+  const handleAddDepartment = () => {
     setShowCreateModal(false);
     setShowSuccessModal(false);
     setShowOrgDetail(false);
     setShowCreateValue(false);
     setShowAddGoal(false);
     setShowAddSkills(false);
-    setProject(true)
+    setDepartment(true)
   }
 
   const createValue = (data) => {
@@ -159,8 +159,8 @@ function Organization() {
     setDepartmentValues([...departmentValue, data])
     console.log([...departmentValue, data])
   }
-  const handleCreateProject = (data) => {
-    dispatch(projectsActions.saveProjectsRequest(data));
+  const handleCreateDepartment = (data) => {
+    dispatch(departmentsActions.saveDepartmentsRequest(data));
 
   }
 
@@ -209,12 +209,12 @@ function Organization() {
                 goal={goal}
                 skill={skill}
                 departmentValue={departmentValue}
-                projects={projects}
+                departments={departments}
                 onAddValue={handleAddValue}
                 showGoal={showGoal}
                 showSkills={showSkills}
                 showDep={showDep}
-                onAddProject={handleAddProject}
+                onAddDepartment={handleAddDepartment}
                 orgData={orgData}
                 showValue={showValue}
               />
@@ -234,9 +234,7 @@ function Organization() {
 
             {showAddSkills && <CreateSkills skills={skills} closeModal={closeValueModal} />}
 
-            {showDepartment && <CreateDepartment depValue={depValue} closeModal={closeValueModal} />}
-
-            {showProject && <CreateProject organizations={organizations} onCreateProject={handleCreateProject} onCloseModal={handleCloseProjectModal} />}
+            {showDepartment && <CreateDepartment organizations={organizations} onCreateDepartment={handleCreateDepartment} onCloseModal={handleCloseDepartmentModal} />}
           </>
 
         }

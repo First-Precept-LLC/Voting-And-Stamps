@@ -7,7 +7,8 @@ const CreateUserPopup = (props) => {
         name: '',
         levelUp: '',
         role: '',
-        department: {} as any
+        department: {} as any,
+        email: ''
     });
 
     const { 
@@ -92,10 +93,11 @@ const CreateUserPopup = (props) => {
     }
 
     const {
-        role,
+        // role,
         name,
         department,
-        levelUp
+        // levelUp,
+        email
     } = state;
 
     const labelText = isEditMode ? 'Update' : 'Create';
@@ -129,6 +131,20 @@ const CreateUserPopup = (props) => {
                                                 className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                                 style={{width:'21rem'}}
                                                 placeholder="Enter full name" value={name} required />
+                                        </div>
+                                        <div className="flex flex-col mb-8">
+                                            <h4 className="text-xs font-bold mb-2">Email</h4>
+                                            <input 
+                                            type="email" 
+                                            name="email"
+                                            className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" 
+                                            placeholder="Enter your email"
+                                            onChange={handleInputChange}
+                                            />
+                                            {/* <input type="text"  id="fullname" name="name" onChange={handleInputChange}
+                                                className="bg-gray-50 border-2 border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                                                style={{width:'21rem'}}
+                                                placeholder="Enter full name" value={name} required /> */}
                                         </div>
                                         {/* <div className="flex flex-col mb-8">
                                             <label htmlFor="countries" className="text-xs font-bold mb-2" >Role </label>
@@ -208,7 +224,7 @@ const CreateUserPopup = (props) => {
                                         className="text-white bg-gradient-to-r from-kelvinDark to-kelvinBold hover:bg-gradient-to-br focus:ring-4  focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6"
                                         data-modal-toggle="success-modal" 
                                         onClick={handleCreateUsers}
-                                        disabled={!name || !department}
+                                        disabled={!name || !department?.id || !email}
                                     >{labelText}</button>
                                 </div>
                             </form>

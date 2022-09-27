@@ -57,11 +57,11 @@ const CreateProcessList = (props) => {
                 processTemplateId: processItem.id,
                 processTemplateName: processItem.name,
                 processTemplateDescription: processItem.description,
-                processTemplateProject: processItem.project,
+                processTemplateDepartment: processItem.department,
                 steps: processItem.steps,
                 userId: getUserId(),
                 orgId: processItem.orgId,
-                projectId: processItem.projectId
+                departmentId: processItem.departmentId
             });
         } else {
             setErrorMsg(true);

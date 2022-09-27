@@ -7,14 +7,14 @@ import dayjs from 'dayjs';
 import MainLayout from '../../components/layout/MainLayout';
 import { processActions } from "../../store/actions/processActions";
 import { valuesActions } from "../../store/actions/valuesActions";
-import { projectsActions } from "../../store/actions/projectsActions";
+import { departmentsActions } from "../../store/actions/departmentsActions";
 import { usersActions } from "../../store/actions/usersActions";
 import { processTemplateActions } from "../../store/actions/processTemplateActions";
 import CreateProcessList from '../../components/process-templates/create-process-list';
 import ViewProcessList from "../../components/process-templates/view-process-content";
 import CreatedTemplateSuccess from '../../components/process-templates/created-template-success';
 
-const ProjectProcessList = (props) => {
+const DepartmentProcessList = (props) => {
     const [selectedId, setSelectedId] = useState("");
     const [selectedProcess, setSelectedProcess] = useState(null);
     const [processItem, setProcessItem] = useState({})
@@ -27,22 +27,22 @@ const ProjectProcessList = (props) => {
     const dispatch = useDispatch();
 
     const {
-        projectProcess: processList,
+        departmentProcess: processList,
         updateStepVotesSuccess,
         saveProcessRequest,
         isSaveProcessSuccess
     } = useSelector(state => state.process);
 
     const {
-        projectById,
-    } = useSelector(state => state.projects);
+        departmentById,
+    } = useSelector(state => state.departments);
 
     const {
         values: organizationValues
     } = useSelector(state => state.values);
 
     const {
-        projectProcessTemplates
+        departmentProcessTemplates
     } = useSelector(state => state.processTemplate);
 
     const {
@@ -58,9 +58,9 @@ const ProjectProcessList = (props) => {
 
     useEffect(() => {
         if (router.query?.id) {
-            dispatch(projectsActions.getProjectByIdRequest(router.query?.id));
-            dispatch(processTemplateActions.getProcessTemplateByProjectIdRequest(router.query?.id));
-            dispatch(processActions.getProcessByProjectIdRequest(router.query?.id));
+            dispatch(departmentsActions.getDepartmentByIdRequest(router.query?.id));
+            dispatch(processTemplateActions.getProcessTemplateByDepartmentIdRequest(router.query?.id));
+            dispatch(processActions.getProcessByDepartmentIdRequest(router.query?.id));
         }
     }, [router.query]);
 
@@ -161,7 +161,7 @@ const ProjectProcessList = (props) => {
         setProcessModal(true);
     }
 
-    console.log(projectById, processList, router.query, 'router.query?');
+    console.log(departmentById, processList, router.query, 'router.query?');
 
     return (
         <>
@@ -185,26 +185,26 @@ const ProjectProcessList = (props) => {
                 {createDetails || processModal ? null : !selectedProcess ?
                     <div className="flex w-full p-8 flex-col">
                         <div className="flex justify-between">
-                            <h1 className="text-3xl mb-8">{projectById?.title} Project</h1>
+                            <h1 className="text-3xl mb-8">{departmentById?.title} Department</h1>
                         </div>
 
                         {/* <!-- Process Template section --> */}
-                        {createDetails || processModal ? null : !!projectProcessTemplates?.length ? <>
+                        {createDetails || processModal ? null : !!departmentProcessTemplates?.length ? <>
                             <div className="flex flex-col mb-8">
                                 <h4>Proccess Template List</h4>
                                 <div className="flex  items-center">
                                     <h4 className="text-kelvinDark mb-1 text-md">Process Template
                                     </h4>
-                                    <h4 className="text-kelvinDark mb-1 text-md" style={{ marginLeft: '190px' }}>Project
+                                    <h4 className="text-kelvinDark mb-1 text-md" style={{ marginLeft: '190px' }}>Department
                                     </h4>
                                 </div>
                                 <div className="flex bg-kelvinLight p-4 rounded-md w-full flex-wrap">
-                                    {projectProcessTemplates?.map((item, index) => {
+                                    {departmentProcessTemplates?.map((item, index) => {
                                         return (
                                             <div key={index}
                                                 className="flex items-center w-full min-h-8 justify-between pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2 ">
                                                 <h6 className="mr-2 w-1/2">{item.name}</h6>
-                                                <p className="text-sm opacity-50 mr-2 font-normal w-32" style={{ marginRight: '37%' }}>{item.project?.title}</p>
+                                                <p className="text-sm opacity-50 mr-2 font-normal w-32" style={{ marginRight: '37%' }}>{item.department?.title}</p>
                                                 <div className="flex items-center">
                                                     <button onClick={() => { createProcessList(item) }}
                                                         className="text-white bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-6 text-left w-44 text-center items-center mr-2"
@@ -346,4 +346,4 @@ const ProjectProcessList = (props) => {
         </>
     )
 }
-export default ProjectProcessList;
+export default DepartmentProcessList;
