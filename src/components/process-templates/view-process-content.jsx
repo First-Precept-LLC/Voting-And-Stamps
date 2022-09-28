@@ -98,7 +98,7 @@ const ViewProcess = (props) => {
                 <script src="/tailwind.js"></script>
             </head>
             <>
-                <p onClick={props.onCloseModal}>Back</p>
+                <p className=' cursor-pointer font-bold hover:text-kelvinBold ' onClick={props.onCloseModal}>Back</p>
                 {!votingStepModal &&
                     <div className="flex w-full p-8 flex-col">
                         <div className="flex justify-between">
@@ -120,7 +120,7 @@ const ViewProcess = (props) => {
                                 <p className="text-kelvinBlack text-sm">{templateData?.processTemplateDescription}</p>
                             </div>
                         </div>
-                        <div className="flex flex-col">
+                        <div className="flex flex-col my-5">
                             <h6 className="text-kelvinDark">Steps</h6>
                             <div className="flex grid grid-cols-2 gap-4">
                                 <div className="flex  bg-kelvinLight p-4">
@@ -128,10 +128,11 @@ const ViewProcess = (props) => {
                                         {templateData?.steps?.map(item => {
                                             return (
                                                 <div key={item.id} onClick={() => { handleSelectStep(item) }}
-                                                    className="flex items-center w-full min-h-8 justify-start pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2 flex-wrap border-2 border-gray-300">
+                                                className={`
+                                                flex items-center w-full min-h-8 justify-start pl-4 py-1 bg-white shadow  
+                                                rounded-md mb-2 flex-wrap ${selectedStep.id === item.id ? 'border-b border-kelvinBold' : ''}`}>
                                                     <input id="link-checkbox" type="checkbox" value="" checked={item.isCompleted} onClick={(event) => handleCheckBox(event, item)}
                                                         className="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 mr-2" />
-
                                                     <h6 className="">{item.name}</h6>
                                                 </div>
                                             )

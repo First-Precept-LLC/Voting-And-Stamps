@@ -191,12 +191,12 @@ const DepartmentProcessList = (props) => {
                         {/* <!-- Process Template section --> */}
                         {createDetails || processModal ? null : !!departmentProcessTemplates?.length ? <>
                             <div className="flex flex-col mb-8">
-                                <h4>Proccess Template List</h4>
+                                <h4 className='text-2xl mb-8 text-kelvinBold'>Proccess Template List</h4>
                                 <div className="flex  items-center">
-                                    <h4 className="text-kelvinDark mb-1 text-md">Process Template
+                                    {/* <h4 className="text-kelvinDark mb-1 text-md">Process Template
                                     </h4>
                                     <h4 className="text-kelvinDark mb-1 text-md" style={{ marginLeft: '190px' }}>Department
-                                    </h4>
+                                    </h4> */}
                                 </div>
                                 <div className="flex bg-kelvinLight p-4 rounded-md w-full flex-wrap">
                                     {departmentProcessTemplates?.map((item, index) => {
@@ -207,7 +207,7 @@ const DepartmentProcessList = (props) => {
                                                 <p className="text-sm opacity-50 mr-2 font-normal w-32" style={{ marginRight: '37%' }}>{item.department?.title}</p>
                                                 <div className="flex items-center">
                                                     <button onClick={() => { createProcessList(item) }}
-                                                        className="text-white bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-6 text-left w-44 text-center items-center mr-2"
+                                                        className="text-white bg-kelvinBold hover:bg-kelvinDark focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-6 text-left w-44 text-center items-center mr-2"
                                                         data-modal-toggle="large-modal">
                                                         <i className="fa-solid fa-play text-white mt-1 mr-1 text-xs"></i>
                                                         Create Process</button>
@@ -222,7 +222,7 @@ const DepartmentProcessList = (props) => {
                                                             }
                                                         }}>
                                                         <button
-                                                            className="text-white bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-6 text-left w-20 text-center "
+                                                            className="text-blue-500 hover:text-white border border-blue-500 hover:bg-blue-500 focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-6 text-left w-20 text-center  "
                                                             data-modal-toggle="large-modal">
                                                             Edit</button>
                                                     </Link>
@@ -230,7 +230,7 @@ const DepartmentProcessList = (props) => {
                                                         <i className="fa-solid fa-ellipsis-vertical mt-1 text-xl"></i>
 
                                                     </a>
-                                                    {item.id === selectedItemId ? <button onClick={() => { deleteProcessTemplateHandler(item.id) }} className=" bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-2  h-6 text-left mr-2 w-24 text-center ">delete</button> : null}
+                                                    {item.id === selectedItemId ? <button onClick={() => { deleteProcessTemplateHandler(item.id) }} className=" border border-red-500 text-red-500 px-4  hover:bg-red-500 hover:text-white font-medium rounded-md text-sm px-2  h-6 text-left mr-2 w-24 text-center  ">delete</button> : null}
                                                 </div>
                                             </div>
                                         )
@@ -240,7 +240,7 @@ const DepartmentProcessList = (props) => {
                                 </div>
                             </div>
                         </> :
-                            <div>No Process Template Found</div>
+                            <div className='p-8 rounded-md bg-kelvinLight'>No Process Template Found</div>
                         }
 
                         {/* <!-- Process section --> */}
@@ -249,9 +249,9 @@ const DepartmentProcessList = (props) => {
                             <>
                                 <div className="flex flex-col mb-8">
 
-                                    <h4>Proccess List</h4>
+                                    <h4 className='text-2xl mb-8 text-kelvinBold'>Proccess List</h4>
                                     <div className="flex  py-1 pl-4 w-full items-center justify-between">
-                                        <h4 className="mb-1 mr-5 text-md">Process
+                                        {/* <h4 className="mb-1 mr-5 text-md">Process
                                         </h4>
                                         <h4 className="mb-1 mx-5 text-md">Process Template
                                         </h4>
@@ -260,7 +260,7 @@ const DepartmentProcessList = (props) => {
                                         <h4 className="mb-1 mx-5 text-md">Assignees
                                         </h4>
                                         <h4 className="mb-1  text-md">Progress
-                                        </h4>
+                                        </h4> */}
                                     </div>
                                     <div className="flex bg-kelvinLight p-4 rounded-md w-full flex-wrap ">
                                         {processList?.map((item) => {
@@ -279,9 +279,9 @@ const DepartmentProcessList = (props) => {
                                                         onClick={() => setSelectedProcess(item)}
                                                     >
                                                         <h6 className="mr-2 items-center"> {item.process || item.name}</h6>
-                                                        <h6 className="mr-2 text-black/50 items-center">{item.processTemplate || item.processTemplateName}</h6>
-                                                        <p className="text-sm opacity-50 mr-2 font-normal items-center">by {item.dueDate ? dayjs(item.dueDate).format("MMM DD, YYYY") : ''}</p>
-                                                        <p className="text-sm opacity-50 mr-2 font-normal items-center">{item.assignees || item?.user?.name}</p>
+                                                        <h6 className="mr-2 text-black/50 items-center">{item.processTemplate || item.processTemplateName} Template</h6>
+                                                        <p className="text-sm opacity-50 mr-2 font-normal items-center">Due by {item.dueDate ? dayjs(item.dueDate).format("MMM DD, YYYY") : ''}</p>
+                                                        <p className="text-sm opacity-50 mr-2 font-normal items-center">Assigned to {item.assignees || item?.user?.name}</p>
                                                         <div className="flex flex-col">
                                                             <div className="mb-1 text-xs text-black/50 items-center" style={{ textAlign: 'center' }}>{getProcessStepProgress(item.steps)}%</div>
                                                             <div className="w-32 bg-gray-400 rounded-full h-1.5 items-center">
@@ -292,7 +292,7 @@ const DepartmentProcessList = (props) => {
 
                                                             <button
                                                                 //onClick={()=>{ontrackModal(item.id)}}
-                                                                className=" bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-2  h-6 text-left mr-2 w-24 text-center "
+                                                                className=" border border-blue-500 text-blue-500 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-2  h-6 text-left mr-2 w-24 text-center  "
                                                                 data-modal-toggle="large-modal">
                                                                 {getProcessStatus(item.steps, item.dueDate)}
                                                             </button>
@@ -307,7 +307,7 @@ const DepartmentProcessList = (props) => {
                                                                 } >
                                                                 <i className="fa-solid fa-ellipsis-vertical text-xl"></i>
                                                             </span>
-                                                            {item.id === selectedId ? <button onClick={() => { deleteHandler(item.id) }}>delete</button> : null}
+                                                            {item.id === selectedId ? <button className='border border-red-500 text-red-500 px-4  hover:bg-red-500 hover:text-white font-medium rounded-md text-sm px-2  h-6 text-left mr-2 w-24 text-center ' onClick={() => { deleteHandler(item.id) }}>delete</button> : null}
                                                         </div>
                                                     </div>
                                                     {/* </Link> */}
@@ -318,7 +318,7 @@ const DepartmentProcessList = (props) => {
                                     </div>
                                 </div>
                             </> :
-                            <div style={{ textAlign: 'center' }}>No Process Found</div>
+                            <div className='p-8 rounded-md bg-kelvinLight my-8'>No Processes Found</div>
                         }
 
 

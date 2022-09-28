@@ -7,10 +7,28 @@ function Sidemenu() {
       >
         <div className="flex flex-col ">
           <div className="flex flex-col">
-            <a href="/create-process-template" className="text-kelvinDark mb-3">
+          <a href="/organizations" className="text-kelvinDark mb-3">
+              <i className="fa-solid  fa-circle mr-1"></i>
+              Organization
+            </a>
+            {/* <a href="/department" className="text-kelvinDark mb-3">
+              <i className="fa-solid  fa-circle mr-1"></i>
+              Departments
+            </a> */}
+            {/* <a href="#" className="text-kelvinDark mb-3">
+              <i className="fa-solid  fa-circle mr-1"></i> Roles
+            </a> */}
+            <a href="/users" className="text-kelvinDark mb-3">
+              <i className="fa-solid  fa-circle mr-1"></i> Users
+            </a>
+          </div>
+          <hr className="my-10" />
+          <div className="flex flex-col">
+           
+            {/* <a href="/create-process-template" className="text-kelvinDark mb-3">
               <i className="fa-solid  fa-circle mr-1"></i> Create Process
               Template
-            </a>
+            </a> */}
             <a href="/process-template-list" className="text-kelvinDark mb-3">
               <i className="fa-solid  fa-circle mr-1"></i>
               Processes Template List
@@ -20,27 +38,10 @@ function Sidemenu() {
               Processes List
             </a>
           
-            <a href="/research-model" className="text-kelvinDark mb-3">
+            {/* <a href="/research-model" className="text-kelvinDark mb-3">
               <i className="fa-solid  fa-circle mr-1"></i>
               Research Model
-            </a>
-          </div>
-          <hr className="my-10" />
-          <div className="flex flex-col">
-            <a href="/organizations" className="text-kelvinDark mb-3">
-              <i className="fa-solid  fa-circle mr-1"></i>
-              Organizations
-            </a>
-            <a href="/department" className="text-kelvinDark mb-3">
-              <i className="fa-solid  fa-circle mr-1"></i>
-              Departments
-            </a>
-            <a href="#" className="text-kelvinDark mb-3">
-              <i className="fa-solid  fa-circle mr-1"></i> Roles
-            </a>
-            <a href="/users" className="text-kelvinDark mb-3">
-              <i className="fa-solid  fa-circle mr-1"></i> Users
-            </a>
+            </a> */}
           </div>
         </div>
         <div className="flex mt-10 text-center text-sm text-kelvinBlack opacity-50">

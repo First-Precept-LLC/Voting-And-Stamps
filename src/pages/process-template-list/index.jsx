@@ -124,7 +124,7 @@ const ProcessTemplateList = (props) => {
                                     className="block p-2 px-5  h-8  w-44 text-gray-900 bg-white rounded-lg border border-gray-300 sm:text-sm focus:ring-blue-500 focus:border-blue-500 mr-2"
                                     placeholder="Search..." onChange={(event) => setSearch(event.target.value)} />
                                 <button
-                                    className="text-white  bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5  h-8 text-left mb-2 hover:bg-kelvinBold"
+                                    className="text-grey-300 border border-gray-300 hover:bg-gray-300 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5  h-8 text-left mb-2 hover:bg-kelvinBold"
                                     id="dropdownDefault" data-dropdown-toggle="dropdown">
                                     <i className="fa-solid fa-sort"></i>
                                     Filters</button>
@@ -133,10 +133,10 @@ const ProcessTemplateList = (props) => {
                         {/* <!-- Process section --> */}
                         <div className="flex flex-col mb-8">
                             <div className="flex  items-center">
-                                <h4 className="text-kelvinDark mb-1 text-md">Process Template
+                                {/* <h4 className="text-kelvinDark mb-1 text-md">Process Template
                                 </h4>
                                 <h4 className="text-kelvinDark mb-1 text-md" style={{ marginLeft: '190px' }}>Department
-                                </h4>
+                                </h4> */}
                             </div>
                             <div className="flex bg-kelvinLight p-4 rounded-md w-full flex-wrap">
                                 {searchedTemplate ? searchedTemplate.map((item, index) => {
@@ -147,9 +147,9 @@ const ProcessTemplateList = (props) => {
                                             <p className="text-sm opacity-50 mr-2 font-normal w-32" style={{ marginRight: '37%' }}>{item.department?.title}</p>
                                             <div className="flex items-center">
                                                 <button onClick={() => { createProcessList(item) }}
-                                                    className="text-white bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-6 text-left w-44 text-center items-center mr-2"
+                                                    className="text-white bg-kelvinBold hover:bg-kelvinDark focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-6 text-left w-44 text-center items-center mr-2"
                                                     data-modal-toggle="large-modal">
-                                                    <i className="fa-solid fa-play text-white mt-1 mr-1 text-xs"></i>
+                                                    <i className="fa-solid fa-play text-white mt-1 mr-3 text-xs"></i>
                                                     Create Process</button>
                                                 <Link 
                                                 href={{
@@ -162,7 +162,7 @@ const ProcessTemplateList = (props) => {
                                                     }
                                                 }}>
                                                     <button
-                                                        className="text-white bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-6 text-left w-20 text-center "
+                                                        className="text-blue-500 hover:text-white border border-blue-500 hover:bg-blue-500 focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-6 text-left w-20 text-center "
                                                         data-modal-toggle="large-modal">
                                                         Edit</button>
                                                 </Link>
@@ -170,7 +170,7 @@ const ProcessTemplateList = (props) => {
                                                     <i className="fa-solid fa-ellipsis-vertical mt-1 text-xl"></i>
 
                                                 </a>
-                                                {item.id === selectedItemId ? <button onClick={() => { deleteHandler(item.id) }} className=" bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-2  h-6 text-left mr-2 w-24 text-center ">delete</button> : null}
+                                                {item.id === selectedItemId ? <button onClick={() => { deleteHandler(item.id) }} className=" border border-red-500 text-red-500 px-4  hover:bg-red-500 hover:text-white font-medium rounded-md text-sm px-2  h-6 text-left mr-2 w-24 text-center ">Delete</button> : null}
                                             </div>
                                         </div>
                                     )

@@ -30,7 +30,7 @@ const OrganizationDetail = (props) => {
                         should be made at your company. Learn More</p>
                 </div>
                 <div
-                    className="flex bg-kelvinLight p-4 rounded-md w-full flex-wrap grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5  items-end">
+                    className="flex cursor-pointer bg-kelvinLight p-4 rounded-md w-full flex-wrap grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5  items-end">
                     {values?.map(item => (<div className="flex  p-2 " key={item.id}>
                         <div  
                             className="flex tems-center w-full p-4 bg-white shadow shadow-md rounded-md"
@@ -119,7 +119,7 @@ const OrganizationDetail = (props) => {
                         >
                             <div className="flex  p-2">
                                 <div
-                                    className="flex items-center w-full py-6 justify-center p-4 bg-white shadow shadow-md rounded-md">
+                                    className="flex items-center w-full py-6 justify-center p-4 bg-white shadow shadow-md rounded-md cursor-pointer">
                                     <h4>{item.title || item.name}</h4>
                                 </div>
                             </div>

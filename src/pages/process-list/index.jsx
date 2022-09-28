@@ -126,7 +126,7 @@ const ProcessListGroup = (props) => {
                                     className="block p-2 px-5  h-8  w-44 text-gray-900 bg-white rounded-lg border border-gray-300 sm:text-sm focus:ring-blue-500 focus:border-blue-500 mr-2"
                                     placeholder="Search..." onChange={(event) => setSearch(event.target.value)} />
                                 <button
-                                    className="bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5  h-8 text-left mb-2 hover:bg-kelvinBold"
+                                    className="text-grey-300 border border-gray-300 hover:bg-gray-300 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5  h-8 text-left mb-2 hover:bg-kelvinBold"
                                     id="dropdownDefault" data-dropdown-toggle="dropdown">
                                     <i className="fa-solid fa-sort"></i>
                                     Filters</button>
@@ -135,7 +135,7 @@ const ProcessListGroup = (props) => {
                         {/* <!-- Process section --> */}
                         <div className="flex flex-col mb-8">
                             <div className="flex  py-1 pl-4 w-full items-center justify-between">
-                                <h4 className="mb-1 mr-5 text-md">Process
+                                {/* <h4 className="mb-1 mr-5 text-md">Process
                                 </h4>
                                 <h4 className="mb-1 mx-5 text-md">Process Template
                                 </h4>
@@ -144,7 +144,7 @@ const ProcessListGroup = (props) => {
                                 <h4 className="mb-1 mx-5 text-md">Assignees
                                 </h4>
                                 <h4 className="mb-1  text-md">Progress
-                                </h4>
+                                </h4> */}
                             </div>
 
 
@@ -161,13 +161,13 @@ const ProcessListGroup = (props) => {
                                         > */}
                                             <div
                                                 key={item.id}
-                                                className="flex items-center w-full min-h-8 justify-between pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2 "
+                                                className="cursor-pointer flex items-center w-full min-h-8 justify-between pl-4 py-1 bg-white shadow shadow-md rounded-md mb-2 "
                                                 onClick={() => setSelectedProcess(item)}
                                             >
                                                 <h6 className="mr-2 items-center"> {item.process || item.name}</h6>
-                                                <h6 className="mr-2 text-black/50 items-center">{item.processTemplate || item.processTemplateName}</h6>
-                                                <p className="text-sm opacity-50 mr-2 font-normal items-center">by {item.dueDate ? dayjs(item.dueDate).format("MMM DD, YYYY") : ''}</p>
-                                                <p className="text-sm opacity-50 mr-2 font-normal items-center">{item.assignees || item?.user?.name}</p>
+                                                <h6 className="mr-2 text-black/50 items-center">{item.processTemplate || item.processTemplateName} Template</h6>
+                                                <p className="text-sm opacity-50 mr-2 font-normal items-center">Due by {item.dueDate ? dayjs(item.dueDate).format("MMM DD, YYYY") : ''}</p>
+                                                <p className="text-sm opacity-50 mr-2 font-normal items-center">Assigned to {item.assignees || item?.user?.name}</p>
                                                 <div className="flex flex-col">
                                                     <div className="mb-1 text-xs text-black/50 items-center" style={{ textAlign: 'center' }}>{getProcessStepProgress(item.steps)}%</div>
                                                     <div className="w-32 bg-gray-400 rounded-full h-1.5 items-center">
@@ -178,7 +178,7 @@ const ProcessListGroup = (props) => {
 
                                                     <button
                                                         //onClick={()=>{ontrackModal(item.id)}}
-                                                        className=" bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-2  h-6 text-left mr-2 w-24 text-center "
+                                                        className="border border-blue-500 text-blue-500 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-2  h-6 text-left mr-2 w-24 text-center "
                                                         data-modal-toggle="large-modal">
                                                         {getProcessStatus(item.steps, item.dueDate)}
                                                     </button>
@@ -193,7 +193,7 @@ const ProcessListGroup = (props) => {
                                                         } >
                                                         <i className="fa-solid fa-ellipsis-vertical text-xl"></i>
                                                     </span>
-                                                    {item.id === selectedId ? <button onClick={() => { deleteHandler(item.id) }}>delete</button> : null}
+                                                    {item.id === selectedId ? <button className='border border-red-500 text-red-500 px-4  hover:bg-red-500 hover:text-white font-medium rounded-md text-sm px-2  h-6 text-left mr-2 w-24 text-center' onClick={() => { deleteHandler(item.id) }}>delete</button> : null}
                                                 </div>
                                             </div>
                                             {/* </Link> */}

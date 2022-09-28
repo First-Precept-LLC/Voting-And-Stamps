@@ -70,7 +70,7 @@ function Users() {
             <div className="flex justify-between">
                 <h1 className="text-3xl mb-8">Users</h1>
                 <button 
-                   className="bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5  h-8 text-left mb-2 hover:bg-kelvinBold"
+                   className="text-grey-300 border border-gray-300 hover:bg-gray-300 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5  h-8 text-left mb-2 hover:bg-kelvinBold"
                    id="dropdownDefault" data-dropdown-toggle="dropdown">
                     <i className="fa-solid fa-sort"></i>
                     Filters</button>
@@ -100,9 +100,9 @@ function Users() {
                                 setAddUserPopup(true);
                                 setSelectedUser(item)
                             }}
-                            className="text-white bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-6 text-left w-20 text-center hover:bg-kelvinBold"
+                            className="text-blue-500 hover:text-white border border-blue-500 hover:bg-blue-500 focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-3 h-6 text-left  text-center"
                             data-modal-toggle="large-modal">
-                                 <i className="fa-solid fa-pencil"></i>
+                                 <i className="fa-solid fa-pencil mr-3"></i>
                             Edit</button>
                                
                                 
@@ -113,7 +113,7 @@ function Users() {
                  
                     <button 
                     disabled={!organizations}
-                        className="text-white bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-8 text-left w-full mb-2 hover:bg-kelvinBold"
+                        className="text-white bg-kelvinBold hover:bg-gradient-to-br focus:ring-4 focus:outline-none  font-medium rounded-md text-sm px-2 py- h-8 text-left w-full mb-2 hover:bg-kelvinDark"
                         data-modal-toggle="large-modal" onClick={()=>{setAddUserPopup(true)}}>
                         <i className="fa-solid fa-plus"></i>
                         Add User</button>

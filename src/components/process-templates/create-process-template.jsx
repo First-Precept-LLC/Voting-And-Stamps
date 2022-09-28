@@ -340,17 +340,19 @@ const CreateProcessTemplates = (props) => {
                                     fields.map((item, index) => {
                                         return (
                                             <div key={index} onClick={e => { setSelectedStepData(item, index) }}
-                                                className="flex items-center w-full min-h-8 justify-between pl-4 py-1 bg-white shadow  rounded-md mb-2 flex-wrap">
-                                                <input name="name" key={item.id} className="flex-grow border-0 " type='text' placeholder="Type the task here" required defaultValue={item.name} onChange={(e) => handleStepInputChange(e, index)} />
-                                                <button className="px-4" onClick={() => { showPopupHandler(item.id) }}>
+                                            className={`
+                                            flex items-center w-full min-h-8 justify-between pl-4 py-1 bg-white shadow  
+                                            rounded-md mb-2 flex-wrap ${selectedStep.id === item.id ? 'border-b border-kelvinBold' : ''}`}>
+                                                <input name="name" key={item.id} className="flex-grow border-0 outline-0 focus:outline-0" type='text' placeholder="Type the task here" required defaultValue={item.name} onChange={(e) => handleStepInputChange(e, index)} />
+                                                <button className=" py-1 px-4 hover:bg-slate-100 rounded-lg" onClick={() => { showPopupHandler(item.id) }}>
                                                     <i className="fa-solid fa-ellipsis-vertical" ></i>
                                                 </button>
                                                 {item.showPopup ?
-                                                    <div style={{ height: "30px", width: '30px' }}>
+                                                    <div className="border border-red-500 text-red-500 py-1 px-4 rounded-lg hover:bg-red-500 hover:text-white ">
                                                         <button onClick={(event) => {
                                                             event.stopPropagation();
                                                             deleteHandler(item.id, index);
-                                                        }}>delete</button>
+                                                        }}>Delete</button>
 
                                                     </div>
                                                     : null
@@ -361,7 +363,7 @@ const CreateProcessTemplates = (props) => {
                                 }
 
                                 <button onClick={() => handleAddField()}
-                                    className="text-white bg-kelvinMedium hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-8 text-left w-full mb-2 hover:bg-kelvinBold"
+                                    className="text-white bg-kelvinBold hover:bg-gradient-to-br focus:ring-4 focus:outline-none  font-medium rounded-md text-sm px-2 py- h-8 text-left w-full mb-2 hover:bg-kelvinDark"
                                     data-modal-toggle="large-modal">
                                     <i className="fa-solid fa-plus"></i>
                                     Add Task
