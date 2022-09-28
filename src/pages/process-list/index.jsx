@@ -150,6 +150,10 @@ const ProcessListGroup = (props) => {
 
                             <div className="flex bg-kelvinLight p-4 rounded-md w-full flex-wrap ">
                                 {searchedProcess?.map((item) => {
+                                    const processStatus = getProcessStatus(item.steps, item.dueDate);
+                                    const processStatusClass = processStatus === 'On Track' ? 'border-blue-500 text-blue-500' : 
+                                    processStatus === 'Completed' ? 'border-green-500 text-green-500' : 'border-red-500 text-red-500';
+
                                     return (
                                         <>
                                             {/* <Link 
@@ -178,9 +182,9 @@ const ProcessListGroup = (props) => {
 
                                                     <button
                                                         //onClick={()=>{ontrackModal(item.id)}}
-                                                        className="border border-blue-500 text-blue-500 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-2  h-6 text-left mr-2 w-24 text-center "
+                                                        className={`${processStatusClass} border  hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-2  h-6 text-left mr-2 w-24 text-center `}
                                                         data-modal-toggle="large-modal">
-                                                        {getProcessStatus(item.steps, item.dueDate)}
+                                                        {processStatus}
                                                     </button>
 
 
