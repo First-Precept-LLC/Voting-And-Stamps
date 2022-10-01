@@ -31,7 +31,7 @@ export default nextConnect<NextApiRequest, NextApiResponse>()
       const token = await encryptSession(session);
 
       setTokenCookie(res, token);
-      res.status(200).send({ done: true });
+      res.status(200).send({ done: true, user });
     } catch (error) {
       console.error(error);
       res.status(401).send(error.message);

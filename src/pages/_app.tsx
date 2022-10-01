@@ -1,6 +1,7 @@
 import { NextPage } from "next";
 import { AppProps } from "next/app";
-import { ReactElement } from "react";
+import { ReactElement, useEffect } from "react";
+import Router from 'next/router'
 // Comment if you don't need i18n
 import { appWithTranslation } from "next-i18next";
 import {Provider} from 'react-redux'
@@ -89,6 +90,11 @@ function VNApp({
   // Use the layout defined at the page level, if available
   // @see https://nextjs.org/docs/basic-features/layouts
   const getLayout = Component.getLayout ?? ((page) => page);
+  useEffect(() => {
+    if (!localStorage.getItem("user")) {
+        Router.push('/account/login');
+    }
+}, []);
   return getLayout(
     <CacheProvider value={emotionCache}>
       <VulcanComponentsProvider>

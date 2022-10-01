@@ -15,7 +15,7 @@ const HomePage = ({ source }: { source: MDXRemoteSerializeResult }) => {
   const readMeContent = <MDXRemote {...source} components={components} />;
   useEffect(() => {
     const {pathname} = Router
-    if(pathname == '/' ){
+    if(pathname == '/' || !localStorage.getItem("user")){
         Router.push('/account/login')
     }
   });
