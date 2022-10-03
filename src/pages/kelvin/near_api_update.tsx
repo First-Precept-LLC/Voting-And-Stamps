@@ -8,7 +8,7 @@ var Eth = require('web3-eth');
 import { gql, useMutation, useLazyQuery, NetworkStatus } from '@apollo/client';
 import { passThroughSymbol } from 'next/dist/server/web/spec-compliant/fetch-event';
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 
 const CONTRACT_ADDRESS = "0x21D5d3EE116E856fE315fFf67Edf3C318A352644";
@@ -29,10 +29,10 @@ const NearUpdate = (props) => {
 	 }
    }`;
  
- const GET_WALLET = gql`
-   query wallet($id: String!) {
-	 wallet(input: {filter: {vulcanId: {_in: [$id]}}}) {
-		 result {auroraWallet, vulcanId}
+ const GET_WALLETS = gql`
+   query wallets($limit: Int) {
+	 wallets(input: {limit: $limit}) {
+		 results {auroraWallet, vulcanId}
 	 }
    }
  `
@@ -57,63 +57,13 @@ const NearUpdate = (props) => {
    );
  
    const [walletRefetch, {loading: walletLoading, data: walletData, error: walletError, networkStatus: walletStatus}] = useLazyQuery(
-	 GET_WALLET,
+	 GET_WALLETS,
 	 {
-	   variables: {id: "61b7d95a8e7c07eb90d8a8ce"},
+	   variables: {limit: 9999999},
 	   notifyOnNetworkStatusChange: true,
 	 }
    );
 
-   let userIds = [] as any;
-   let stampCounts = [] as any;
-   let avgStamps = 0;
-
-   useEffect(() => {
-	if (walletData && walletData["wallet"] && walletData["wallet"]["result"]) {
-	if(walletData["wallet"]["result"]["auroraWallet"] != "none") {
-		userIds.push(walletData["wallet"]["result"]["auroraWallet"]);
-		avgStamps = 0;
-		for(let j = 0; j < SAMPLE_VALUES.length; j++) {
-			stampsRefetch({variables: {user: walletData["wallet"]["result"]["vulcanId"], collection: SAMPLE_VALUES[j]}});
-		}
-		stampCounts.push(avgStamps);
-	}
-	}
-   }, [JSON.stringify(walletData)]);
-
-   useEffect(() => {
-	if(stampsData) {
-		avgStamps += stampsData["getUserStamps"]/SAMPLE_VALUES.length;
-	 }
-   }, [JSON.stringify(stampsData)]);
-
-   useEffect(() => {
-	let body = async () => {
-
-		if(queryData) {
-			Contract.setProvider('wss://testnet.aurora.dev');
-            let eth = new Eth(Eth.givenProvider || 'wss://testnet.aurora.dev');
-            console.log("set!");
-            let address = CONTRACT_ADDRESS;
-            let contract = new Contract(jsonInterface, address);
-            userIds = [] as any;
-            stampCounts = [] as any;
-			for(let i = 0; i < queryData["vulcanUsers"]["results"].length; i++) {
-				let user = queryData["vulcanUsers"]["results"][i];
-				await walletRefetch({variables: {id: queryData["vulcanUsers"]["results"][i]._id}});
-			}
-	        window.ethereum.request({ method: 'eth_requestAccounts' }).then((accounts) => {
-		    let encodedABI = contract.methods.fullOverride(userIds, stampCounts).encodeABI();
-		    eth.sendTransaction({from: accounts[0], to: "0x5fe76a1CA26e1812dBdBb487454d30d4bA560110", data: encodedABI});
-		//contract.methods.fullOverride(userIds, stampCounts).send({from: accounts[0]});
-    });
-		}
-
-	};
-	body();
-
-    }
-   , [JSON.stringify(networkStatus)]);
 
    const jsonInterface = [
 	{
@@ -629,6 +579,131 @@ const NearUpdate = (props) => {
 	}
 ];
 
+   const [userIds, setUserIds] = useState( [] as any);
+   const [stampCounts, setStampCounts] = useState([] as any);
+   const [complete, setComplete] = useState(false);
+   const [totalUsers, setTotalUsers] = useState(0);
+   const [avgStamps, setAvgStamps] = useState(0);
+   const [stampsCounted, setStampsCounted] = useState(0);
+
+   /*useEffect(() => {
+	let body = async () => {
+		if (walletData && walletData["wallet"] && walletData["wallet"]["result"]) {
+		if(walletData["wallet"]["result"]["auroraWallet"] != "none") {
+			console.log(walletData);
+			userIds.push(walletData["wallet"]["result"]["auroraWallet"]);
+			console.log("ids!");
+			console.log(userIds);
+			avgStamps = 0;
+			for(let j = 0; j < SAMPLE_VALUES.length; j++) {
+				console.log("iter!");
+				await stampsRefetch({variables: {user: walletData["wallet"]["result"]["vulcanId"], collection: SAMPLE_VALUES[j]}});
+			}
+			console.log("stamps!");
+			console.log(avgStamps);
+			stampCounts.push(avgStamps);
+			if( stampsData.length == totalUsers) {
+				complete = true;
+			}
+		   }
+		}
+    };
+	body();
+   }, [JSON.stringify(walletData)]);*/
+
+   useEffect(() => {
+	if(stampsData) {
+		setAvgStamps(avgStamps + stampsData["getUserStamps"]/SAMPLE_VALUES.length);
+		console.log(stampsCounted);
+		setStampsCounted(stampsCounted + 1);
+		console.log("counting!");
+		console.log(stampsCounted);
+		
+	 }
+   }, [JSON.stringify(stampsData)]);
+   useEffect(() => {
+	if(stampsCounted == SAMPLE_VALUES.length) {
+		console.log("full set of values counted!");
+		setStampCounts([...stampCounts, avgStamps]);
+		setStampsCounted(0);
+		
+	}
+
+   }, [stampsCounted]);
+
+   useEffect(() => {
+	if(stampCounts.length == totalUsers && totalUsers != 0) {
+		console.log("All counts complete!");
+		setComplete(true);
+	}
+   }, [stampCounts.length]);
+   
+
+   useEffect(() => {
+	let body = async () => {
+
+		if(walletData) {
+			Contract.setProvider('wss://testnet.aurora.dev');
+            let eth = new Eth(Eth.givenProvider || 'wss://testnet.aurora.dev');
+            console.log("set!");
+            let address = CONTRACT_ADDRESS;
+            let contract = new Contract(jsonInterface, address);
+            setUserIds([] as any);
+            setStampCounts([] as any);
+			setTotalUsers(0);
+			
+			for(let i = 0; i < walletData["wallets"]["results"].length; i++) {
+				let wallet = walletData["wallets"]["results"][i];
+				if(wallet["auroraWallet"] != "none") {
+					setTotalUsers(totalUsers + 1);
+					setUserIds([...userIds, wallet["auroraWallet"]]);
+				}
+			}
+
+			for(let i = 0; i < walletData["wallets"]["results"].length; i++) {
+				console.log("wallet!");
+				let wallet = walletData["wallets"]["results"][i];
+				for(let j = 0; j < SAMPLE_VALUES.length; j++) {
+					console.log("iter!");
+					if(wallet["auroraWallet"] != "none") {
+					   await stampsRefetch({variables: {user: wallet["vulcanId"], collection: SAMPLE_VALUES[j]}});
+					}
+				}
+			}
+	        /*window.ethereum.request({ method: 'eth_requestAccounts' }).then((accounts) => {
+		    let encodedABI = contract.methods.fullOverride(userIds, stampCounts).encodeABI();
+		    eth.sendTransaction({from: accounts[0], to: CONTRACT_ADDRESS, data: encodedABI});
+		//contract.methods.fullOverride(userIds, stampCounts).send({from: accounts[0]});
+    });*/
+		}
+
+	};
+	body();
+
+    }
+   , [JSON.stringify(walletStatus)]);
+
+
+   useEffect(() => {
+	if(complete) { 
+		Contract.setProvider('wss://testnet.aurora.dev');
+        let eth = new Eth(Eth.givenProvider || 'wss://testnet.aurora.dev');
+        console.log("set!");
+        let address = CONTRACT_ADDRESS;
+        let contract = new Contract(jsonInterface, address);
+	    window.ethereum.request({ method: 'eth_requestAccounts' }).then((accounts) => {
+		let encodedABI = contract.methods.fullOverride(userIds, stampCounts).encodeABI();
+		eth.sendTransaction({from: accounts[0], to: CONTRACT_ADDRESS, data: encodedABI});
+		setComplete(false);
+
+
+      });
+   }
+
+}, [complete]);
+
+   
+
 
 
 
@@ -650,9 +725,9 @@ const NearUpdate = (props) => {
 
 
 
-    userIds = [] as any;
-    stampCounts = [] as any;
-	refetch();
+    setUserIds([] as any);
+	setStampCounts([] as any);
+	walletRefetch();
 
  }
 }>Call the contract!</button>

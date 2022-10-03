@@ -65,7 +65,7 @@ export interface WalletTypeServer extends VulcanDocument {
     name: "Wallet",
     graphql: {
       typeName: "Wallet",
-      multiTypeName: "Walletss",
+      multiTypeName: "Wallets",
     },
     schema,
     permissions: {
