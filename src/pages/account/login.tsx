@@ -98,9 +98,7 @@ const Login = () => {
             />
           </div>
 
-          <div>
-            <p className={styles.or}>or</p>
-          </div>
+          
 
           <div>
             <button disabled={!state.email || !state.password} onClick={handleSubmit} className={styles.button}>

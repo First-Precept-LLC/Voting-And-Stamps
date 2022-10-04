@@ -184,8 +184,18 @@ const DepartmentProcessList = (props) => {
             <MainLayout>
                 {createDetails || processModal ? null : !selectedProcess ?
                     <div className="flex w-full p-8 flex-col">
-                        <div className="flex justify-between">
-                            <h1 className="text-3xl mb-8">{departmentById?.title} Department</h1>
+                        <div className="flex justify-start items-center mb-8">
+                            <h1 className="text-3xl ">{departmentById?.title} Department</h1>
+                            <button
+                                                            className="text-blue-500 hover:text-white ml-2 focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm  h-6 text-left text-center  "
+                                                            data-modal-toggle="large-modal">
+                                                            <i class="fa-solid fa-pen-to-square text-gray-500 hover:text-gray-800  text-lg"></i></button>
+                            <input type="text" name="" id="" className='rounded-md border border-gray-300' />
+                            
+                            <button
+                                                            className="text-blue-500 hover:text-white border border-blue-500 hover:bg-blue-500 focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-6 text-left w-20 text-center ml-2 "
+                                                            data-modal-toggle="large-modal">
+                                                            Done</button>
                         </div>
 
                         {/* <!-- Process Template section --> */}

@@ -123,11 +123,11 @@ const ProcessTemplateList = (props) => {
                                 <input type="text" id="search-process-template"
                                     className="block p-2 px-5  h-8  w-44 text-gray-900 bg-white rounded-lg border border-gray-300 sm:text-sm focus:ring-blue-500 focus:border-blue-500 mr-2"
                                     placeholder="Search..." onChange={(event) => setSearch(event.target.value)} />
-                                <button
+                                {/* <button
                                     className="text-grey-300 border border-gray-300 hover:bg-gray-300 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5  h-8 text-left mb-2 hover:bg-kelvinBold"
                                     id="dropdownDefault" data-dropdown-toggle="dropdown">
                                     <i className="fa-solid fa-sort"></i>
-                                    Filters</button>
+                                    Filters</button> */}
                             </div>
                         </div>
                         {/* <!-- Process section --> */}
