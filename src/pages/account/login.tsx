@@ -24,6 +24,7 @@ const Login = () => {
 
   useEffect(() => {
     if (localStorage.getItem("user")) {
+      window.location.href = '/organizations';
       router.push('/organizations');
     }
   }, []);
@@ -47,7 +48,7 @@ const Login = () => {
       });
       const response = await res.json();
       if (res.status === 200) {
-        router.push('/organizations');
+        window.location.href = '/organizations'
         localStorage.setItem("user", JSON.stringify(response.user));
       } else {
         throw new Error(await res.text());
