@@ -740,10 +740,13 @@ const NearUpdate = (props) => {
 }}>Get some data!</button>
 <button onClick={() => {
 	Contract.setProvider('wss://testnet.aurora.dev');
+	let eth = new Eth(Eth.givenProvider || 'wss://testnet.aurora.dev');
 	let address = CONTRACT_ADDRESS;
 	let contract = new Contract(jsonInterface, address);
-	console.log(contract.methods.isWhitelisted().call());
-}}>Get some data!</button>
+	window.ethereum.request({ method: 'eth_requestAccounts' }).then((accounts) => {
+		console.log(contract.methods.balanceOf(accounts[0]).call());
+    });
+}}>Get some balance!</button>
 <button onClick={() => {
 	Contract.setProvider('wss://testnet.aurora.dev');
 	let eth = new Eth(Eth.givenProvider || 'wss://testnet.aurora.dev');
@@ -769,7 +772,7 @@ const NearUpdate = (props) => {
 
 	window.ethereum.request({ method: 'eth_requestAccounts' }).then((accounts) => {
 		console.log(accounts);
-		let encodedABI = contract.methods.transferFrom(accounts[0], recipient, 100).encodeABI();
+		let encodedABI = contract.methods.transferFromWithFee(accounts[0], recipient, 100).encodeABI();
 		eth.sendTransaction({from: accounts[0], to: CONTRACT_ADDRESS, data: encodedABI});
 		//contract.methods.fullOverride(userIds, stampCounts).send({from: accounts[0]});
 		console.log("transfer?");
