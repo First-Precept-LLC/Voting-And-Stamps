@@ -16,7 +16,7 @@ const initialState = {
   saveValuesRequest: false,
    isSaveValuesSuccess: false,
    isSaveValuesFailure: false,
-   editUsersRequest: false,
+   editValuesRequest: false,
    isEditValuesSuccess: false,
    isEditValuesFailure: false
 }
@@ -53,7 +53,7 @@ export const valuesSlice = createSlice({
       state.isSaveValuesFailure = true;
     },
     editValuesRequest: (state, action) => {
-      state.editUsersRequest = true;
+      state.editValuesRequest = true;
     },
     editValuesSuccess: (state, action) => {
       const localValues = localStorage.getItem("values");
@@ -62,14 +62,14 @@ export const valuesSlice = createSlice({
       if (findUserIndex !== -1) {
         copyValues[findUserIndex] = action.payload;
       }
-      state.editUsersRequest = true;
+      state.editValuesRequest = true;
       state.isEditValuesSuccess = true;
       state.isEditValuesFailure = false;
       localStorage.setItem("values", JSON.stringify(copyValues));
       state.values = copyValues;
     },
     editValuesFailure: (state) => {
-      state.editUsersRequest = true;
+      state.editValuesRequest = true;
       state.isEditValuesSuccess = false;
       state.isEditValuesFailure = true;
     },

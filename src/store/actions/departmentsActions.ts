@@ -16,6 +16,10 @@ const initialState = {
 
   getDepartmentByIdRequest: false,
   departmentById: {},
+
+  editDepartmentsRequest: false,
+  isEditDepartmentsSuccess: false,
+  isEditDepartmentsFailure: false
 }
 
 export const departmentsSlice = createSlice({
@@ -55,6 +59,8 @@ export const departmentsSlice = createSlice({
     resetStatus: (state, action) => {
       state.isSaveDepartmentsSuccess = false;
       state.isSaveDepartmentsFailure = false;
+      state.isEditDepartmentsSuccess = false;
+      state.isEditDepartmentsFailure = false;
     },
     getDepartmentByIdRequest: (state, action) => {
       state.getDepartmentByIdRequest = true;
@@ -66,7 +72,28 @@ export const departmentsSlice = createSlice({
     getDepartmentByIdFailure: (state, action) => {
       state.getDepartmentByIdRequest = false;
       state.departmentById = {};
-    }
+    },
+    editDepartmentsRequest: (state, action) => {
+      state.editDepartmentsRequest = true;
+    },
+    editDepartmentsSuccess: (state, action) => {
+      const localValues = localStorage.getItem("departments");
+      const copyValues = localValues ? JSON.parse(localValues) : [];
+      const findUserIndex = copyValues.findIndex((value) => value.id === action.payload?.id);
+      if (findUserIndex !== -1) {
+        copyValues[findUserIndex] = action.payload;
+      }
+      state.editDepartmentsRequest = true;
+      state.isEditDepartmentsSuccess = true;
+      state.isEditDepartmentsFailure = false;
+      localStorage.setItem("departments", JSON.stringify(copyValues));
+      state.departments = copyValues;
+    },
+    editDepartmentsFailure: (state) => {
+      state.editDepartmentsRequest = true;
+      state.isEditDepartmentsSuccess = false;
+      state.isEditDepartmentsFailure = true;
+    },
   },
 })
 

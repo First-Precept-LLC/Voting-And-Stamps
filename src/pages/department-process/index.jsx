@@ -21,6 +21,8 @@ const DepartmentProcessList = (props) => {
     const [selectedItemId, setSelectedItemId] = useState('');
     const [createDetails, setCreateDetails] = useState(false);
     const [processModal, setProcessModal] = useState(false);
+    const [isEditOpen, setIsEditOpen] = useState(false);
+    const [departmentName, setDepartmentName] = useState("");
 
     const router = useRouter();
 
@@ -35,6 +37,7 @@ const DepartmentProcessList = (props) => {
 
     const {
         departmentById,
+        isEditDepartmentsSuccess
     } = useSelector(state => state.departments);
 
     const {
@@ -79,6 +82,19 @@ const DepartmentProcessList = (props) => {
             dispatch(processActions.resetStatus());
         }
     }, [saveProcessRequest, isSaveProcessSuccess]);
+
+    useEffect(() => {
+        if (departmentById?.title){
+            setDepartmentName(departmentById?.title)
+        }
+    }, [departmentById]);
+
+    useEffect(() => {
+        if (isEditDepartmentsSuccess) {
+            dispatch(departmentsActions.getDepartmentByIdRequest(router.query?.id));
+            dispatch(departmentsActions.resetStatus());
+        }
+    }, [isEditDepartmentsSuccess])
 
     const deleteHandler = (id) => {
         dispatch(processActions.deleteProcessRequest(id))
@@ -185,17 +201,50 @@ const DepartmentProcessList = (props) => {
                 {createDetails || processModal ? null : !selectedProcess ?
                     <div className="flex w-full p-8 flex-col">
                         <div className="flex justify-start items-center mb-8">
-                            <h1 className="text-3xl ">{departmentById?.title} Department</h1>
-                            <button
-                                                            className="text-blue-500 hover:text-white ml-2 focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm  h-6 text-left text-center  "
-                                                            data-modal-toggle="large-modal">
-                                                            <i class="fa-solid fa-pen-to-square text-gray-500 hover:text-gray-800  text-lg"></i></button>
-                            <input type="text" name="" id="" className='rounded-md border border-gray-300' />
-                            
-                            <button
-                                                            className="text-blue-500 hover:text-white border border-blue-500 hover:bg-blue-500 focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-6 text-left w-20 text-center ml-2 "
-                                                            data-modal-toggle="large-modal">
-                                                            Done</button>
+                            {!isEditOpen &&
+                            <>
+                                    <h1 className="text-3xl ">{departmentById?.title}</h1>
+                                    <button
+                                        className="text-blue-500 hover:text-white ml-2 focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm  h-6 text-left text-center  "
+                                        data-modal-toggle="large-modal"
+                                        disabled={isEditOpen}
+                                        onClick={() => setIsEditOpen(true)}
+                                    >
+                                        <i className="fa-solid fa-pen-to-square text-gray-500 hover:text-gray-800  text-lg" />
+                                    </button>
+                            </> }
+                            {isEditOpen  && <>
+                                <input 
+                                    value={departmentName} 
+                                    type="text" 
+                                    name="departmentName"  
+                                    className='rounded-md border border-gray-300' 
+                                    onChange={(event) => setDepartmentName(event.target.value)}
+                                />   
+                                <button
+                                    className="text-blue-500 hover:text-white border border-blue-500 hover:bg-blue-500 focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-6 text-left w-20 text-center ml-2 "
+                                    data-modal-toggle="large-modal"
+                                    onClick={() => {
+                                        setIsEditOpen(false);
+                                        setDepartmentName(departmentById?.title);
+                                    }}
+                                    >
+                                    Cancel</button>
+                                    <button
+                                        className="text-blue-500 hover:text-white border border-blue-500 hover:bg-blue-500 focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-md text-sm px-5 py- h-6 text-left w-20 text-center ml-2 "
+                                        data-modal-toggle="large-modal"
+                                        disabled={!departmentName?.trim()?.length}
+                                        onClick={() => {
+                                            dispatch(departmentsActions.editDepartmentsRequest({
+                                                ...departmentById,
+                                                title: departmentName
+                                            }));
+                                            setIsEditOpen(false);
+                                        }}
+                                    >
+                                    Done</button>
+                                </>
+}
                         </div>
 
                         {/* <!-- Process Template section --> */}

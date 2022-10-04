@@ -49,3 +49,16 @@ export function* getDepartmentById({payload}) {
   }
 }
 
+export function* editDepartment({payload}) {
+  try {
+    yield put({
+      type: departmentsActions.editDepartmentsSuccess.type,
+      payload,
+    })
+  } catch (error) {
+    yield put({
+      type: departmentsActions.editDepartmentsFailure.type,
+    })
+  }
+}
+

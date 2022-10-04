@@ -10,7 +10,7 @@ import { processActions } from "~/store/actions/processActions"
 
 import { saveOrganizations, getOrganizations } from "./organizationsSaga";
 import { saveValues, getValues, editValues } from "./valuesSaga";
-import { saveDepartments, getDepartments, getDepartmentById } from "./departmentsSaga";
+import { saveDepartments, getDepartments, getDepartmentById, editDepartment } from "./departmentsSaga";
 import { getUsers, saveUsers, editUsers } from "./usersSaga";
 import { getProcessTemplates, saveProcessTemplates, editProcessTemplates, deleteProcessTemplates, getProcessTemplateByDepartmentId } from "./processTemplateSaga";
 import { getProcess, saveProcess, editProcess, deleteProcess, updateProcessStepVotes, getProcessByDepartmentId } from "./processSaga"
@@ -31,6 +31,7 @@ export default function* rootSagas() {
     takeLatest(departmentsActions.saveDepartmentsRequest.type, saveDepartments),
     takeLatest(departmentsActions.getDepartmentsRequest.type, getDepartments),
     takeLatest(departmentsActions.getDepartmentByIdRequest.type, getDepartmentById),
+    takeLatest(departmentsActions.editDepartmentsRequest.type, editDepartment),
 
 
     // users
