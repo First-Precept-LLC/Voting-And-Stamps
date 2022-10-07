@@ -11,7 +11,7 @@ import { passThroughSymbol } from 'next/dist/server/web/spec-compliant/fetch-eve
 import { useEffect, useState } from "react";
 
 
-const CONTRACT_ADDRESS = "0x21D5d3EE116E856fE315fFf67Edf3C318A352644";
+const CONTRACT_ADDRESS = "0xC5573DE6A2Dbe30431acb8ac278DA0e0C24fC2d8";
 
 const NearUpdate = (props) => {
 	let SAMPLE_VALUES = ["Truth", "Life", "Agency"]; //TODO: change this
@@ -129,6 +129,25 @@ const NearUpdate = (props) => {
 			}
 		],
 		"name": "buyTokens",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "tokensToMint",
+				"type": "uint256"
+			}
+		],
+		"name": "buyTokensWithFee",
 		"outputs": [
 			{
 				"internalType": "bool",
@@ -356,35 +375,6 @@ const NearUpdate = (props) => {
 			}
 		],
 		"name": "transferFrom",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_from",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "_to",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_value",
-				"type": "uint256"
-			}
-		],
-		"name": "transferFromWithFee",
 		"outputs": [
 			{
 				"internalType": "bool",
@@ -755,7 +745,7 @@ const NearUpdate = (props) => {
 
 	window.ethereum.request({ method: 'eth_requestAccounts' }).then((accounts) => {
 		console.log(accounts);
-		let encodedABI = contract.methods.buyTokens(100).encodeABI();
+		let encodedABI = contract.methods.buyTokensWithFee(100).encodeABI();
 		eth.sendTransaction({from: accounts[0], to: CONTRACT_ADDRESS, data: encodedABI});
 		//contract.methods.fullOverride(userIds, stampCounts).send({from: accounts[0]});
 		console.log("mint?");
@@ -772,7 +762,7 @@ const NearUpdate = (props) => {
 
 	window.ethereum.request({ method: 'eth_requestAccounts' }).then((accounts) => {
 		console.log(accounts);
-		let encodedABI = contract.methods.transferFromWithFee(accounts[0], recipient, 100).encodeABI();
+		let encodedABI = contract.methods.transferFrom(accounts[0], recipient, 1).encodeABI();
 		eth.sendTransaction({from: accounts[0], to: CONTRACT_ADDRESS, data: encodedABI});
 		//contract.methods.fullOverride(userIds, stampCounts).send({from: accounts[0]});
 		console.log("transfer?");
