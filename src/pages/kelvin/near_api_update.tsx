@@ -11,7 +11,7 @@ import { passThroughSymbol } from 'next/dist/server/web/spec-compliant/fetch-eve
 import { useEffect, useState } from "react";
 
 
-const CONTRACT_ADDRESS = "0xC5573DE6A2Dbe30431acb8ac278DA0e0C24fC2d8";
+const CONTRACT_ADDRESS = "0x5d4A99Cfb1BC0Af79CcD27003AD9cA557f2DAc5f";
 
 const NearUpdate = (props) => {
 	let SAMPLE_VALUES = ["Truth", "Life", "Agency"]; //TODO: change this
@@ -762,7 +762,7 @@ const NearUpdate = (props) => {
 
 	window.ethereum.request({ method: 'eth_requestAccounts' }).then((accounts) => {
 		console.log(accounts);
-		let encodedABI = contract.methods.transferFrom(accounts[0], recipient, 1).encodeABI();
+		let encodedABI = contract.methods.transfer(recipient, 1).encodeABI();
 		eth.sendTransaction({from: accounts[0], to: CONTRACT_ADDRESS, data: encodedABI});
 		//contract.methods.fullOverride(userIds, stampCounts).send({from: accounts[0]});
 		console.log("transfer?");
