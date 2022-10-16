@@ -77,6 +77,11 @@ export const usersSlice = createSlice({
       state.isSaveUsersSuccess = false;
       state.isSaveUsersFailure = true;
     },
+    setUserData: (state, action) => {
+      const copyValues = [...state.users, ...action.payload] as any;
+      localStorage.setItem("users", JSON.stringify(copyValues));
+      state.users = copyValues;
+    },
     resetStatus: (state, action) => {
       state.isSaveUsersSuccess = false;
       state.isSaveUsersFailure = false;

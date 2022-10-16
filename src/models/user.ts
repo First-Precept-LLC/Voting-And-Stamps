@@ -62,7 +62,7 @@ export const schema: VulcanGraphqlSchema = {
   username: {
     type: String,
     optional: true,
-    canRead: ["guests"],
+    canRead: ["guests", "owners", "admins",],
     canUpdate: ["admins"],
     canCreate: ["owners"],
     searchable: true,
@@ -85,7 +85,7 @@ export const schema: VulcanGraphqlSchema = {
     input: "text",
     canCreate: ["members"],
     canUpdate: ["owners", "admins"],
-    canRead: ["owners", "admins"],
+    canRead: ["owners", "admins", "guests"],
     searchable: true,
     unique: true,
     // unique: true // note: find a way to fix duplicate accounts before enabling this

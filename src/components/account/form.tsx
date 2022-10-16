@@ -3,6 +3,12 @@ import { routes } from "~/lib/routes";
 
 const UserForm = ({ isLogin, errorMessage, onSubmit }) => (
   <form onSubmit={onSubmit}>
+    {!isLogin && (
+      <label>
+        <span>User Name</span>
+        <input type="text" name="username" required />
+      </label>
+    )}
     <label>
       <span>Email</span>
       <input type="text" name="email" required />

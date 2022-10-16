@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from 'react-redux';
+import { gql, useLazyQuery } from '@apollo/client'
 import { usersActions } from "../../store/actions/usersActions";
 import { organizationActions } from "../../store/actions/organizationsActions";
 import { departmentsActions } from "../../store/actions/departmentsActions";
@@ -7,11 +8,30 @@ import MainLayout from '../../components/layout/MainLayout';
 import  CreateUserPopup from '../../components/users/create-users-popup'
 
 
+const GET_USERS = gql`
+query vulcanUsers($limit : Int) {
+  vulcanUsers(input: {limit: $limit}) {
+    results {_id, email, username}
+  }
+}`;
+
 function Users() {
     const dispatch = useDispatch();
     const [ addUserPopup , setAddUserPopup ] = useState(false);
     const [ selectedUser, setSelectedUser ] = useState(null);
-
+    const [getUsers] = useLazyQuery(GET_USERS, {
+        onCompleted: (data) => {
+            if (data.vulcanUsers && data.vulcanUsers.results) {
+                const userData = data.vulcanUsers.results.map((result) => ({
+                    ...result,
+                    id: result._id,
+                    name: result.username
+                }));
+                dispatch(usersActions.getUsersRequest(userData));
+            }
+        },
+        onError: (error) => console.error("Error creating a post", error),
+      });
     const {
         organizations
       } = useSelector(state => state.organizations);
@@ -25,9 +45,10 @@ function Users() {
       } = useSelector(state => state.departments);
     
     useEffect(() => {
-        if (organizations) {
-            dispatch(usersActions.getUsersRequest())
-        }
+        getUsers({variables: { limit: 1000 }});
+        // if (organizations) {
+        //     getUsers({variables: {limit: 1000}});
+        // }
     }, [organizations]);
 
     useEffect(() => {
