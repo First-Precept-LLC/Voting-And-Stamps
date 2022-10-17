@@ -63,8 +63,8 @@ export const schema: VulcanGraphqlSchema = {
     type: String,
     optional: true,
     canRead: ["guests", "owners", "admins",],
-    canUpdate: ["admins"],
-    canCreate: ["owners"],
+    canUpdate: ["admins", "guests"],
+    canCreate: ["owners", "guests"],
     searchable: true,
   },
   isAdmin: {
