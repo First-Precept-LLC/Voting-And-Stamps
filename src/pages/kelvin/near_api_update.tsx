@@ -3,6 +3,9 @@ var Contract = require('web3-eth-contract');
 var Eth = require('web3-eth');
 
 
+declare global {
+    interface Window { ethereum: any; }
+}
 
 
 import { gql, useMutation, useLazyQuery, NetworkStatus } from '@apollo/client';
@@ -11,7 +14,7 @@ import { passThroughSymbol } from 'next/dist/server/web/spec-compliant/fetch-eve
 import { useEffect, useState } from "react";
 
 
-const CONTRACT_ADDRESS = "0x5d4A99Cfb1BC0Af79CcD27003AD9cA557f2DAc5f";
+const CONTRACT_ADDRESS = "0x1B070cD1d29F1ce731B80411402910310A515Ad8";
 
 const NearUpdate = (props) => {
 	let SAMPLE_VALUES = ["Truth", "Life", "Agency"]; //TODO: change this
