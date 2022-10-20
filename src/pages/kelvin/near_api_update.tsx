@@ -14,7 +14,9 @@ import { passThroughSymbol } from 'next/dist/server/web/spec-compliant/fetch-eve
 import { useEffect, useState } from "react";
 
 
-const CONTRACT_ADDRESS = "0x1B070cD1d29F1ce731B80411402910310A515Ad8";
+
+
+const CONTRACT_ADDRESS = "0x700A1330038b00D5de3682919eE2f6280bff9eBD";
 
 const NearUpdate = (props) => {
 	let SAMPLE_VALUES = ["Truth", "Life", "Agency"]; //TODO: change this
@@ -617,8 +619,9 @@ const NearUpdate = (props) => {
    useEffect(() => {
 	if(stampsCounted == SAMPLE_VALUES.length) {
 		console.log("full set of values counted!");
-		setStampCounts([...stampCounts, avgStamps]);
+		setStampCounts([...stampCounts, Math.round(avgStamps)]);
 		setStampsCounted(0);
+		setAvgStamps(0);
 		
 	}
 
@@ -627,6 +630,7 @@ const NearUpdate = (props) => {
    useEffect(() => {
 	if(stampCounts.length == totalUsers && totalUsers != 0) {
 		console.log("All counts complete!");
+		console.log(totalUsers);
 		setComplete(true);
 	}
    }, [stampCounts.length]);
@@ -641,17 +645,21 @@ const NearUpdate = (props) => {
             console.log("set!");
             let address = CONTRACT_ADDRESS;
             let contract = new Contract(jsonInterface, address);
-            setUserIds([] as any);
-            setStampCounts([] as any);
-			setTotalUsers(0);
+
+			let userCount = 0;
+			let userwallets = [] as any;
+
 			
 			for(let i = 0; i < walletData["wallets"]["results"].length; i++) {
 				let wallet = walletData["wallets"]["results"][i];
 				if(wallet["auroraWallet"] != "none") {
-					setTotalUsers(totalUsers + 1);
-					setUserIds([...userIds, wallet["auroraWallet"]]);
+					userCount += 1;
+					userwallets.push(wallet["auroraWallet"]);
 				}
 			}
+
+			setTotalUsers(userCount);
+			setUserIds(userwallets);
 
 			for(let i = 0; i < walletData["wallets"]["results"].length; i++) {
 				console.log("wallet!");
@@ -681,7 +689,9 @@ const NearUpdate = (props) => {
 	if(complete) { 
 		Contract.setProvider('wss://testnet.aurora.dev');
         let eth = new Eth(Eth.givenProvider || 'wss://testnet.aurora.dev');
-        console.log("set!");
+        console.log("complete!");
+		console.log(userIds);
+		console.log(stampCounts);
         let address = CONTRACT_ADDRESS;
         let contract = new Contract(jsonInterface, address);
 	    window.ethereum.request({ method: 'eth_requestAccounts' }).then((accounts) => {
@@ -718,8 +728,9 @@ const NearUpdate = (props) => {
 
 
 
-    setUserIds([] as any);
+	setUserIds([] as any);
 	setStampCounts([] as any);
+	setTotalUsers(0);
 	walletRefetch();
 
  }
@@ -748,7 +759,7 @@ const NearUpdate = (props) => {
 
 	window.ethereum.request({ method: 'eth_requestAccounts' }).then((accounts) => {
 		console.log(accounts);
-		let encodedABI = contract.methods.buyTokensWithFee(100).encodeABI();
+		let encodedABI = contract.methods.buyTokensWithFee(200).encodeABI();
 		eth.sendTransaction({from: accounts[0], to: CONTRACT_ADDRESS, data: encodedABI});
 		//contract.methods.fullOverride(userIds, stampCounts).send({from: accounts[0]});
 		console.log("mint?");
