@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import mongoose from "mongoose";
-import {resolvers, testServer, StampsModule} from "~/pages/api/graphql"
+import {resolvers, testServer} from "~/pages/api/graphql"
+import { StampsModule } from "../stamp-utils";
 
 
 
