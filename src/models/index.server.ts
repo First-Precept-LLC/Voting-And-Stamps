@@ -17,8 +17,11 @@ import { Org } from "./org.server";
 import { StepInstance } from "./step_instance.server";
 import { Step } from "./step.server";
 import { UserVote } from "./uservote.server";
+import { Wallet } from "./wallet.server";
 
-const models = [User, SampleModel, Content, Resolution, Prediction, Value, Chat, Goal, Training, PastScore, Proj, ProcessTemplate, Process, Org, StepInstance, Step, UserVote];
+
+const models = [User, SampleModel, Content, Resolution, Prediction, Value, Chat, Goal, Training, PastScore, Proj, ProcessTemplate, Process, Org, StepInstance, Step, UserVote, Wallet];
+
 
 
 

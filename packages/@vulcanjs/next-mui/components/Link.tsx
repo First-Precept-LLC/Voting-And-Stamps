@@ -14,6 +14,7 @@ export interface NextLinkComposedProps
       "href" | "onClick" | "onMouseEnter"
     >,
     Omit<NextLinkProps, "href" | "as" | "onClick" | "onMouseEnter"> {
+
   to: NextLinkProps["href"];
   linkAs?: NextLinkProps["as"];
   href?: NextLinkProps["href"];
@@ -84,7 +85,6 @@ const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link(
   const className = clsx(classNameProps, {
     [activeClassName]: router.pathname === pathname && activeClassName,
   });
-
   if (isExternal) {
     if (noLinkStyle) {
       return (
