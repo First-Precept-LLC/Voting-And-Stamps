@@ -6,11 +6,14 @@ import {
   } from "@vulcanjs/graphql/server";
 
 import { createMongooseConnector } from "@vulcanjs/mongo";
+import { Value } from "./value.server";
 
 
 export interface OrgTypeServer extends VulcanDocument {
     name?: string;
     vision?: string;
+    values?: string[];
+    bonk?: string;
   }
 
   
@@ -59,6 +62,29 @@ export interface OrgTypeServer extends VulcanDocument {
       canCreate: ["guests","members"]
   
     },
+
+    valuesList: {
+      type: Array,
+      arrayItem: {
+        type: String,
+        optional: true,
+        canRead: ["guests"],
+        canCreate: ["guests","members"],
+        canUpdate: ["guests", "members"]
+      },
+      relation: {
+        fieldName: "values",
+        kind: "hasMany",
+        model: Value,
+        typeName: "[Value]",
+      },
+      optional: true,
+      canRead: ["guests"],
+      canCreate: ["guests","members"],
+      canUpdate: ["guests", "members"]
+    },
+
+   
   };
 
   export const modelDef: CreateGraphqlModelOptionsServer = {
