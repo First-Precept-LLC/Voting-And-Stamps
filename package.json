@@ -84,6 +84,7 @@
     "@mui/icons-material": "^5.0.0",
     "@mui/material": "^5.0.0",
     "@next/mdx": "^10.0.2",
+    "@plasmicapp/loader-nextjs": "^1.0.191",
     "@reduxjs/toolkit": "^1.8.5",
     "@rescript/react": "^0.10.3",
     "@vulcanjs/demo": "^0.4.0",
