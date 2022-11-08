@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { gql, useMutation, useQuery } from '@apollo/client'
 import { organizationActions } from "../../store/actions/organizationsActions";
 import { valuesActions } from '../../store/actions/valuesActions';
 import { departmentsActions } from "../../store/actions/departmentsActions";
@@ -15,6 +16,21 @@ import CreateGoal from '../../components/organizations/create-goal'
 import CreateNewOrganization from "../../components/organizations/create-new-organization"
 
 import CreateDepartment from "../../components/organizations/create-departments"
+import { getUserId } from '../../services/user.service';
+
+const CREATE_ORG = gql`
+  mutation createOrg($name: String!, $vision: String!, $userId: String!) {
+    createOrg(input: {data: {name: $name, vision: $vision, userId: $userId}}) {
+      data {_id}
+    }
+}`;
+
+const GET_ORG = gql`
+        query org($nameFilter: String!) {
+            org(input: {filter:{userId:{_eq:$nameFilter}}}) {
+              result {_id,name,vision}
+            }
+}`;
 
 function Organization() {
   const dispatch = useDispatch();
@@ -67,6 +83,25 @@ function Organization() {
     }
   }, [getOrganizationRequest, organizations]);
 
+  const [createOrganizationGraphql] = useMutation(
+    CREATE_ORG,{
+      onCompleted: (data) => {
+        dispatch(organizationActions.saveOrganizationsRequest(data));
+      },
+      onError: (error) => console.error("Error creating a post", error),
+    }
+  );
+
+  const { getOrgData } = useQuery(GET_ORG, {
+    notifyOnNetworkStatusChange: true,
+    variables: { nameFilter: getUserId() },
+    onCompleted: (dataValue) => {
+        if (dataValue?.org) {
+          dispatch(organizationActions.saveOrganizationsRequest(dataValue?.org?.result));
+        }
+    }
+  });
+
 
   const handleSuccessCloseModal = () => {
     setShowCreateModal(false);
@@ -76,11 +111,13 @@ function Organization() {
   }
 
   const handleCreateOrganization = (data) => {
-    console.log(data);
     setOrgData(data);
     setShowCreateModal(false);
-    dispatch(organizationActions.saveOrganizationsRequest(data));
-    // createExample({variables: {name:data.orgName,vision:data.vision,userId: getUserId()}});
+    createOrganizationGraphql({ variables: { 
+      name:data.orgName,
+      vision:data.vision,
+      userId: data.userId
+    }});
   }
 
   const handleAddValue = (value) => {
@@ -193,7 +230,6 @@ function Organization() {
       <MainLayout>
         {getOrganizationRequest ? <>Loading....</> :
           <>
-
             {
               !organizations &&
               !showCreateModal &&
@@ -238,8 +274,6 @@ function Organization() {
           </>
 
         }
-
-
       </MainLayout>
     </>
   );

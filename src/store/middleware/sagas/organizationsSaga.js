@@ -6,7 +6,7 @@ export function* saveOrganizations({payload}) {
   try {
     const requestData = {
         ...payload,
-        id: uuidV4()
+        id: payload._id || uuidV4()
     }
     yield put({
       type: organizationActions.saveOrganizationsSuccess.type,
