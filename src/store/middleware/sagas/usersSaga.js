@@ -8,7 +8,7 @@ export function* getUsers({ payload }) {
     try {
       yield put({
         type: usersActions.getUsersSuccess.type,
-        payload: localValues ? JSON.parse(localValues) : [],
+        payload: localValues ? JSON.parse(localValues) : payload,
       })
     } catch (error) {
       yield put({
