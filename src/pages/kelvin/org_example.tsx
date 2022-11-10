@@ -3,8 +3,8 @@ import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
 const OrgExample = (props) => {
 
   const CREATE_ORG = gql`
-  mutation createOrg($name: String!, $vision: String!) {
-    createOrg(input: {data: {name: $name, vision: $vision}}) {
+  mutation createOrg($name: String!, $vision: String!, $valuesList: [String]) {
+    createOrg(input: {data: {name: $name, vision: $vision, valuesList: $valuesList}}) {
       data {_id}
     }
   }`;
@@ -18,7 +18,8 @@ const OrgExample = (props) => {
 
   let example_vars = {
       "name": "An Example",
-      "vision": "To serve as an example"
+      "vision": "To serve as an example",
+      "valuesList": ["62cd9b45cc74b602dde8ce16"]
   };
 
   
