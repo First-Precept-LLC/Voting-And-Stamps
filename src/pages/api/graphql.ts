@@ -11,6 +11,7 @@ import mongoConnection from "~/lib/api/middlewares/mongoConnection";
 import corsOptions from "~/lib/api/cors";
 import { contextFromReq } from "~/lib/api/context";
 import { Utilities, StampsModule } from "./stamp-utils";
+import bodyParser, {BodyParser} from "body-parser";
 import models from "~/models/index.server";
 
 // will trigger seed
@@ -478,6 +479,9 @@ const admin_usernames = []; //Either fill with admins, or remove
  app.use(gqlPath, cors(corsOptions));
  // init the db
  app.use(gqlPath, mongoConnection(mongoUri));
+
+ app.use(bodyParser({ limit: '2mb' }));
+
  
  server.applyMiddleware({ app, path: "/api/graphql" });
  

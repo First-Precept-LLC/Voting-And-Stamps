@@ -95,6 +95,7 @@
     "apollo-server-express": "2.14.2",
     "babel-jest": "26.0.1",
     "babel-plugin-istanbul": "6.0.0",
+    "body-parser": "^1.20.1",
     "bucklescript": "^0.0.2",
     "cloudinary": "^1.28.1",
     "clsx": "^1.1.1",
