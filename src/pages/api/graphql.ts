@@ -235,6 +235,7 @@ const admin_usernames = []; //Either fill with admins, or remove
       return average_impact_rating + total_user_votes;
     },
     
+    
     //Save a variable for use in a prediction.
     saveVariable: async (obj, args, context, info) => {
       const db = mongoose.connection;

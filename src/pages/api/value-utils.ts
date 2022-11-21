@@ -3,7 +3,7 @@ import { gql, useMutation, useQuery, NetworkStatus } from '@apollo/client'
 
 let VALUE_UPDATE = gql`
 mutation updateOrg($id: String!, $valuesList: [String]) {
-    updateOrg(input: {id: "62cd9b45cc74b602dde8ce16", data: {valuesList: $valuesList}}) {
+    updateOrg(input: {id: $id, data: {valuesList: $valuesList}}) {
        data {values {title}}
      }
  }
@@ -53,13 +53,14 @@ export function createAndAddValue(org_id, value_title, value_desc, value_icon) {
         GET_ORG,
         {
           notifyOnNetworkStatusChange: true,
-          variables: org_id,
+          variables: {id: org_id},
           onCompleted: (data => {
             valuesList = data["org"]["result"]["valuesList"];
-            createValue({variables: {title: value_title, decription: value_desc, icon: value_icon}});
+            createValue({variables: {title: value_title, description: value_desc, icon: value_icon}});
           })
         }
     );
+ 
 
      
 

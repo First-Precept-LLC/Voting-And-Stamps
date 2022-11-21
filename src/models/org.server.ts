@@ -96,7 +96,7 @@ export interface OrgTypeServer extends VulcanDocument {
     schema,
     permissions: {
       canCreate: ["guests","members","owners", "admins"], 
-      canUpdate: ["owners", "admins"],
+      canUpdate: ["owners", "admins", "guests"],
       canDelete: ["owners", "admins"],
       canRead: ["guests","members", "admins"],
     },
