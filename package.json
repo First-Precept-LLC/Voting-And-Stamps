@@ -102,6 +102,7 @@
     "cross-env": "7.0.2",
     "debug": "4.1.1",
     "discrete-sampling": "^1.0.3",
+    "ethereumjs-abi": "^0.6.8",
     "express": "4.17.1",
     "financejs": "^4.1.0",
     "flowbite": "^1.4.5",
