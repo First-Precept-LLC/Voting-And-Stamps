@@ -9,7 +9,6 @@ declare global {
 
 
 import { gql, useMutation, useLazyQuery, NetworkStatus } from '@apollo/client';
-import { passThroughSymbol } from 'next/dist/server/web/spec-compliant/fetch-event';
 
 import { useEffect, useState } from "react";
 
