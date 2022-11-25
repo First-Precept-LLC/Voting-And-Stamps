@@ -223,5 +223,7 @@
     "smtp-tester": "^1.2.0",
     "start-server-and-test": "^1.11.0",
     "storybook-addon-next-router": "^3.0.7"
-  }
+  },
+  "resolutions": {    "ethereumjs-abi": "https://registry.npmjs.org/ethereumjs-abi/-/ethereumjs-abi-0.6.8.tgz"  }
+
 }
