@@ -1,6 +1,6 @@
 import { NextPage } from "next";
 import { AppProps } from "next/app";
-import { ReactElement } from "react";
+import { ReactElement, ReactNode } from "react";
 // Comment if you don't need i18n
 import { appWithTranslation } from "next-i18next";
 
@@ -43,6 +43,7 @@ type NextPageWithLayout = NextPage & {
 export interface VNAppProps extends AppProps {
   Component: NextPageWithLayout;
   emotionCache: EmotionCache;
+  pageProps: any;
 }
 
 const Favicons = () => (
