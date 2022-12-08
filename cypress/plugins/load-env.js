@@ -8,10 +8,11 @@ module.exports = async (on, config) => {
   console.info(
     `Loading environment variables in Cypress, from Next .env files`
   );
+  console.log(process.env);
   // @see https://github.com/vercel/next.js/issues/17903#issuecomment-708902413
   const { combinedEnv } = await loadEnvConfig(
     // needed to find the files
-    process.env.PWD,
+    process.env.PWD || process.cwd(),
     // will load either from .env.development or .env.production
     process.env.NODE_ENV === "development"
   );
