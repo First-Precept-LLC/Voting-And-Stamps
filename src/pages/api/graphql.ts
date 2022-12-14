@@ -63,6 +63,7 @@ const admin_usernames = []; //Either fill with admins, or remove
      calculateResult(user: String, proposalId: String, expression: String, collection: String): Float
      scoreUserByTag(user: String, collection: String, tag: String): Float
      getContentPage(first: Int, after: String, contentType: String): ContentConnection
+     createTemplateAndSteps(name: String, parentProject: String, estimatedDuration: String, description: String, stepNames: [String], stepDurations: [String], stepDescriptions: [String]): Boolean
    }
 
    type ContentConnection {
@@ -428,6 +429,31 @@ const admin_usernames = []; //Either fill with admins, or remove
     //TODO: do some kind of statistical analysis to find how effective the training is.
 
     
+  },
+
+  createTemplateAndSteps: async (obj, args, context, info) => {
+    const db = mongoose.connection;
+    let template = await db.collection("processtemplates").insertOne({
+      name: args.name,
+      parentProject: args.parentProject,
+      estimatedDuration: args.estimatedDuration,
+      description: args.description
+    });
+    if (! template.acknowledged) {
+      return false;
+    }
+    let templateId = template.insertedId;
+    let success = true;
+    for (let i = 0; i < args.stepNames.length; i++) {
+      let result = await db.collection("steps").insertOne({
+        name: args.stepNames[i],
+        parentProcessTemplate: templateId,
+        estimatedDuration: args.stepDurations[i],
+        description: args.stepDescriptions[i]
+      });
+      success = success && result.acknowledged;
+    }
+    return success;
   }
     
  }
